@@ -4,20 +4,19 @@
 #include <iostream>
 #include <cmath>
 #include <string>
-#include <SDL2/SDL.h>
-
-using std::cerr;
-using std::endl;
-using std::cout;
-
-#include <vector>
 
 #include <Mesh.hpp>
 #include <Mat4.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
 
-constexpr float PI = 3.14159;//2653589793f;
+#include <SDL2/SDL.h>
+
+using std::cerr;
+using std::endl;
+using std::cout;
+
+constexpr float PI = 3.14159f;//2653589793f;
 
 // TODO: doing rasterization later on.
 void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
@@ -25,6 +24,15 @@ void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
     SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
+}
+
+void drawTriangle(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, float x3, float y3)
+{
+    drawTriangle(renderer,
+        static_cast<int>(std::round(x1)), static_cast<int>(std::round(y1)),
+        static_cast<int>(std::round(x2)), static_cast<int>(std::round(y2)),
+        static_cast<int>(std::round(x3)), static_cast<int>(std::round(y3))
+    );
 }
 
 void fillTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
@@ -64,26 +72,46 @@ int main(int argc, char* argv[])
     }
 
     Mesh meshCube;
-    meshCube.tris = {
-        // SOUTH
-        {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
-        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-        // EAST
-        {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-        {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
-        // NORTH
-        {{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
-        {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-        // WEST
-        {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-        {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-        // TOP
-        {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
-        {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
-        // BOTTOM
-        {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
-        {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-    };
+    //meshCube.tris = {
+    //    // SOUTH
+    //      1                         2                 3
+    //    {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+    //       1                         3                 4
+    //    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+    //    // EAST
+    //        4                        3                    5
+    //    {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    //          4                      5                  6
+    //    {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
+    //    // NORTH
+    //        6                     5                    7
+    //    {{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
+    //        6                      7                    8
+    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+    //    // WEST
+    //            8                    7                  2
+    //    {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+    //            8                    2                   1
+    //    {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
+    //    // TOP
+    //          2                      7                  5
+    //    {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+    //           2                     5                  3
+    //    {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
+    //    // BOTTOM
+    //           6                     8                    1
+    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
+    //           6                     1                    4
+    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+    //};
+    if (!meshCube.loadFromOBJFile("plain_cube.obj")) {
+        cerr << "Can't load OBJ file";
+        // todo review these dubplicated "destructors"
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -2;
+    }
 
 
     // Projection Matrix
@@ -108,6 +136,7 @@ int main(int argc, char* argv[])
     Vec3d cam = { 0 };
 
     bool showHiddenVertexes = false;
+    bool illuminationOn = true;
 
     bool quit = false;
     while (!quit) {
@@ -132,7 +161,13 @@ int main(int argc, char* argv[])
             case SDLK_h:
                 showHiddenVertexes = !showHiddenVertexes;
                 SDL_Log("Show Hidden Vertexes = %d", showHiddenVertexes);
+                break;
+            case SDLK_l:
+                illuminationOn = !illuminationOn;
+                SDL_Log("Illumination ON = %d", illuminationOn);
+                break;
             }
+        
             break;
         case SDL_QUIT:
             quit = true;
@@ -216,17 +251,22 @@ int main(int argc, char* argv[])
             }
 
             // Illumination
-            Vec3d light_direction = { 0.0f, 0.0f,-1.0f };
-            float ll = std::sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
-            light_direction.x /= ll;
-            light_direction.y /= ll;
-            light_direction.z /= ll;
+            if (illuminationOn)
+            {
+                Vec3d light_direction = { 0.0f, 0.0f,-1.0f };
+                float ll = std::sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
+                light_direction.x /= ll;
+                light_direction.y /= ll;
+                light_direction.z /= ll;
 
-            // Dot Product
-            float dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
-            uint8_t r, g, b;
-            r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
-            SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+                // Dot Product
+                float dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
+                uint8_t r, g, b;
+                r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
+                SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+                // end Illuminiation
+            }
+
 
             // Projection 3D -> 2D
             matProj.MulMatVec(triTranslated.a, triProj.a);
