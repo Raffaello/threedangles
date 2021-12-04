@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
 #include <SDL2/SDL.h>
 
 using std::cerr;
@@ -43,9 +44,14 @@ int main(int argc, char* argv[])
     int height = 512;
     int flags = 0; // SDL_WINDOW_FULLSCREEN
     int r_flags = SDL_RENDERER_SOFTWARE;
+    std::string title = "ThreeDangles";
+    int FPS = 60;
+    int frameTime_ms = 1000 / FPS;
 
+    SDL_Log("FPS CAP ~= %d", FPS);
+    SDL_Log("frame_time = %d", frameTime_ms);
 
-    SDL_Window* window = SDL_CreateWindow("ThreeDangles", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
+    SDL_Window* window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
     if (nullptr == window) {
         cerr << SDL_GetError() << endl;
         return -1;
@@ -108,8 +114,8 @@ int main(int argc, char* argv[])
         SDL_Event e;
         SDL_PollEvent(&e);
 
-        // TODO: compute FPS and display on Title/screen
-        // BODY: also cap the Frame rate to VSYNC or 60
+        uint32_t startTicks = SDL_GetTicks();
+        //uint64_t start_perf = SDL_GetPerformanceCounter();
 
         switch (e.type)
         {
@@ -249,6 +255,15 @@ int main(int argc, char* argv[])
 
         // Swap buffers
         SDL_RenderPresent(renderer);
+
+        // FPS frame rate cap
+        uint32_t endTicks = SDL_GetTicks();
+        //uint64_t endPerf = SDL_GetPerformanceCounter();
+        uint32_t frameDelay = frameTime_ms - (endTicks - startTicks);
+
+        SDL_SetWindowTitle(window, (title + " FPS: " + std::to_string(1000.0f/frameDelay)).c_str());
+        SDL_Delay(frameDelay);
+        //SDL_Log("s=%d -- e=%d, d=%d", startTicks, endTicks, frameDelay);
     }
 
 
