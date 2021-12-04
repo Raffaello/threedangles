@@ -94,6 +94,10 @@ int main(int argc, char* argv[])
     matProj.m[3][2] = -(znear * q);
     matProj.m[3][3] = 0.0f;
 
+    Vec3d cam = { 0 };
+
+    bool showHiddenVertexes = false;
+
     bool quit = false;
     while (!quit) {
         SDL_Event e;
@@ -102,10 +106,18 @@ int main(int argc, char* argv[])
         switch (e.type)
         {
         case SDL_KEYDOWN:
-            if (e.key.keysym.sym == SDLK_ESCAPE) {
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+            {
                 SDL_Event esc = { 0 };
                 esc.type = SDL_QUIT;
                 SDL_PushEvent(&esc);
+                break;
+            }
+            case SDLK_h:
+                showHiddenVertexes = !showHiddenVertexes;
+                SDL_Log("Show Hidden Vertexes = %d", showHiddenVertexes);
             }
             break;
         case SDL_QUIT:
@@ -161,7 +173,48 @@ int main(int argc, char* argv[])
             triTranslated.b.z = triRotZX.b.z + offset;
             triTranslated.c.z = triRotZX.c.z + offset;
 
-            // Proejection 3D -> 2D
+            // Normals
+            Vec3d normal, line1, line2;
+            line1.x = triTranslated.b.x - triTranslated.a.x;
+            line1.y = triTranslated.b.y - triTranslated.a.y;
+            line1.z = triTranslated.b.z - triTranslated.a.z;
+
+            line2.y = triTranslated.c.y - triTranslated.a.y;
+            line2.x = triTranslated.c.x - triTranslated.a.x;
+            line2.z = triTranslated.c.z - triTranslated.a.z;
+
+            normal.x = line1.y * line2.z - line1.z * line2.y;
+            normal.y = line1.z * line2.x - line1.x * line2.z;
+            normal.z = line1.x * line2.y - line1.y * line2.x;
+
+            float nl = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            normal.x /= nl;
+            normal.y /= nl;
+            normal.z /= nl;
+
+            float norm_dp = normal.x * (triTranslated.a.x - cam.x)
+                + normal.y * (triTranslated.a.y - cam.y)
+                + normal.z * (triTranslated.a.z - cam.z)
+            ;
+
+            if (!showHiddenVertexes && norm_dp >= 0.0f) {
+                continue;
+            }
+
+            // Illumination
+            Vec3d light_direction = { 0.0f, 0.0f,-1.0f };
+            float ll = std::sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
+            light_direction.x /= ll;
+            light_direction.y /= ll;
+            light_direction.z /= ll;
+
+            // Dot Product
+            float dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
+            uint8_t r, g, b;
+            r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
+            SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+
+            // Projection 3D -> 2D
             matProj.MulMatVec(triTranslated.a, triProj.a);
             matProj.MulMatVec(triTranslated.b, triProj.b);
             matProj.MulMatVec(triTranslated.c, triProj.c);
