@@ -8,8 +8,14 @@ set (CMAKE_DEBUG_POSTFIX d)
 
 find_package(SDL2 CONFIG REQUIRED)
 
+if (WIN32)
+    set(LIB_SDL2main SDL2::SDL2main)
+endif()
 
-# Add source to this project's executable.
-add_executable (threedangles "threedangles.cpp" "threedangles.h")
+add_executable(threedangles "threedangles.cpp")
+target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main})
 
-# TODO: Add tests and install targets if needed.
+############################### tests ########################################
+if(BUILD_TESTING)
+    add_subdirectory("test")
+endif()

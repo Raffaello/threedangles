@@ -10,7 +10,10 @@ It will feature the following algorithms:
 - Transformations
 - Camera positioning
 - Loading 3D file for objects
-
+- textures
+- lightings
+- rasterization
+- Left-hand rules
 
 The algorithms will be all implemented from scratch without using any modern library or Engine.
 

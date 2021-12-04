@@ -12,3 +12,5 @@ project ("threedangles")
 
 # Include sub-projects.
 add_subdirectory ("threedangles")
+
+include(CTest)
