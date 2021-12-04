@@ -2,6 +2,8 @@
 //
 
 #include <iostream>
+#include <cmath>
+
 #include <SDL2/SDL.h>
 
 using std::cerr;
