@@ -108,6 +108,9 @@ int main(int argc, char* argv[])
         SDL_Event e;
         SDL_PollEvent(&e);
 
+        // TODO: compute FPS and display on Title/screen
+        // BODY: also cap the Frame rate to VSYNC or 60
+
         switch (e.type)
         {
         case SDL_KEYDOWN:
