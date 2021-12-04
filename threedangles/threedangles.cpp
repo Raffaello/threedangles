@@ -26,6 +26,11 @@ void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3
     SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
 }
 
+void fillTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
+{
+    // TODO
+}
+
 
 int main(int argc, char* argv[])
 {
