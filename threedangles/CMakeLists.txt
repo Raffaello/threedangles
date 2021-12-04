@@ -14,9 +14,15 @@ endif()
 
 add_executable(threedangles "threedangles.cpp")
 target_sources(threedangles PUBLIC
-    "src/Mat4.hpp"
     "src/Mat4.cpp"
+    "src/Vec3d.cpp"
+    "src/Triangle.cpp"
+    "src/Mesh.cpp"
 )
+target_include_directories(threedangles PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
 target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main})
 
 ############################### tests ########################################

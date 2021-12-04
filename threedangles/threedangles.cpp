@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cmath>
-
 #include <SDL2/SDL.h>
 
 using std::cerr;
@@ -12,38 +11,12 @@ using std::cout;
 
 #include <vector>
 
+#include <Mesh.hpp>
+#include <Mat4.hpp>
+#include <Vec3d.hpp>
+#include <Triangle.hpp>
+
 constexpr float PI = 3.14159;//2653589793f;
-
-struct vec3d {
-    float x, y, z;
-};
-
-struct triangle {
-    vec3d a, b, c;
-};
-
-struct mesh {
-    std::vector<triangle> tris; // ?
-};
-
-struct mat4x4 {
-    float m[4][4] = { 0 };
-};
-
-void MulMatVec(mat4x4& m, vec3d& input, vec3d& output)
-{
-    output.x = input.x * m.m[0][0] + input.y * m.m[1][0] + input.z * m.m[2][0] + m.m[3][0];
-    output.y = input.x * m.m[0][1] + input.y * m.m[1][1] + input.z * m.m[2][1] + m.m[3][1];
-    output.z = input.x * m.m[0][2] + input.y * m.m[1][2] + input.z * m.m[2][2] + m.m[3][2];
-    float t  = input.x * m.m[0][3] + input.y * m.m[1][3] + input.z * m.m[2][3] + m.m[3][3];
-
-    // Zero epsilon?
-    if (t != 0.0f) {
-        output.x /= t;
-        output.y /= t;
-        output.z /= t;
-    }
-}
 
 // TODO: doing rasterization later on.
 void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
@@ -54,7 +27,6 @@ void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3
 }
 
 
-
 int main(int argc, char* argv[])
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -62,8 +34,8 @@ int main(int argc, char* argv[])
         return -1;
     }
     
-    int width = 640;
-    int height = 480;
+    int width = 512;
+    int height = 512;
     int flags = 0; // SDL_WINDOW_FULLSCREEN
     int r_flags = SDL_RENDERER_SOFTWARE;
 
@@ -74,19 +46,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    //SDL_Surface* surface = SDL_CreateRGBSurface()
-    
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, r_flags);
     if (nullptr == renderer) {
         cerr << SDL_GetError() << endl;
         return -1;
     }
 
-    /* Enable Unicode translation */
-    //SDL_EnableUNICODE(1);
-
-    
-    mesh meshCube;
+    Mesh meshCube;
     meshCube.tris = {
         // SOUTH
         {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
@@ -120,16 +86,13 @@ int main(int argc, char* argv[])
     SDL_Log("ASPECT RATIO = %f", ar);
     SDL_Log("FOV          = %f", fov);
 
-    mat4x4 matProj;
+    Mat4 matProj;
     matProj.m[0][0] = ar * fov;
     matProj.m[1][1] = fov;
     matProj.m[2][2] = q;
-    //matProj.m[2][2] = zfar / (zfar - znear);
     matProj.m[2][3] = 1.0f;
     matProj.m[3][2] = -(znear * q);
-    //matProj.m[3][2] = (-zfar * znear) / (zfar - znear);
     matProj.m[3][3] = 0.0f;
-
 
     bool quit = false;
     while (!quit) {
@@ -140,7 +103,7 @@ int main(int argc, char* argv[])
         {
         case SDL_KEYDOWN:
             if (e.key.keysym.sym == SDLK_ESCAPE) {
-                SDL_Event esc;
+                SDL_Event esc = { 0 };
                 esc.type = SDL_QUIT;
                 SDL_PushEvent(&esc);
             }
@@ -155,7 +118,7 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        mat4x4 matRotZ, matRotX;
+        Mat4 matRotZ, matRotX;
         float alpha = 1.0f * SDL_GetTicks()/1000.0f;
         // Rotation Z
         matRotZ.m[0][0] = std::cos(alpha);
@@ -179,18 +142,18 @@ int main(int argc, char* argv[])
         // draw the triangles.
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
         for (auto& tri : meshCube.tris) {
-            triangle triProj;
-            triangle triRotZ, triRotZX;
-            triangle triTranslated;
+            Triangle triProj;
+            Triangle triRotZ, triRotZX;
+            Triangle triTranslated;
 
             // Rotate Z
-            MulMatVec(matRotZ, tri.a, triRotZ.a);
-            MulMatVec(matRotZ, tri.b, triRotZ.b);
-            MulMatVec(matRotZ, tri.c, triRotZ.c);
+            matRotZ.MulMatVec(tri.a, triRotZ.a);
+            matRotZ.MulMatVec(tri.b, triRotZ.b);
+            matRotZ.MulMatVec(tri.c, triRotZ.c);
             // Rotate X
-            MulMatVec(matRotX, triRotZ.a, triRotZX.a);
-            MulMatVec(matRotX, triRotZ.b, triRotZX.b);
-            MulMatVec(matRotX, triRotZ.c, triRotZX.c);
+            matRotX.MulMatVec(triRotZ.a, triRotZX.a);
+            matRotX.MulMatVec(triRotZ.b, triRotZX.b);
+            matRotX.MulMatVec(triRotZ.c, triRotZX.c);
 
             // offset into the screen
             triTranslated = triRotZX;
@@ -199,9 +162,9 @@ int main(int argc, char* argv[])
             triTranslated.c.z = triRotZX.c.z + offset;
 
             // Proejection 3D -> 2D
-            MulMatVec(matProj, triTranslated.a, triProj.a);
-            MulMatVec(matProj, triTranslated.b, triProj.b);
-            MulMatVec(matProj, triTranslated.c, triProj.c);
+            matProj.MulMatVec(triTranslated.a, triProj.a);
+            matProj.MulMatVec(triTranslated.b, triProj.b);
+            matProj.MulMatVec(triTranslated.c, triProj.c);
 
             // Scale into view
             triProj.a.x += 1.0f; triProj.a.y += 1.0f;
@@ -222,8 +185,6 @@ int main(int argc, char* argv[])
                 triProj.c.x, triProj.c.y
             );
         }
-
-        
 
         // Swap buffers
         SDL_RenderPresent(renderer);
