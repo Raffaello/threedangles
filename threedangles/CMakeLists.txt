@@ -13,6 +13,10 @@ if (WIN32)
 endif()
 
 add_executable(threedangles "threedangles.cpp")
+target_sources(threedangles PUBLIC
+    "src/Mat4.hpp"
+    "src/Mat4.cpp"
+)
 target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main})
 
 ############################### tests ########################################

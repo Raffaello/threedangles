@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     // Projection Matrix
     const float ar = static_cast<float>(width) / static_cast<float>(height);
     const float theta = 90.0f;
-    const float fov = 1.0f / std::tanf(theta * 0.5f / 180.0f * PI);
+    const float fov = 1.0f / std::tan(theta * 0.5f / 180.0f * PI);
     const float zfar = 1000.0f;
     const float znear = 0.1f;
     const float q = zfar / (zfar - znear);
@@ -158,19 +158,19 @@ int main(int argc, char* argv[])
         mat4x4 matRotZ, matRotX;
         float alpha = 1.0f * SDL_GetTicks()/1000.0f;
         // Rotation Z
-        matRotZ.m[0][0] = std::cosf(alpha);
-        matRotZ.m[0][1] = std::sinf(alpha);
-        matRotZ.m[1][0] = -std::sinf(alpha);
-        matRotZ.m[1][1] = std::cosf(alpha);
+        matRotZ.m[0][0] = std::cos(alpha);
+        matRotZ.m[0][1] = std::sin(alpha);
+        matRotZ.m[1][0] = -std::sin(alpha);
+        matRotZ.m[1][1] = std::cos(alpha);
         matRotZ.m[2][2] = 1.0f;
         matRotZ.m[3][3] = 1.0f;
 
         // Rotation X
         matRotX.m[0][0] = 1.0f;
-        matRotX.m[1][1] = std::cosf(alpha * 0.5f);
-        matRotX.m[1][2] = std::sinf(alpha * 0.5f);
-        matRotX.m[2][1] = -std::sinf(alpha * 0.5f);
-        matRotX.m[2][2] = std::cosf(alpha * 0.5f);
+        matRotX.m[1][1] = std::cos(alpha * 0.5f);
+        matRotX.m[1][2] = std::sin(alpha * 0.5f);
+        matRotX.m[2][1] = -std::sin(alpha * 0.5f);
+        matRotX.m[2][2] = std::cos(alpha * 0.5f);
         matRotX.m[3][3] = 1.0f;
 
         // offset params
