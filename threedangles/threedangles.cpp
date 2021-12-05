@@ -18,6 +18,12 @@ using std::cerr;
 using std::endl;
 using std::cout;
 
+void quit_sdl(SDL_Renderer* renderer, SDL_Window* window)
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
 
 int main(int argc, char* argv[])
 {
@@ -43,22 +49,21 @@ int main(int argc, char* argv[])
     SDL_Window* window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
     if (nullptr == window) {
         cerr << SDL_GetError() << endl;
-        ret = -1;
-        goto quit;
+        quit_sdl(nullptr, nullptr);
+        return -1;
     }
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, r_flags);
     if (nullptr == renderer) {
         cerr << SDL_GetError() << endl;
-        ret = -1;
-        goto quit;
+        quit_sdl(nullptr, window);
+        return - 1;
     }
 
-    
     if (!mesh.loadFromOBJFile("plain_axis.obj")) {
         cerr << "Can't load OBJ file";
-        ret = -2;
-        goto quit;
+        quit_sdl(renderer, window);
+        return -2;
     }
 
     // Projection Matrix
@@ -139,7 +144,7 @@ int main(int argc, char* argv[])
 
         // Camera Matrix
         //lookAt = { 0.0f, 0.0f, 1.0f };
-        Vec3d up(0.0f, -1.0f, 0.0f);
+        Vec3d up(0.0f, 1.0f, 0.0f);
         Vec3d target = cam + lookAt;
         Mat4x4 matCam = Engine::matrix_pointAt(cam, target, up);
         Mat4x4 matView = Engine::matrix_InversePointAt(matCam);
@@ -234,10 +239,8 @@ int main(int argc, char* argv[])
         SDL_Delay(frameDelay);
     }
 
-quit:
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    quit_sdl(renderer, window);
     return ret;
 }
+
+
