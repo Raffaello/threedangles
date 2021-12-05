@@ -1,7 +1,7 @@
 #include <Vec3d.hpp>
 #include <cmath>
 
-Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z)
+Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z), w(1.0f)
 {
 }
 
@@ -19,10 +19,10 @@ Vec3d Vec3d::operator-(const Vec3d& v)
     return { x - v.x, y - v.y, z - v.z };
 }
 
-//Vec3d Vec3d::operator*(const Vec3d& v)
-//{
-//    return { x * v.x, y * v.y, z * v.z };
-//}
+Vec3d Vec3d::operator*(const float k)
+{
+    return { x * k, y * k, z * k };
+}
 
 Vec3d Vec3d::operator/(const float k)
 {

@@ -6,12 +6,13 @@
 class Triangle
 {
 public:
-    Triangle(const Vec3d& a, const Vec3d& b, const Vec3d& c);
+    Triangle(const Vec3d& a_, const Vec3d& b_, const Vec3d& c_);
     Triangle() = default;
 
     Vec3d a, b, c;
-    
-    
+
+    Triangle operator+(const Vec3d& v);
+
     void setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
     void setColor(const Triangle& that);
 

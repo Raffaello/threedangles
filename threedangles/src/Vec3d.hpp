@@ -8,7 +8,7 @@ public:
 
     Vec3d operator+(const Vec3d& v);
     Vec3d operator-(const Vec3d& v);
-    //Vec3d operator*(const Vec3d& v); // dotProd
+    Vec3d operator*(const float k);
     Vec3d operator/(const float k);
     float dotProd(const Vec3d& v);
     float magnitude(const Vec3d& v);

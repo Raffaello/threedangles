@@ -2,8 +2,19 @@
 #include <cmath>
 #include <algorithm>
 
-Triangle::Triangle(const Vec3d& a, const Vec3d& b, const Vec3d& c) : a(a), b(b), c(c)
+Triangle::Triangle(const Vec3d& a_, const Vec3d& b_, const Vec3d& c_) : a(a_), b(b_), c(c_)
 {
+}
+
+Triangle Triangle::operator+(const Vec3d& v)
+{
+    Triangle t(*this);
+
+    t.a = a + v;
+    t.b = b + v;
+    t.c = c + v;
+
+    return t;
 }
 
 void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)

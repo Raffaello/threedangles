@@ -131,8 +131,9 @@ int main(int argc, char* argv[])
         Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
 
         // World Matrix
-        //Mat4x4 matWorld = Engine::matrix_createIdentity();
+        Mat4x4 matWorld; // = Engine::matrix_createIdentity();
         // do the matrix multiplication
+        matWorld = matRotZ * matRotX * matTrans;
 
 
         // Process the triangles.
@@ -140,27 +141,17 @@ int main(int argc, char* argv[])
         for (auto& tri : mesh.tris)
         {
             Triangle triProj;
-            Triangle triRotZ, triRotZX;
-            Triangle triTranslated;
+            Triangle triTransformed;
 
-            // Rotate Z
-            matRotZ.MulMatVec(tri, triRotZ);
-            // Rotate X
-            matRotX.MulMatVec(triRotZ, triRotZX);
-
-            // offset into the screen
-            triTranslated = triRotZX;
-            triTranslated.a.z = triRotZX.a.z + offset;
-            triTranslated.b.z = triRotZX.b.z + offset;
-            triTranslated.c.z = triRotZX.c.z + offset;
+            triTransformed = matWorld * tri;
 
             // Normals
             Vec3d normal, line1, line2;
 
-            line1 = triTranslated.b - triTranslated.a;
-            line2 = triTranslated.c - triTranslated.a;
+            line1 = triTransformed.b - triTransformed.a;
+            line2 = triTransformed.c - triTransformed.a;
             normal = line1.crossProd(line2).normalize();
-            float norm_dp = normal.dotProd(triTranslated.a - cam);
+            float norm_dp = normal.dotProd(triTransformed.a - cam);
 
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
@@ -169,31 +160,31 @@ int main(int argc, char* argv[])
             if (illuminationOn)
             {
                 Vec3d light_direction(0.0f, 0.0f,-1.0f);
-                light_direction.normalize();
-                // Dot Product
-                float dp = normal.dotProd(light_direction);
+                float dp = normal.dotProd(light_direction.normalize());
                 uint8_t r, g, b;
                 r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
-                triTranslated.setColor(r, g, b, SDL_ALPHA_OPAQUE);
+                triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
                 // end Illuminiation
             }
 
             // Projection 3D -> 2D
-            matProj.MulMatVec(triTranslated, triProj);
+            matProj.MulMatVec(triTransformed, triProj);
+            // copy the color from the other translated triangle to the projected one (this should be optimized)
+            triProj.setColor(triTransformed);
 
             // Scale into view
-            triProj.a.x += 1.0f; triProj.a.y += 1.0f;
-            triProj.b.x += 1.0f; triProj.b.y += 1.0f;
-            triProj.c.x += 1.0f; triProj.c.y += 1.0f;
-
-            triProj.a.x *= 0.5f * static_cast<float>(width);
-            triProj.a.y *= 0.5f * static_cast<float>(height);
-            triProj.b.x *= 0.5f * static_cast<float>(width);
-            triProj.b.y *= 0.5f * static_cast<float>(height);
-            triProj.c.x *= 0.5f * static_cast<float>(width);
-            triProj.c.y *= 0.5f * static_cast<float>(height);
-            // copy the color from the other translated triangle to the projected one (this should be optimized)
-            triProj.setColor(triTranslated);
+            const Vec3d offsetView(1.0f, 1.0f, 0.0f);
+            triProj = triProj + offsetView;
+            const float w2 = 0.5f * static_cast<float>(width);
+            const float h2 = 0.5f * static_cast<float>(height);
+            
+            triProj.a.x *= w2;
+            triProj.a.y *= h2;
+            triProj.b.x *= w2;
+            triProj.b.y *= h2;
+            triProj.c.x *= w2;
+            triProj.c.y *= h2;
+            
             // Triangle Rasterization
             trianglesToRaster.push_back(triProj);
         }
