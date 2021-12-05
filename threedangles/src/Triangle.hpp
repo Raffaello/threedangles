@@ -11,7 +11,7 @@ public:
 
     Vec3d a, b, c;
     
-
+    
     void setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
     void setColor(const Triangle& that);
 

@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     matProj.m[3][2] = -(znear * q);
     matProj.m[3][3] = 0.0f;
 
-    Vec3d cam = { 0 };
+    Vec3d cam;
 
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
@@ -186,23 +186,19 @@ int main(int argc, char* argv[])
         matRotX.m[2][2] = std::cos(alpha * 0.5f);
         matRotX.m[3][3] = 1.0f;
 
-        
+
         std::vector<Triangle> trianglesToRaster;
-        // draw the triangles.
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
-        for (auto& tri : mesh.tris) {
+        // Process the triangles.
+        for (auto& tri : mesh.tris)
+        {
             Triangle triProj;
             Triangle triRotZ, triRotZX;
             Triangle triTranslated;
 
             // Rotate Z
-            matRotZ.MulMatVec(tri.a, triRotZ.a);
-            matRotZ.MulMatVec(tri.b, triRotZ.b);
-            matRotZ.MulMatVec(tri.c, triRotZ.c);
+            matRotZ.MulMatVec(tri, triRotZ);
             // Rotate X
-            matRotX.MulMatVec(triRotZ.a, triRotZX.a);
-            matRotX.MulMatVec(triRotZ.b, triRotZX.b);
-            matRotX.MulMatVec(triRotZ.c, triRotZX.c);
+            matRotX.MulMatVec(triRotZ, triRotZX);
 
             // offset into the screen
             triTranslated = triRotZX;
@@ -212,27 +208,11 @@ int main(int argc, char* argv[])
 
             // Normals
             Vec3d normal, line1, line2;
-            line1.x = triTranslated.b.x - triTranslated.a.x;
-            line1.y = triTranslated.b.y - triTranslated.a.y;
-            line1.z = triTranslated.b.z - triTranslated.a.z;
 
-            line2.y = triTranslated.c.y - triTranslated.a.y;
-            line2.x = triTranslated.c.x - triTranslated.a.x;
-            line2.z = triTranslated.c.z - triTranslated.a.z;
-
-            normal.x = line1.y * line2.z - line1.z * line2.y;
-            normal.y = line1.z * line2.x - line1.x * line2.z;
-            normal.z = line1.x * line2.y - line1.y * line2.x;
-
-            float nl = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-            normal.x /= nl;
-            normal.y /= nl;
-            normal.z /= nl;
-
-            float norm_dp = normal.x * (triTranslated.a.x - cam.x)
-                + normal.y * (triTranslated.a.y - cam.y)
-                + normal.z * (triTranslated.a.z - cam.z)
-            ;
+            line1 = triTranslated.b - triTranslated.a;
+            line2 = triTranslated.c - triTranslated.a;
+            normal = line1.crossProd(line2).normalize();
+            float norm_dp = normal.dotProd(triTranslated.a - cam);
 
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
@@ -240,26 +220,18 @@ int main(int argc, char* argv[])
             // Illumination
             if (illuminationOn)
             {
-                Vec3d light_direction = { 0.0f, 0.0f,-1.0f };
-                float ll = std::sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
-                light_direction.x /= ll;
-                light_direction.y /= ll;
-                light_direction.z /= ll;
-
+                Vec3d light_direction(0.0f, 0.0f,-1.0f);
+                light_direction.normalize();
                 // Dot Product
-                float dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
+                float dp = normal.dotProd(light_direction);
                 uint8_t r, g, b;
                 r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
                 triTranslated.setColor(r, g, b, SDL_ALPHA_OPAQUE);
-                //SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
                 // end Illuminiation
             }
 
-
             // Projection 3D -> 2D
-            matProj.MulMatVec(triTranslated.a, triProj.a);
-            matProj.MulMatVec(triTranslated.b, triProj.b);
-            matProj.MulMatVec(triTranslated.c, triProj.c);
+            matProj.MulMatVec(triTranslated, triProj);
 
             // Scale into view
             triProj.a.x += 1.0f; triProj.a.y += 1.0f;

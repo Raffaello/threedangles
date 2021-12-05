@@ -18,3 +18,10 @@ void Mat4::MulMatVec(Vec3d& input, Vec3d& output)
         output.z /= t;
     }
 }
+
+void Mat4::MulMatVec(Triangle& input, Triangle& output)
+{
+    MulMatVec(input.a, output.a);
+    MulMatVec(input.b, output.b);
+    MulMatVec(input.c, output.c);
+}
