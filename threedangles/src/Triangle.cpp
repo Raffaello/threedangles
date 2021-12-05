@@ -6,6 +6,24 @@ Triangle::Triangle(const Vec3d& a, const Vec3d& b, const Vec3d& c) : a(a), b(b),
 {
 }
 
+void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
+{
+    _r = r;
+    _g = g;
+    _b = b;
+    _a = a;
+}
+
+void Triangle::setColor(const Triangle& that)
+{
+    _r = that._r;
+    _g = that._g;
+    _b = that._b;
+    _a = that._a;
+}
+
+
+
 void Triangle::draw(SDL_Renderer* renderer)
 {
     int x1 = static_cast<int>(std::round(a.x));
@@ -15,6 +33,7 @@ void Triangle::draw(SDL_Renderer* renderer)
     int x3 = static_cast<int>(std::round(c.x));
     int y3 = static_cast<int>(std::round(c.y));
 
+    SDL_SetRenderDrawColor(renderer, _r, _g, _b, _a);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
     SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
@@ -28,6 +47,7 @@ void Triangle::fill(SDL_Renderer* renderer)
     int y2 = static_cast<int>(std::round(b.y));
     int x3 = static_cast<int>(std::round(c.x));
     int y3 = static_cast<int>(std::round(c.y));
+    SDL_SetRenderDrawColor(renderer, _r, _g, _b, _a);
 
     int t1x, t2x, y, minx, maxx, t1xp, t2xp;
     bool changed1 = false;

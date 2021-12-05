@@ -10,6 +10,10 @@ public:
     Triangle() = default;
 
     Vec3d a, b, c;
+    
+
+    void setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
+    void setColor(const Triangle& that);
 
     void draw( SDL_Renderer* renderer);
     /** @brief Fill a triangle - Bresenham method
@@ -19,5 +23,10 @@ public:
     void fill(SDL_Renderer* renderer);
 
 private:
+    uint8_t _r = 0;
+    uint8_t _g = 0;
+    uint8_t _b = 0;
+    uint8_t _a = 0xFF;
+
     void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y);
 };

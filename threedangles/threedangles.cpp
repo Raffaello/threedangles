@@ -21,6 +21,8 @@ constexpr float PI = 3.14159f;//2653589793f;
 
 int main(int argc, char* argv[])
 {
+    int ret = 0;
+
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         cerr << SDL_GetError() << endl;
         return -1;
@@ -33,6 +35,7 @@ int main(int argc, char* argv[])
     std::string title = "ThreeDangles";
     int FPS = 60;
     int frameTime_ms = 1000 / FPS;
+    Mesh mesh;
 
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
@@ -40,16 +43,18 @@ int main(int argc, char* argv[])
     SDL_Window* window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
     if (nullptr == window) {
         cerr << SDL_GetError() << endl;
-        return -1;
+        ret = -1;
+        goto quit;
     }
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, r_flags);
     if (nullptr == renderer) {
         cerr << SDL_GetError() << endl;
-        return -1;
+        ret = -1;
+        goto quit;
     }
 
-    Mesh meshCube;
+    
     //meshCube.tris = {
     //    // SOUTH
     //      1                         2                 3
@@ -82,15 +87,11 @@ int main(int argc, char* argv[])
     //           6                     1                    4
     //    {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
     //};
-    if (!meshCube.loadFromOBJFile("plain_cube.obj")) {
+    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
-        // todo review these dubplicated "destructors"
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -2;
+        ret = -2;
+        goto quit;
     }
-
 
     // Projection Matrix
     const float ar = static_cast<float>(width) / static_cast<float>(height);
@@ -186,10 +187,10 @@ int main(int argc, char* argv[])
         matRotX.m[3][3] = 1.0f;
 
         
-        
+        std::vector<Triangle> trianglesToRaster;
         // draw the triangles.
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
-        for (auto& tri : meshCube.tris) {
+        for (auto& tri : mesh.tris) {
             Triangle triProj;
             Triangle triRotZ, triRotZX;
             Triangle triTranslated;
@@ -249,7 +250,8 @@ int main(int argc, char* argv[])
                 float dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
                 uint8_t r, g, b;
                 r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
-                SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
+                triTranslated.setColor(r, g, b, SDL_ALPHA_OPAQUE);
+                //SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
                 // end Illuminiation
             }
 
@@ -270,19 +272,26 @@ int main(int argc, char* argv[])
             triProj.b.y *= 0.5f * static_cast<float>(height);
             triProj.c.x *= 0.5f * static_cast<float>(width);
             triProj.c.y *= 0.5f * static_cast<float>(height);
-
+            // copy the color from the other translated triangle to the projected one (this should be optimized)
+            triProj.setColor(triTranslated);
             // Triangle Rasterization
-            /*fillTriangle(renderer,
-                triProj.a.x, triProj.a.y,
-                triProj.b.x, triProj.b.y,
-                triProj.c.x, triProj.c.y
-            );*/
+            trianglesToRaster.push_back(triProj);
+        }
 
-            triProj.fill(renderer);
+        //sorting like a "depth buffer", Z-depth sorting
+        std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
+            [](Triangle& t1, Triangle& t2) {
+                float z1 = (t1.a.z + t1.b.z + t1.c.z) / 3.0f;
+                float z2 = (t2.a.z + t2.b.z + t2.c.z) / 3.0f;
+                return z1 > z2;
+            }
+        );
 
+        for (auto& t : trianglesToRaster) {
+            t.fill(renderer);
             // Wire frame debug
-            /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-            triProj.draw(renderer);*/
+           /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+           triProj.draw(renderer);*/
         }
 
         // Swap buffers
@@ -298,9 +307,10 @@ int main(int argc, char* argv[])
         //SDL_Log("s=%d -- e=%d, d=%d", startTicks, endTicks, frameDelay);
     }
 
-
+quit:
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-    return 0;
+
+    return ret;
 }
