@@ -15,5 +15,8 @@ public:
     Vec3d normalize();
     Vec3d crossProd(const Vec3d& v);
 
-    float x, y, z, w;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float w = 1.0f;
 };

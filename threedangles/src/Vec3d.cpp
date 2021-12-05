@@ -1,11 +1,11 @@
 #include <Vec3d.hpp>
 #include <cmath>
 
-Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z), w(1.0f)
+Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z)
 {
 }
 
-Vec3d::Vec3d() : Vec3d(0.0f, 0.0f, 0.0f)
+Vec3d::Vec3d()
 {
 }
 
