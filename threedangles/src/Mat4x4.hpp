@@ -3,10 +3,9 @@
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
 
-class Mat4
+class Mat4x4
 {
 public:
-    //Mat4();
     void MulMatVec(Vec3d& input, Vec3d& output);
     void MulMatVec(Triangle& input, Triangle& output);
 

@@ -6,10 +6,11 @@
 #include <string>
 
 #include <Mesh.hpp>
-#include <Mat4.hpp>
+#include <Mat4x4.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
 #include <algorithm>
+#include <Engine.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -17,7 +18,6 @@ using std::cerr;
 using std::endl;
 using std::cout;
 
-constexpr float PI = 3.14159f;//2653589793f;
 
 int main(int argc, char* argv[])
 {
@@ -55,38 +55,6 @@ int main(int argc, char* argv[])
     }
 
     
-    //meshCube.tris = {
-    //    // SOUTH
-    //      1                         2                 3
-    //    {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
-    //       1                         3                 4
-    //    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-    //    // EAST
-    //        4                        3                    5
-    //    {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-    //          4                      5                  6
-    //    {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 1.0f}},
-    //    // NORTH
-    //        6                     5                    7
-    //    {{1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 1.0f}},
-    //        6                      7                    8
-    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-    //    // WEST
-    //            8                    7                  2
-    //    {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-    //            8                    2                   1
-    //    {{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
-    //    // TOP
-    //          2                      7                  5
-    //    {{0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
-    //           2                     5                  3
-    //    {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
-    //    // BOTTOM
-    //           6                     8                    1
-    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}},
-    //           6                     1                    4
-    //    {{1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-    //};
     if (!mesh.loadFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         ret = -2;
@@ -94,23 +62,10 @@ int main(int argc, char* argv[])
     }
 
     // Projection Matrix
-    const float ar = static_cast<float>(width) / static_cast<float>(height);
-    const float theta = 90.0f;
-    const float fov = 1.0f / std::tan(theta * 0.5f / 180.0f * PI);
+    const float fov = 90.0f;
     const float zfar = 1000.0f;
     const float znear = 0.1f;
-    const float q = zfar / (zfar - znear);
-
-    SDL_Log("ASPECT RATIO = %f", ar);
-    SDL_Log("FOV          = %f", fov);
-
-    Mat4 matProj;
-    matProj.m[0][0] = ar * fov;
-    matProj.m[1][1] = fov;
-    matProj.m[2][2] = q;
-    matProj.m[2][3] = 1.0f;
-    matProj.m[3][2] = -(znear * q);
-    matProj.m[3][3] = 0.0f;
+    Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
     Vec3d cam;
 
@@ -168,27 +123,20 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        Mat4 matRotZ, matRotX;
-        float alpha = 1.0f * SDL_GetTicks()/1000.0f;
-        // Rotation Z
-        matRotZ.m[0][0] = std::cos(alpha);
-        matRotZ.m[0][1] = std::sin(alpha);
-        matRotZ.m[1][0] = -std::sin(alpha);
-        matRotZ.m[1][1] = std::cos(alpha);
-        matRotZ.m[2][2] = 1.0f;
-        matRotZ.m[3][3] = 1.0f;
+        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
+        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
 
-        // Rotation X
-        matRotX.m[0][0] = 1.0f;
-        matRotX.m[1][1] = std::cos(alpha * 0.5f);
-        matRotX.m[1][2] = std::sin(alpha * 0.5f);
-        matRotX.m[2][1] = -std::sin(alpha * 0.5f);
-        matRotX.m[2][2] = std::cos(alpha * 0.5f);
-        matRotX.m[3][3] = 1.0f;
+        // Translation
+        Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
+
+        // World Matrix
+        //Mat4x4 matWorld = Engine::matrix_createIdentity();
+        // do the matrix multiplication
 
 
-        std::vector<Triangle> trianglesToRaster;
         // Process the triangles.
+        std::vector<Triangle> trianglesToRaster;
         for (auto& tri : mesh.tris)
         {
             Triangle triProj;
