@@ -117,10 +117,14 @@ int main(int argc, char* argv[])
                 offset -= 0.5f;
                 SDL_Log("offset = %f", offset);
                 break;
+            default:
+                break;
             }
             break;
         case SDL_QUIT:
             quit = true;
+            break;
+        default:
             break;
         }
 

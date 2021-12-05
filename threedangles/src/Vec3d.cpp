@@ -5,10 +5,6 @@ Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z)
 {
 }
 
-Vec3d::Vec3d()
-{
-}
-
 Vec3d Vec3d::operator+(const Vec3d& v)
 {
     return { x + v.x, y + v.y, z + v.z };

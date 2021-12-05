@@ -4,7 +4,7 @@ class Vec3d
 {
 public:
     Vec3d(const float x, const float y, const float z);
-    Vec3d();
+    Vec3d() = default;
 
     Vec3d operator+(const Vec3d& v);
     Vec3d operator-(const Vec3d& v);
