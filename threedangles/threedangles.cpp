@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     }
 
     
-    if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
+    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
         cerr << "Can't load OBJ file";
         ret = -2;
         goto quit;
@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
     Vec3d cam;
+    Vec3d lookAt(0.0f, 0.0f, 1.0f);
 
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
@@ -123,7 +124,8 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        //float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        float alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
 
@@ -135,6 +137,12 @@ int main(int argc, char* argv[])
         // do the matrix multiplication
         matWorld = matRotZ * matRotX * matTrans;
 
+        // Camera Matrix
+        //lookAt = { 0.0f, 0.0f, 1.0f };
+        Vec3d up(0.0f, -1.0f, 0.0f);
+        Vec3d target = cam + lookAt;
+        Mat4x4 matCam = Engine::matrix_pointAt(cam, target, up);
+        Mat4x4 matView = Engine::matrix_InversePointAt(matCam);
 
         // Process the triangles.
         std::vector<Triangle> trianglesToRaster;
@@ -142,6 +150,7 @@ int main(int argc, char* argv[])
         {
             Triangle triProj;
             Triangle triTransformed;
+            Triangle triViewed;
 
             triTransformed = matWorld * tri;
 
@@ -167,10 +176,13 @@ int main(int argc, char* argv[])
                 // end Illuminiation
             }
 
+            // World Space -> View Space
+            matView.MulMatVec(triTransformed, triViewed);
+            triViewed.setColor(triTransformed);
             // Projection 3D -> 2D
-            matProj.MulMatVec(triTransformed, triProj);
+            matProj.MulMatVec(triViewed, triProj);
             // copy the color from the other translated triangle to the projected one (this should be optimized)
-            triProj.setColor(triTransformed);
+            triProj.setColor(triViewed);
 
             // Scale into view
             const Vec3d offsetView(1.0f, 1.0f, 0.0f);

@@ -71,3 +71,37 @@ Mat4x4 Engine::matrix_createIdentity()
     
     return m;
 }
+
+Mat4x4 Engine::matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up)
+{
+    Vec3d forward = (target - pos).normalize();
+
+    Vec3d t = (forward * up.dotProd(forward));
+    Vec3d newUp = (up - t).normalize();
+    Vec3d newRight = newUp.crossProd(forward);
+
+    //Dimensioning & Translation Matrix
+    Mat4x4 m;
+    m.m[0][0] = newRight.x; m.m[0][1] = newRight.y; m.m[0][2] = newRight.z; m.m[0][3] = 0.0f;
+    m.m[1][0] = newUp.x; m.m[1][1] = newUp.y; m.m[1][2] = newUp.z; m.m[1][3] = 0.0f;
+    m.m[2][0] = forward.x; m.m[2][1] = forward.y; m.m[2][2] = forward.z; m.m[2][3] = 0.0f;
+    m.m[3][0] = pos.x; m.m[3][1] = pos.y; m.m[3][2] = pos.z; m.m[3][3] = 1.0f;
+
+    return m;
+}
+
+Mat4x4 Engine::matrix_InversePointAt(Mat4x4& m)
+{
+    Mat4x4 matrix;
+
+    matrix.m[0][0] = m.m[0][0]; matrix.m[0][1] = m.m[1][0]; matrix.m[0][2] = m.m[2][0]; matrix.m[0][3] = 0.0f;
+    matrix.m[1][0] = m.m[0][1]; matrix.m[1][1] = m.m[1][1]; matrix.m[1][2] = m.m[2][1]; matrix.m[1][3] = 0.0f;
+    matrix.m[2][0] = m.m[0][2]; matrix.m[2][1] = m.m[1][2]; matrix.m[2][2] = m.m[2][2]; matrix.m[2][3] = 0.0f;
+
+    matrix.m[3][0] = -(m.m[3][0] * matrix.m[0][0] + m.m[3][1] * matrix.m[1][0] + m.m[3][2] * matrix.m[2][0]);
+    matrix.m[3][1] = -(m.m[3][0] * matrix.m[0][1] + m.m[3][1] * matrix.m[1][1] + m.m[3][2] * matrix.m[2][1]);
+    matrix.m[3][2] = -(m.m[3][0] * matrix.m[0][2] + m.m[3][1] * matrix.m[1][2] + m.m[3][2] * matrix.m[2][2]);
+    matrix.m[3][3] = 1.0f;
+
+    return matrix;
+}
