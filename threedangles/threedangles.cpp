@@ -233,9 +233,8 @@ int main(int argc, char* argv[])
                 + normal.z * (triTranslated.a.z - cam.z)
             ;
 
-            if (!showHiddenVertexes && norm_dp >= 0.0f) {
+            if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
-            }
 
             // Illumination
             if (illuminationOn)

@@ -14,6 +14,7 @@ public:
     void draw( SDL_Renderer* renderer);
     /** @brief Fill a triangle - Bresenham method
       * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+      * @see https://www.avrfreaks.net/sites/default/files/triangles.c
       */
     void fill(SDL_Renderer* renderer);
 

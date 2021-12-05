@@ -38,7 +38,8 @@ void Triangle::fill(SDL_Renderer* renderer)
     int dx1, dy1, dx2, dy2;
     int e1, e2;
 
-    // order points by ascending y (y1<=y2<=y3)
+    // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
+    // sortVerticesAscendingByY();
     if (y1 > y2) {
         std::swap(y1, y2);
         std::swap(x1, x2);
@@ -84,14 +85,22 @@ void Triangle::fill(SDL_Renderer* renderer)
         changed2 = true;
     }
 
+
+    /* here we know that v1.y <= v2.y <= v3.y */
+    /* check for trivial case of bottom-flat triangle */
+
     e2 = dx2 >> 1;
     // Flat top, just process the second half
-    if (y1 == y2) goto next;
+    if (y1 == y2)
+        goto next;
+    
     e1 = dx1 >> 1;
-
-    for (int i = 0; i < dx1;) {
-        t1xp = 0; t2xp = 0;
-        if (t1x < t2x) {
+    for (int i = 0; i < dx1;)
+    {
+        t1xp = 0;
+        t2xp = 0;
+        if (t1x < t2x)
+        {
             minx = t1x;
             maxx = t2x;
         }
@@ -108,25 +117,35 @@ void Triangle::fill(SDL_Renderer* renderer)
             while (e1 >= dx1)
             {
                 e1 -= dx1;
-                if (changed1) t1xp = signx1;
-                else          goto next1;
+                if (changed1)
+                    t1xp = signx1;
+                else
+                    goto next1;
             }
-            if (changed1) break;
-            else t1x += signx1;
+            
+            if (changed1)
+                break;
+            else
+                t1x += signx1;
         }
         // Move line
     next1:
         // process second line until y value is about to change
-        while (1) {
+        while (1)
+        {
             e2 += dy2;
             while (e2 >= dx2)
             {
                 e2 -= dx2;
-                if (changed2) t2xp = signx2;
-                else          goto next2;
+                if (changed2)
+                    t2xp = signx2;
+                else
+                    goto next2;
             }
-            if (changed2)     break;
-            else              t2x += signx2;
+            if (changed2)
+                break;
+            else
+                t2x += signx2;
         }
     next2:
         if (minx > t1x)
@@ -149,6 +168,7 @@ void Triangle::fill(SDL_Renderer* renderer)
         if (y == y2)
             break;
     }
+
 next:
     // Second half
     dy1 = y3 - y2;
@@ -161,23 +181,25 @@ next:
         signx1 = 1;
 
     t1x = x2;
-
-    if (dy1 > dx1) {   // swap values
+    if (dy1 > dx1)
+    {   // swap values
         std::swap(dy1, dx1);
         changed1 = true;
     }
-    else changed1 = false;
+    else
+        changed1 = false;
 
     e1 = dx1 >> 1;
-
     for (int i = 0; i <= dx1; i++)
     {
         t1xp = 0; t2xp = 0;
-        if (t1x < t2x) {
+        if (t1x < t2x)
+        {
             minx = t1x;
             maxx = t2x;
         }
-        else {
+        else
+        {
             minx = t2x;
             maxx = t1x;
         }
@@ -188,11 +210,13 @@ next:
             while (e1 >= dx1)
             {
                 e1 -= dx1;
-                if (changed1) {
+                if (changed1)
+                {
                     t1xp = signx1;
                     break;
                 }//t1x += signx1;
-                else          goto next3;
+                else
+                    goto next3;
             }
             if (changed1)
                 break;
@@ -209,14 +233,18 @@ next:
             while (e2 >= dx2)
             {
                 e2 -= dx2;
-                if (changed2) t2xp = signx2;
-                else          goto next4;
+                if (changed2)
+                    t2xp = signx2;
+                else
+                    goto next4;
             }
-            if (changed2)     break;
-            else              t2x += signx2;
+
+            if (changed2)
+                break;
+            else
+                t2x += signx2;
         }
     next4:
-
         if (minx > t1x)
             minx = t1x;
         if (minx > t2x)
@@ -225,7 +253,8 @@ next:
             maxx = t1x;
         if (maxx < t2x)
             maxx = t2x;
-        draw_hline(renderer, minx, maxx, y);    // Draw line from min to max points found on the y
+        // Draw line from min to max points found on the y
+        draw_hline(renderer, minx, maxx, y);
         // Now increase y
         if (!changed1)
             t1x += signx1;
