@@ -9,6 +9,7 @@
 #include <Mat4.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
+#include <algorithm>
 
 #include <SDL2/SDL.h>
 
@@ -17,29 +18,6 @@ using std::endl;
 using std::cout;
 
 constexpr float PI = 3.14159f;//2653589793f;
-
-// TODO: doing rasterization later on.
-void drawTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
-{
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-    SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
-    SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
-}
-
-void drawTriangle(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, float x3, float y3)
-{
-    drawTriangle(renderer,
-        static_cast<int>(std::round(x1)), static_cast<int>(std::round(y1)),
-        static_cast<int>(std::round(x2)), static_cast<int>(std::round(y2)),
-        static_cast<int>(std::round(x3)), static_cast<int>(std::round(y3))
-    );
-}
-
-void fillTriangle(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int x3, int y3)
-{
-    // TODO
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -138,6 +116,9 @@ int main(int argc, char* argv[])
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
 
+    // offset params
+    float offset = 3.0f;
+
     bool quit = false;
     while (!quit) {
         SDL_Event e;
@@ -166,8 +147,15 @@ int main(int argc, char* argv[])
                 illuminationOn = !illuminationOn;
                 SDL_Log("Illumination ON = %d", illuminationOn);
                 break;
+            case SDLK_KP_PLUS:
+                offset += 0.5f;
+                SDL_Log("offset = %f", offset);
+                break;
+            case SDLK_KP_MINUS:
+                offset -= 0.5f;
+                SDL_Log("offset = %f", offset);
+                break;
             }
-        
             break;
         case SDL_QUIT:
             quit = true;
@@ -197,8 +185,7 @@ int main(int argc, char* argv[])
         matRotX.m[2][2] = std::cos(alpha * 0.5f);
         matRotX.m[3][3] = 1.0f;
 
-        // offset params
-        float offset = 3.0f;
+        
         
         // draw the triangles.
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
@@ -286,11 +273,17 @@ int main(int argc, char* argv[])
             triProj.c.y *= 0.5f * static_cast<float>(height);
 
             // Triangle Rasterization
-            drawTriangle(renderer,
+            /*fillTriangle(renderer,
                 triProj.a.x, triProj.a.y,
                 triProj.b.x, triProj.b.y,
                 triProj.c.x, triProj.c.y
-            );
+            );*/
+
+            triProj.fill(renderer);
+
+            // Wire frame debug
+            /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+            triProj.draw(renderer);*/
         }
 
         // Swap buffers
