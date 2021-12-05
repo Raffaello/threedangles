@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
 
     Vec3d cam;
     Vec3d lookAt(0.0f, 0.0f, 1.0f);
+    float cam_yaw = 0.0f;
 
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
@@ -117,6 +118,33 @@ int main(int argc, char* argv[])
                 offset -= 0.5f;
                 SDL_Log("offset = %f", offset);
                 break;
+            case SDLK_UP:
+                cam.y -= 1.0f;
+                break;
+            case SDLK_DOWN:
+                cam.y += 1.0f;
+                break;
+            case SDLK_LEFT:
+                cam.x -= 1.0f;
+                break;
+            case SDLK_RIGHT:
+                cam.x += 1.0f;
+                break;
+            case SDLK_a:
+                cam_yaw += 0.1f;
+                break;
+            case SDLK_d:
+                cam_yaw -= 0.1f;
+                break;
+            case SDLK_w:
+                //cam.z += 1.0f;
+                cam = cam + lookAt * 0.5f;
+                break;
+            case SDLK_s:
+                //cam.z -= 1.0f;
+                cam = cam - lookAt * 0.5f;
+                break;
+
             default:
                 break;
             }
@@ -133,8 +161,8 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //float alpha = 0.0f;
+        //float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        float alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
 
@@ -149,7 +177,11 @@ int main(int argc, char* argv[])
         // Camera Matrix
         //lookAt = { 0.0f, 0.0f, 1.0f };
         Vec3d up(0.0f, 1.0f, 0.0f);
-        Vec3d target = cam + lookAt;
+        Vec3d target(0.0f, 0.0f, 1.0f);
+        Mat4x4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
+        lookAt = matCamRot * target;
+        target = cam + lookAt;
+
         Mat4x4 matCam = Engine::matrix_pointAt(cam, target, up);
         Mat4x4 matView = Engine::matrix_InversePointAt(matCam);
 

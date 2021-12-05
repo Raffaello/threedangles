@@ -48,6 +48,21 @@ Mat4x4 Engine::matrix_createRotationX(const float alpha)
     return matRotX;
 }
 
+Mat4x4 Engine::matrix_createRotationY(const float alpha)
+{
+    Mat4x4 matRotY;
+
+    matRotY.m[0][0] = std::cos(alpha);
+    matRotY.m[0][2] = std::sin(alpha);
+    matRotY.m[2][0] = -std::sin(alpha);
+    matRotY.m[1][1] = 1.0f;
+    matRotY.m[2][2] = std::cos(alpha);
+    matRotY.m[3][3] = 1.0f;
+
+    return matRotY;
+    
+}
+
 Mat4x4 Engine::matrix_createTranslation(const Vec3d& v)
 {
     Mat4x4 m;
