@@ -17,12 +17,12 @@ Triangle Triangle::operator+(const Vec3d& v)
     return t;
 }
 
-void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a)
+void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha)
 {
     _r = r;
     _g = g;
-    _b = b;
-    _a = a;
+    _b = blue;
+    _a = alpha;
 }
 
 void Triangle::setColor(const Triangle& that)
@@ -239,12 +239,13 @@ next:
         {
             e1 += dy1;
             while (e1 >= dx1)
+            //if (e1 >= dx1)
             {
                 e1 -= dx1;
                 if (changed1)
                 {
                     t1xp = signx1;
-                    break;
+                    //break;
                 }//t1x += signx1;
                 else
                     goto next3;
@@ -299,7 +300,7 @@ next:
     }
 }
 
-void Triangle::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y)
+void Triangle::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {

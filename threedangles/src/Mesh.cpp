@@ -74,7 +74,7 @@ bool Mesh::loadFromOBJFile(const std::string& filename)
                 catch (const std::invalid_argument& e) {}
             }
 
-            tris.push_back({ vertexes.at(v_[0] - 1), vertexes.at(v_[1] - 1), vertexes.at(v_[2] - 1) });
+            tris.emplace_back(vertexes.at(v_[0] - 1), vertexes.at(v_[1] - 1), vertexes.at(v_[2] - 1));
         }
         else if (type == "vt")
         {

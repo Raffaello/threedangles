@@ -13,7 +13,7 @@ public:
 
     Triangle operator+(const Vec3d& v);
 
-    void setColor(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a);
+    void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha);
     void setColor(const Triangle& that);
 
     void draw( SDL_Renderer* renderer);
@@ -29,5 +29,5 @@ private:
     uint8_t _b = 0;
     uint8_t _a = 0xFF;
 
-    void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y);
+    void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
 };

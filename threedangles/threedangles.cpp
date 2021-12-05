@@ -133,8 +133,8 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        //float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        float alpha = 0.0f;
+        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        //float alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
 

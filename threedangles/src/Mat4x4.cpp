@@ -27,13 +27,13 @@ void Mat4x4::MulMatVec(Triangle& input, Triangle& output)
     MulMatVec(input.c, output.c);
 }
 
-Mat4x4 Mat4x4::operator*(const Mat4x4& m)
+Mat4x4 Mat4x4::operator*(const Mat4x4& m_)
 {
     Mat4x4 matrix;
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            matrix.m[i][j] = this->m[i][0] * m.m[0][j] + this->m[i][1] * m.m[1][j] + this->m[i][2] * m.m[2][j] + this->m[i][3] * m.m[3][j];
+            matrix.m[i][j] = m[i][0] * m_.m[0][j] + m[i][1] * m_.m[1][j] + m[i][2] * m_.m[2][j] + m[i][3] * m_.m[3][j];
         }
     }
 
