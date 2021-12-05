@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     }
 
     
-    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
+    if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
         cerr << "Can't load OBJ file";
         ret = -2;
         goto quit;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     bool illuminationOn = true;
 
     // offset params
-    float offset = 3.0f;
+    float offset = 16.0f;
 
     bool quit = false;
     while (!quit) {
@@ -209,13 +209,17 @@ int main(int argc, char* argv[])
         SDL_RenderPresent(renderer);
 
         // FPS frame rate cap
-        uint32_t endTicks = SDL_GetTicks();
+        const uint32_t endTicks = SDL_GetTicks();
         //uint64_t endPerf = SDL_GetPerformanceCounter();
-        uint32_t frameDelay = frameTime_ms - (endTicks - startTicks);
+        const uint32_t totTicks = (endTicks - startTicks);
+        uint32_t frameDelay = 0;
 
-        SDL_SetWindowTitle(window, (title + " FPS: " + std::to_string(1000.0f/frameDelay)).c_str());
+        if (totTicks < frameTime_ms)
+            frameDelay = frameTime_ms - totTicks;
+        
+        //SDL_SetWindowTitle(window, (title + " FPS: ~" + std::to_string(1000.0f/frameDelay)).c_str());
+        //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
-        //SDL_Log("s=%d -- e=%d, d=%d", startTicks, endTicks, frameDelay);
     }
 
 quit:
