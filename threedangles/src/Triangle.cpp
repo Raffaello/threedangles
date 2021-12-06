@@ -33,8 +33,6 @@ void Triangle::setColor(const Triangle& that)
     _a = that._a;
 }
 
-
-
 void Triangle::draw(SDL_Renderer* renderer)
 {
     compute_int_coord();
