@@ -218,10 +218,13 @@ int main(int argc, char* argv[])
             }
 
             // World Space -> View Space
-            matView.MulMatVec(triTransformed, triViewed);
+            //matView.MulMatVec(triTransformed, triViewed);
+            triViewed = matView * triTransformed;
             triViewed.setColor(triTransformed);
+            
             // Projection 3D -> 2D
-            matProj.MulMatVec(triViewed, triProj);
+            //matProj.MulMatVec(triViewed, triProj);
+            triProj = (matProj * triViewed).normByW();
             // copy the color from the other translated triangle to the projected one (this should be optimized)
             triProj.setColor(triViewed);
 

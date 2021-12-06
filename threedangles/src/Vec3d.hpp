@@ -14,6 +14,8 @@ public:
     float magnitude(const Vec3d& v);
     Vec3d normalize();
     Vec3d crossProd(const Vec3d& v);
+    Vec3d normByW();
+
 
     float x = 0.0f;
     float y = 0.0f;

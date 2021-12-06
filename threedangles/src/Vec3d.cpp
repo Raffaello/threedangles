@@ -44,3 +44,8 @@ Vec3d Vec3d::crossProd(const Vec3d& v)
 {
     return { y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x };
 }
+
+Vec3d Vec3d::normByW()
+{
+    return { x / w, y / w, z / w };
+}

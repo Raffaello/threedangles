@@ -17,6 +17,17 @@ Triangle Triangle::operator+(const Vec3d& v)
     return t;
 }
 
+Triangle Triangle::normByW()
+{
+    Triangle t(*this);
+
+    t.a = a.normByW();
+    t.b = b.normByW();
+    t.c = c.normByW();
+
+    return t;
+}
+
 void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha)
 {
     _r = r;

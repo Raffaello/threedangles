@@ -13,6 +13,8 @@ public:
 
     Triangle operator+(const Vec3d& v);
 
+    Triangle normByW();
+
     void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha);
     void setColor(const Triangle& that);
 

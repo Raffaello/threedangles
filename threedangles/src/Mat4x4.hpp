@@ -7,8 +7,8 @@
 class Mat4x4
 {
 public:
-    void MulMatVec(Vec3d& input, Vec3d& output);
-    void MulMatVec(Triangle& input, Triangle& output);
+    //void MulMatVec(Vec3d& input, Vec3d& output);
+    //void MulMatVec(Triangle& input, Triangle& output);
 
     Mat4x4 operator*(const Mat4x4& m_);
     Vec3d operator*(const Vec3d& i);
