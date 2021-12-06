@@ -29,6 +29,9 @@ private:
     uint8_t _b = 0;
     uint8_t _a = 0xFF;
 
+    int x1, y1, x2, y2, x3, y3;
+
     void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
     void fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x);
+    inline void compute_int_coord() noexcept;
 };

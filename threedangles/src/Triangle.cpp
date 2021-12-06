@@ -37,14 +37,9 @@ void Triangle::setColor(const Triangle& that)
 
 void Triangle::draw(SDL_Renderer* renderer)
 {
-    int x1 = static_cast<int>(std::round(a.x));
-    int y1 = static_cast<int>(std::round(a.y));
-    int x2 = static_cast<int>(std::round(b.x));
-    int y2 = static_cast<int>(std::round(b.y));
-    int x3 = static_cast<int>(std::round(c.x));
-    int y3 = static_cast<int>(std::round(c.y));
-
+    compute_int_coord();
     SDL_SetRenderDrawColor(renderer, _r, _g, _b, _a);
+    
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
     SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
@@ -52,12 +47,7 @@ void Triangle::draw(SDL_Renderer* renderer)
 
 void Triangle::fill(SDL_Renderer* renderer)
 {
-    int x1 = static_cast<int>(std::round(a.x));
-    int y1 = static_cast<int>(std::round(a.y));
-    int x2 = static_cast<int>(std::round(b.x));
-    int y2 = static_cast<int>(std::round(b.y));
-    int x3 = static_cast<int>(std::round(c.x));
-    int y3 = static_cast<int>(std::round(c.y));
+    compute_int_coord();
     SDL_SetRenderDrawColor(renderer, _r, _g, _b, _a);
 
     int t1x, t2x, y, minx, maxx, t1xp, t2xp;
@@ -305,4 +295,14 @@ void Triangle::fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x)
         maxx = t1x;
     if (maxx < t2x)
         maxx = t2x;
+}
+
+void Triangle::compute_int_coord() noexcept
+{
+    x1 = static_cast<int>(std::round(a.x));
+    y1 = static_cast<int>(std::round(a.y));
+    x2 = static_cast<int>(std::round(b.x));
+    y2 = static_cast<int>(std::round(b.y));
+    x3 = static_cast<int>(std::round(c.x));
+    y3 = static_cast<int>(std::round(c.y));
 }
