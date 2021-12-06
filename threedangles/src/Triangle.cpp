@@ -179,15 +179,9 @@ void Triangle::fill(SDL_Renderer* renderer)
                 t2x += signx2;
         }
     next2:
-        if (minx > t1x)
-            minx = t1x;
-        if (minx > t2x)
-            minx = t2x;
-        if (maxx < t1x)
-            maxx = t1x;
-        if (maxx < t2x)
-            maxx = t2x;
-        draw_hline(renderer, minx, maxx, y);    // Draw line from min to max points found on the y
+        fill_update_minmax(minx, maxx, t1x, t2x);
+        // Draw line from min to max points found on the y
+        draw_hline(renderer, minx, maxx, y);
         // Now increase y
         if (!changed1)
             t1x += signx1;
@@ -277,14 +271,7 @@ next:
                 t2x += signx2;
         }
     next4:
-        if (minx > t1x)
-            minx = t1x;
-        if (minx > t2x)
-            minx = t2x;
-        if (maxx < t1x)
-            maxx = t1x;
-        if (maxx < t2x)
-            maxx = t2x;
+        fill_update_minmax(minx, maxx, t1x, t2x);
         // Draw line from min to max points found on the y
         draw_hline(renderer, minx, maxx, y);
         // Now increase y
@@ -306,4 +293,16 @@ void Triangle::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) c
     for (; x1 <= x2; x1++) {
         SDL_RenderDrawPoint(renderer, x1, y);
     }
+}
+
+void Triangle::fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x)
+{
+    if (minx > t1x)
+        minx = t1x;
+    if (minx > t2x)
+        minx = t2x;
+    if (maxx < t1x)
+        maxx = t1x;
+    if (maxx < t2x)
+        maxx = t2x;
 }

@@ -30,4 +30,5 @@ private:
     uint8_t _a = 0xFF;
 
     void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
+    void fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x);
 };
