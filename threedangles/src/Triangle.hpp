@@ -32,6 +32,18 @@ private:
     int x1, y1, x2, y2, x3, y3;
 
     void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
-    void fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x);
     inline void compute_int_coord() noexcept;
+
+    int t1x, t2x, y, minx, maxx, t1xp, t2xp;
+    bool changed1 = false;
+    bool changed2 = false;
+
+    int8_t signx1, signx2;
+
+    int dx1, dy1, dx2, dy2;
+    int e1, e2;
+
+    void fill_top_flat(SDL_Renderer* renderer);
+    void fill_bottom_flat(SDL_Renderer* renderer);
+    void fill_update_minmax();
 };

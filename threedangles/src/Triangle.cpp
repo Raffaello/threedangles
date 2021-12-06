@@ -50,17 +50,7 @@ void Triangle::fill(SDL_Renderer* renderer)
     compute_int_coord();
     SDL_SetRenderDrawColor(renderer, _r, _g, _b, _a);
 
-    int t1x, t2x, y, minx, maxx, t1xp, t2xp;
-    bool changed1 = false;
-    bool changed2 = false;
-
-    int8_t signx1, signx2;
-
-    int dx1, dy1, dx2, dy2;
-    int e1, e2;
-
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
-    // sortVerticesAscendingByY();
     if (y1 > y2) {
         std::swap(y1, y2);
         std::swap(x1, x2);
@@ -76,7 +66,33 @@ void Triangle::fill(SDL_Renderer* renderer)
 
     t1x = t2x = x1;
     y = y1;
+    changed1 = changed2 = false;
 
+    fill_top_flat(renderer);
+    // Second half
+    fill_bottom_flat(renderer);
+}
+
+void Triangle::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept
+{
+    if (x1 >= x2) std::swap(x1, x2);
+    for (; x1 <= x2; x1++) {
+        SDL_RenderDrawPoint(renderer, x1, y);
+    }
+}
+
+void Triangle::compute_int_coord() noexcept
+{
+    x1 = static_cast<int>(std::round(a.x));
+    y1 = static_cast<int>(std::round(a.y));
+    x2 = static_cast<int>(std::round(b.x));
+    y2 = static_cast<int>(std::round(b.y));
+    x3 = static_cast<int>(std::round(c.x));
+    y3 = static_cast<int>(std::round(c.y));
+}
+
+void Triangle::fill_top_flat(SDL_Renderer* renderer)
+{
     dy1 = y2 - y1;
     dx1 = x2 - x1;
     if (dx1 < 0) {
@@ -106,15 +122,14 @@ void Triangle::fill(SDL_Renderer* renderer)
         changed2 = true;
     }
 
-
     /* here we know that v1.y <= v2.y <= v3.y */
     /* check for trivial case of bottom-flat triangle */
 
     e2 = dx2 >> 1;
     // Flat top, just process the second half
     if (y1 == y2)
-        goto next;
-    
+        return;
+
     e1 = dx1 >> 1;
     for (int i = 0; i < dx1;)
     {
@@ -143,7 +158,7 @@ void Triangle::fill(SDL_Renderer* renderer)
                 else
                     goto next1;
             }
-            
+
             if (changed1)
                 break;
             else
@@ -152,7 +167,7 @@ void Triangle::fill(SDL_Renderer* renderer)
         // Move line
     next1:
         // process second line until y value is about to change
-        while (1)
+        while (true)
         {
             e2 += dy2;
             while (e2 >= dx2)
@@ -169,7 +184,7 @@ void Triangle::fill(SDL_Renderer* renderer)
                 t2x += signx2;
         }
     next2:
-        fill_update_minmax(minx, maxx, t1x, t2x);
+        fill_update_minmax();
         // Draw line from min to max points found on the y
         draw_hline(renderer, minx, maxx, y);
         // Now increase y
@@ -183,9 +198,10 @@ void Triangle::fill(SDL_Renderer* renderer)
         if (y == y2)
             break;
     }
+}
 
-next:
-    // Second half
+void Triangle::fill_bottom_flat(SDL_Renderer* renderer)
+{
     dy1 = y3 - y2;
     dx1 = x3 - x2;
     if (dx1 < 0) {
@@ -223,7 +239,7 @@ next:
         {
             e1 += dy1;
             while (e1 >= dx1)
-            //if (e1 >= dx1)
+                //if (e1 >= dx1)
             {
                 e1 -= dx1;
                 if (changed1)
@@ -261,7 +277,7 @@ next:
                 t2x += signx2;
         }
     next4:
-        fill_update_minmax(minx, maxx, t1x, t2x);
+        fill_update_minmax();
         // Draw line from min to max points found on the y
         draw_hline(renderer, minx, maxx, y);
         // Now increase y
@@ -277,15 +293,7 @@ next:
     }
 }
 
-void Triangle::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept
-{
-    if (x1 >= x2) std::swap(x1, x2);
-    for (; x1 <= x2; x1++) {
-        SDL_RenderDrawPoint(renderer, x1, y);
-    }
-}
-
-void Triangle::fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x)
+void Triangle::fill_update_minmax()
 {
     if (minx > t1x)
         minx = t1x;
@@ -295,14 +303,4 @@ void Triangle::fill_update_minmax(int& minx, int& maxx, int& t1x, int& t2x)
         maxx = t1x;
     if (maxx < t2x)
         maxx = t2x;
-}
-
-void Triangle::compute_int_coord() noexcept
-{
-    x1 = static_cast<int>(std::round(a.x));
-    y1 = static_cast<int>(std::round(a.y));
-    x2 = static_cast<int>(std::round(b.x));
-    y2 = static_cast<int>(std::round(b.y));
-    x3 = static_cast<int>(std::round(c.x));
-    y3 = static_cast<int>(std::round(c.y));
 }
