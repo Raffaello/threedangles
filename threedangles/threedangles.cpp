@@ -74,11 +74,13 @@ int main(int argc, char* argv[])
     const float znear = 0.1f;
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
-    Vec3d cam;
-    Vec3d lookAt(0.0f, 0.0f, 1.0f);
+    Vec3d cam(0.0f, 0.0f, -1.0f);
+    Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
 
     bool showHiddenVertexes = false;
+    // 0 wire, 1 filled, 2 filled+wire
+    short filled = 1;
     bool illuminationOn = true;
 
     // offset params
@@ -112,6 +114,10 @@ int main(int argc, char* argv[])
                 illuminationOn = !illuminationOn;
                 SDL_Log("Illumination ON = %d", illuminationOn);
                 break;
+            case SDLK_f:
+                filled++; filled %= 3;
+                SDL_Log("Filling Triangles = %d", filled);
+                break;
             case SDLK_KP_PLUS:
                 offset -= 0.5f;
                 SDL_Log("offset = %f", offset);
@@ -139,11 +145,9 @@ int main(int argc, char* argv[])
                 cam_yaw += 0.1f;
                 break;
             case SDLK_w:
-                //cam.z += 1.0f;
                 cam = cam + lookAt * 0.5f;
                 break;
             case SDLK_s:
-                //cam.z -= 1.0f;
                 cam = cam - lookAt * 0.5f;
                 break;
 
@@ -197,14 +201,14 @@ int main(int argc, char* argv[])
 
             triTransformed = matWorld * tri;
 
-            // Normals
+            // Normals (back-face culling)
             Vec3d normal, line1, line2;
 
             line1 = triTransformed.b - triTransformed.a;
             line2 = triTransformed.c - triTransformed.a;
             normal = line1.crossProd(line2).normalize();
             float norm_dp = normal.dotProd(triTransformed.a - cam);
-
+            
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
 
@@ -216,24 +220,24 @@ int main(int argc, char* argv[])
                 uint8_t r, g, b;
                 r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
                 triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
-                // end Illuminiation
             }
             else {
                 triTransformed.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
             }
 
             // World Space -> View Space
-            //matView.MulMatVec(triTransformed, triViewed);
             triViewed = matView * triTransformed;
+            // TODO avoid to setColor ...
+            // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
-            
+
             // Projection 3D -> 2D
-            //matProj.MulMatVec(triViewed, triProj);
             triProj = (matProj * triViewed).normByW();
             // copy the color from the other translated triangle to the projected one (this should be optimized)
             triProj.setColor(triViewed);
 
             // Scale into view
+            // TODO use a matrix instead...
             const Vec3d offsetView(1.0f, 1.0f, 0.0f);
             triProj = triProj + offsetView;
             
@@ -258,11 +262,20 @@ int main(int argc, char* argv[])
             }
         );
 
-        for (auto& t : trianglesToRaster) {
-            //t.fill(renderer);
-            // Wire frame debug
-            //SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-            t.draw(renderer);
+        if (filled >= 1) {
+            for (auto& t : trianglesToRaster) {
+                t.fill(renderer);
+                // Wire frame debug
+                if (filled == 2) {
+                    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                    t.draw(renderer);
+                }
+            }
+        }
+        else {
+            for (auto& t : trianglesToRaster) {
+                t.draw(renderer);
+            }
         }
 
         // Swap buffers

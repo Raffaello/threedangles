@@ -1,7 +1,11 @@
 #include <Vec3d.hpp>
 #include <cmath>
 
-Vec3d::Vec3d(const float x, const float y, const float z) : x(x), y(y), z(z)
+Vec3d::Vec3d(const float x, const float y, const float z) : Vec3d(x, y, z, 1.0f)
+{
+}
+
+Vec3d::Vec3d(const float x, const float y, const float z, const float w) :x(x), y(y), z(z), w(w)
 {
 }
 
@@ -47,5 +51,5 @@ Vec3d Vec3d::crossProd(const Vec3d& v)
 
 Vec3d Vec3d::normByW()
 {
-    return { x / w, y / w, z / w };
+    return { x / w, y / w, z / w, 1.0f / w };
 }
