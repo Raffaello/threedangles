@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
     
     int width = 512;
     int height = 512;
+    const float w2 = 0.5f * static_cast<float>(width);
+    const float h2 = 0.5f * static_cast<float>(height);
     int flags = 0; // SDL_WINDOW_FULLSCREEN
     int r_flags = SDL_RENDERER_SOFTWARE;
     std::string title = "ThreeDangles";
@@ -60,7 +62,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
+    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -68,7 +70,7 @@ int main(int argc, char* argv[])
 
     // Projection Matrix
     const float fov = 90.0f;
-    const float zfar = 1000.0f;
+    const float zfar = 100.0f;
     const float znear = 0.1f;
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
@@ -80,7 +82,7 @@ int main(int argc, char* argv[])
     bool illuminationOn = true;
 
     // offset params
-    float offset = 16.0f;
+    float offset = 5.0f;
 
     bool quit = false;
     while (!quit) {
@@ -111,30 +113,30 @@ int main(int argc, char* argv[])
                 SDL_Log("Illumination ON = %d", illuminationOn);
                 break;
             case SDLK_KP_PLUS:
-                offset += 0.5f;
-                SDL_Log("offset = %f", offset);
-                break;
-            case SDLK_KP_MINUS:
                 offset -= 0.5f;
                 SDL_Log("offset = %f", offset);
                 break;
-            case SDLK_UP:
-                cam.y -= 1.0f;
+            case SDLK_KP_MINUS:
+                offset += 0.5f;
+                SDL_Log("offset = %f", offset);
                 break;
-            case SDLK_DOWN:
+            case SDLK_UP:
                 cam.y += 1.0f;
                 break;
-            case SDLK_LEFT:
-                cam.x -= 1.0f;
+            case SDLK_DOWN:
+                cam.y -= 1.0f;
                 break;
-            case SDLK_RIGHT:
+            case SDLK_LEFT:
                 cam.x += 1.0f;
                 break;
+            case SDLK_RIGHT:
+                cam.x -= 1.0f;
+                break;
             case SDLK_a:
-                cam_yaw += 0.1f;
+                cam_yaw -= 0.1f;
                 break;
             case SDLK_d:
-                cam_yaw -= 0.1f;
+                cam_yaw += 0.1f;
                 break;
             case SDLK_w:
                 //cam.z += 1.0f;
@@ -161,8 +163,8 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         // Rotation
-        //float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        float alpha = 0.0f;
+        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        //alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
 
@@ -206,7 +208,7 @@ int main(int argc, char* argv[])
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
 
-            // Illumination
+            // Illumination (flat shading)
             if (illuminationOn)
             {
                 Vec3d light_direction(0.0f, 0.0f,-1.0f);
@@ -215,6 +217,9 @@ int main(int argc, char* argv[])
                 r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
                 triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
                 // end Illuminiation
+            }
+            else {
+                triTransformed.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
             }
 
             // World Space -> View Space
@@ -231,8 +236,6 @@ int main(int argc, char* argv[])
             // Scale into view
             const Vec3d offsetView(1.0f, 1.0f, 0.0f);
             triProj = triProj + offsetView;
-            const float w2 = 0.5f * static_cast<float>(width);
-            const float h2 = 0.5f * static_cast<float>(height);
             
             triProj.a.x *= w2;
             triProj.a.y *= h2;
@@ -248,17 +251,18 @@ int main(int argc, char* argv[])
         //sorting like a "depth buffer", Z-depth sorting
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {
-                float z1 = (t1.a.z + t1.b.z + t1.c.z) / 3.0f;
-                float z2 = (t2.a.z + t2.b.z + t2.c.z) / 3.0f;
-                return z1 > z2;
+                // divsion by 3.0f can be skipped
+                float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
+                float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
+                return z1 < z2;
             }
         );
 
         for (auto& t : trianglesToRaster) {
-            t.fill(renderer);
+            //t.fill(renderer);
             // Wire frame debug
-           /*SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-           triProj.draw(renderer);*/
+            //SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+            t.draw(renderer);
         }
 
         // Swap buffers
