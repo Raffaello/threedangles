@@ -65,16 +65,16 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
+    if (!mesh.loadFromOBJFile("plain_mountains.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
     }
 
     // Projection Matrix
-    const float fov = 90.0f;
+    const float fov = 45.0f;
     const float zfar = 50.0f;
-    const float znear = 0.1f;
+    const float znear = 1.f;
     // TODO unify Projection, offsetview and matScale
     // BODY into 1 matrix only instead of 3 distinct operations.
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
@@ -254,15 +254,17 @@ int main(int argc, char* argv[])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
                 nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
-                // clipping on Zfar plane (clipped[2] -> vector<clippped>)
-                
                 for (int i = 0; i < nClippedTriangles; i++)
+                    clips.push_back(clipped[i]);
+
+                // clipping on Zfar plane (clipped[2] -> vector<clippped>)
+                /*for (int i = 0; i < nClippedTriangles; i++)
                 {
                     Triangle clippedFar[2];
                     int nClippedTrianglesFar = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, triViewed, clippedFar[0], clippedFar[1]);
                     for (int n = 0; n < nClippedTrianglesFar; n++)
                         clips.push_back(clippedFar[n]);
-                }
+                }*/
             }
             else {
                 clips.push_back(triViewed);
@@ -387,7 +389,7 @@ int main(int argc, char* argv[])
         if (totTicks < frameTime_ms)
             frameDelay = frameTime_ms - totTicks;
         
-        //SDL_SetWindowTitle(window, (title + " FPS: ~" + std::to_string(1000.0f/frameDelay)).c_str());
+        SDL_SetWindowTitle(window, (title + " FPS: ~" + std::to_string(1000.0f/totTicks)).c_str());
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
     }

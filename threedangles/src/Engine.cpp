@@ -8,23 +8,23 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     // Perspective Projection Matrix
     // @see https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
     Mat4x4 m;
-    //const float ar = static_cast<float>(w) / static_cast<float>(h);
-    //const float q = zfar / (zfar - znear);
-    //const float fov_rad = 1.0f / std::tan(fov * 0.5f / 180.0f * PI);
+    /*const float ar = static_cast<float>(w) / static_cast<float>(h);
+    const float q = zfar / (zfar - znear);
+    const float fov_rad = 1.0f / std::tan(fov * 0.5f / 180.0f * PI);
 
-   /* m.m[0][0] = ar * fov_rad;
+    m.m[0][0] = ar * fov_rad;
     m.m[1][1] = fov_rad;
     m.m[2][2] = q;
     m.m[2][3] = 1.0f;
     m.m[3][2] = -(znear * q);
     m.m[3][3] = 0.0f;*/
 
-    const float top = znear * tan(PI / 180.0f * fov * 0.5f);
+    const float top = znear * tan(PI / 180.0f * 0.5f * fov);
     const float bottom = -top;
     const float tb = top - bottom;
     //const float right = top * ar;
     //const float left = -right;
-    const float right = static_cast<float>(w) * tb / (2*static_cast<float>(h));
+    const float right = static_cast<float>(w) * tb / (2.0f * static_cast<float>(h));
     const float left = -right;
 
     const float rl = right - left;
@@ -40,13 +40,13 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     m.m[2][3] = -2.0f * zfar * znear / zfn;
     m.m[3][2] = -1.0f;
 
-    // left handed?
+    // left handed
     m.m[0][2] *= -1.0f;
     m.m[1][2] *= -1.0f;
     m.m[2][2] *= -1.0f;
     m.m[3][2] *= -1.0f;
 
-
+    
     return m;
 }
 
@@ -235,7 +235,7 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
 
         // Copy appearance info to new triangle
         out_tri1.setColor(in_tri);
-        out_tri1.setColor(0xFF, 0, 0, 255);
+        //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
         out_tri1.a = *inside_points[0];
@@ -256,9 +256,9 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
 
         // Copy appearance info to new triangles
         out_tri1.setColor(in_tri);
-        out_tri1.setColor(0, 0xFF, 0, 255);
+        //out_tri1.setColor(0, 64, 0, 255);
         out_tri2.setColor(in_tri);
-        out_tri2.setColor(0, 0, 0xFF, 255);
+        //out_tri2.setColor(0, 0, 64, 255);
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
