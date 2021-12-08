@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
+    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 
     // Projection Matrix
     const float fov = 90.0f;
-    const float zfar = 100.0f;
+    const float zfar = 50.0f;
     const float znear = 0.1f;
     // TODO unify Projection, offsetview and matScale
     // BODY into 1 matrix only instead of 3 distinct operations.
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     // 0 wire, 1 filled, 2 filled+wire
     short filled = 1;
     bool illuminationOn = true;
-
+    bool clipping = true;
     // offset params
     float offset = 5.0f;
 
@@ -161,6 +161,9 @@ int main(int argc, char* argv[])
                 cam = cam - lookAt * 0.5f;
                 SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
                 break;
+            case SDLK_c:
+                clipping = !clipping;
+                SDL_Log("clipping = %d", clipping);
 
             default:
                 break;
@@ -179,7 +182,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 0.0f;
+        alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
 
@@ -242,16 +245,35 @@ int main(int argc, char* argv[])
             // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
 
-            // Clipping on Znear plane (triViewd -> clipped[2])
-            int nClippedTriangles = 0;
-            Triangle clipped[2];
-            nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
-            for (int n = 0; n < nClippedTriangles; n++)
+            // TODO clipping is like fixed!
+            // BODY when moving the camera the "frustum" is fixed
+            // BODY not following the camera ...
+            std::vector<Triangle> clips;// (clipped, clipped + nClippedTriangles);
+            if (clipping) {
+                // Clipping on Znear plane (triViewd -> clipped[2])
+                int nClippedTriangles = 0;
+                Triangle clipped[2];
+                nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
+                // clipping on Zfar plane (clipped[2] -> vector<clippped>)
+                
+                for (int i = 0; i < nClippedTriangles; i++)
+                {
+                    Triangle clippedFar[2];
+                    int nClippedTrianglesFar = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, triViewed, clippedFar[0], clippedFar[1]);
+                    for (int n = 0; n < nClippedTrianglesFar; n++)
+                        clips.push_back(clippedFar[n]);
+                }
+            }
+            else {
+                clips.push_back(triViewed);
+            }
+
+            for (auto& c: clips)
             {
                 // Projection 3D -> 2D
-                triProj = (matProj * clipped[n]).normByW();
+                triProj = (matProj * c).normByW();
                 // copy the color from the other translated triangle to the projected one (this should be optimized)
-                triProj.setColor(clipped[n]);
+                triProj.setColor(c);
                 // Scale into view
                 triProj = triProj + offsetView;
                 triProj = matScale * triProj;
@@ -273,17 +295,19 @@ int main(int argc, char* argv[])
 
         if (filled >= 1) {
             for (auto& t : trianglesToRaster) {
-                //t.fill(renderer);
-                //// Wire frame debug
-                //if (filled == 2) {
-                //    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                //    t.draw(renderer);
-                //}
-
+                if (!clipping) {
+                    t.fill(renderer);
+                    // Wire frame debug
+                    if (filled == 2) {
+                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                        t.draw(renderer);
+                    }
+                    continue;
+                }
 
                 // Clip triangles against all four screen edges, this could yield
-            // a bunch of triangles, so create a queue that we traverse to 
-            //  ensure we only test new triangles generated against planes
+                // a bunch of triangles, so create a queue that we traverse to 
+                //  ensure we only test new triangles generated against planes
                 Triangle clipped[2];
                 std::list<Triangle> listTriangles;
 

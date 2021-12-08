@@ -192,8 +192,8 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
 
     // Create two temporary storage arrays to classify points either side of plane
     // If distance sign is positive, point lies on "inside" of plane
-    Vec3d* inside_points[3];  int nInsidePointCount = 0;
-    Vec3d* outside_points[3]; int nOutsidePointCount = 0;
+    Vec3d* inside_points[3]{};  int nInsidePointCount = 0;
+    Vec3d* outside_points[3]{}; int nOutsidePointCount = 0;
 
     // Get signed distance of each point in triangle to plane
     float d0 = dist(in_tri.a);

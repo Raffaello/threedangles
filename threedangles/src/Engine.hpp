@@ -20,7 +20,7 @@ public:
     static Mat4x4 matrix_InversePointAt(Mat4x4& m);
 
 
-    // todo review those 2.
+    // todo review those 2. replace with Cohen-Sutherland / Sutherland-Hodgman algo 
     static Vec3d Vector_IntersectPlane(Vec3d& plane_p, Vec3d& plane_n, Vec3d& lineStart, Vec3d& lineEnd);
     static int Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in_tri, Triangle& out_tri1, Triangle& out_tri2);
 };
