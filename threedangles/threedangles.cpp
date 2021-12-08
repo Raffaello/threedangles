@@ -14,6 +14,9 @@
 
 #include <SDL2/SDL.h>
 
+
+#include <list>
+
 using std::cerr;
 using std::endl;
 using std::cout;
@@ -239,16 +242,23 @@ int main(int argc, char* argv[])
             // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
 
-            // Projection 3D -> 2D
-            triProj = (matProj * triViewed).normByW();
-            // copy the color from the other translated triangle to the projected one (this should be optimized)
-            triProj.setColor(triViewed);
-            // Scale into view
-            triProj = triProj + offsetView;
-            triProj = matScale * triProj;
-            
-            // Triangle Rasterization
-            trianglesToRaster.push_back(triProj);
+            // Clipping on Znear plane (triViewd -> clipped[2])
+            int nClippedTriangles = 0;
+            Triangle clipped[2];
+            nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
+            for (int n = 0; n < nClippedTriangles; n++)
+            {
+                // Projection 3D -> 2D
+                triProj = (matProj * clipped[n]).normByW();
+                // copy the color from the other translated triangle to the projected one (this should be optimized)
+                triProj.setColor(clipped[n]);
+                // Scale into view
+                triProj = triProj + offsetView;
+                triProj = matScale * triProj;
+
+                // Triangle Rasterization
+                trianglesToRaster.push_back(triProj);
+            }
         }
 
         //sorting like a "depth buffer", Z-depth sorting
@@ -263,11 +273,75 @@ int main(int argc, char* argv[])
 
         if (filled >= 1) {
             for (auto& t : trianglesToRaster) {
-                t.fill(renderer);
-                // Wire frame debug
-                if (filled == 2) {
-                    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    t.draw(renderer);
+                //t.fill(renderer);
+                //// Wire frame debug
+                //if (filled == 2) {
+                //    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                //    t.draw(renderer);
+                //}
+
+
+                // Clip triangles against all four screen edges, this could yield
+            // a bunch of triangles, so create a queue that we traverse to 
+            //  ensure we only test new triangles generated against planes
+                Triangle clipped[2];
+                std::list<Triangle> listTriangles;
+
+                // Add initial triangle
+                listTriangles.push_back(t);
+                int nNewTriangles = 1;
+
+                for (int p = 0; p < 4; p++)
+                {
+                    int nTrisToAdd = 0;
+                    while (nNewTriangles > 0)
+                    {
+                        // Take triangle from front of queue
+                        Triangle test = listTriangles.front();
+                        listTriangles.pop_front();
+                        nNewTriangles--;
+
+                        // Clip it against a plane. We only need to test each 
+                        // subsequent plane, against subsequent new triangles
+                        // as all triangles after a plane clip are guaranteed
+                        // to lie on the inside of the plane. I like how this
+                        // comment is almost completely and utterly justified
+                        switch (p)
+                        {
+                        case 0:
+                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            break;
+                        case 1:
+                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, (float)height - 1, 0.0f }, { 0.0f, -1.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            break;
+                        case 2:
+                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            break;
+                        case 3:
+                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ (float)width - 1, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            break;
+                        default:
+                            break;
+                        }
+
+                        // Clipping may yield a variable number of triangles, so
+                        // add these new ones to the back of the queue for subsequent
+                        // clipping against next planes
+                        for (int w = 0; w < nTrisToAdd; w++)
+                            listTriangles.push_back(clipped[w]);
+                    }
+                    nNewTriangles = listTriangles.size();
+                }
+
+                // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+                for (auto& t : listTriangles)
+                {
+                    t.fill(renderer);
+                    //DrawTriangle(t.p[0].x, t.p[0].y, t.p[1].x, t.p[1].y, t.p[2].x, t.p[2].y, PIXEL_SOLID, FG_BLACK);
+                    if (filled == 2) {
+                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                        t.draw(renderer);
+                    }
                 }
             }
         }
