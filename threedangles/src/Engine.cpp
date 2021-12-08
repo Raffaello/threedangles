@@ -55,8 +55,8 @@ Mat4x4 Engine::matrix_createRotationZ(const float theta)
     Mat4x4 matRotZ;
 
     matRotZ.m[0][0] = std::cos(theta);
-    matRotZ.m[0][1] = -std::sin(theta);
-    matRotZ.m[1][0] = std::sin(theta);
+    matRotZ.m[0][1] = std::sin(theta);
+    matRotZ.m[1][0] = -std::sin(theta);
     matRotZ.m[1][1] = std::cos(theta);
     matRotZ.m[2][2] = 1.0f;
     matRotZ.m[3][3] = 1.0f;
@@ -70,8 +70,8 @@ Mat4x4 Engine::matrix_createRotationX(const float theta)
 
     matRotX.m[0][0] = 1.0f;
     matRotX.m[1][1] = std::cos(theta);
-    matRotX.m[1][2] = -std::sin(theta);
-    matRotX.m[2][1] = std::sin(theta);
+    matRotX.m[1][2] = std::sin(theta);
+    matRotX.m[2][1] = -std::sin(theta);
     matRotX.m[2][2] = std::cos(theta);
     matRotX.m[3][3] = 1.0f;
 
@@ -83,8 +83,8 @@ Mat4x4 Engine::matrix_createRotationY(const float theta)
     Mat4x4 matRotY;
 
     matRotY.m[0][0] = std::cos(theta);
-    matRotY.m[0][2] = std::sin(theta);
-    matRotY.m[2][0] = -std::sin(theta);
+    matRotY.m[0][2] = -std::sin(theta);
+    matRotY.m[2][0] = std::sin(theta);
     matRotY.m[1][1] = 1.0f;
     matRotY.m[2][2] = std::cos(theta);
     matRotY.m[3][3] = 1.0f;

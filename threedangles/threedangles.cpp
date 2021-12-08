@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
+    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        alpha = 0.0f;
+        //alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
         Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
 
