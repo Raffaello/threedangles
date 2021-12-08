@@ -42,43 +42,43 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     return m;
 }
 
-Mat4x4 Engine::matrix_createRotationZ(const float alpha)
+Mat4x4 Engine::matrix_createRotationZ(const float theta)
 {
     Mat4x4 matRotZ;
 
-    matRotZ.m[0][0] = std::cos(alpha);
-    matRotZ.m[0][1] = std::sin(alpha);
-    matRotZ.m[1][0] = -std::sin(alpha);
-    matRotZ.m[1][1] = std::cos(alpha);
+    matRotZ.m[0][0] = std::cos(theta);
+    matRotZ.m[0][1] = std::sin(theta);
+    matRotZ.m[1][0] = -std::sin(theta);
+    matRotZ.m[1][1] = std::cos(theta);
     matRotZ.m[2][2] = 1.0f;
     matRotZ.m[3][3] = 1.0f;
 
     return matRotZ;
 }
 
-Mat4x4 Engine::matrix_createRotationX(const float alpha)
+Mat4x4 Engine::matrix_createRotationX(const float theta)
 {
     Mat4x4 matRotX;
 
     matRotX.m[0][0] = 1.0f;
-    matRotX.m[1][1] = std::cos(alpha * 0.5f);
-    matRotX.m[1][2] = std::sin(alpha * 0.5f);
-    matRotX.m[2][1] = -std::sin(alpha * 0.5f);
-    matRotX.m[2][2] = std::cos(alpha * 0.5f);
+    matRotX.m[1][1] = std::cos(theta * 0.5f);
+    matRotX.m[1][2] = std::sin(theta * 0.5f);
+    matRotX.m[2][1] = -std::sin(theta * 0.5f);
+    matRotX.m[2][2] = std::cos(theta * 0.5f);
     matRotX.m[3][3] = 1.0f;
 
     return matRotX;
 }
 
-Mat4x4 Engine::matrix_createRotationY(const float alpha)
+Mat4x4 Engine::matrix_createRotationY(const float theta)
 {
     Mat4x4 matRotY;
 
-    matRotY.m[0][0] = std::cos(alpha);
-    matRotY.m[0][2] = std::sin(alpha);
-    matRotY.m[2][0] = -std::sin(alpha);
+    matRotY.m[0][0] = std::cos(theta);
+    matRotY.m[0][2] = std::sin(theta);
+    matRotY.m[2][0] = -std::sin(theta);
     matRotY.m[1][1] = 1.0f;
-    matRotY.m[2][2] = std::cos(alpha);
+    matRotY.m[2][2] = std::cos(theta);
     matRotY.m[3][3] = 1.0f;
 
     return matRotY;
