@@ -31,13 +31,13 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     
     const float zfn = zfar - znear;
 
-    m.m[0][0] = 2 * znear / rl;
+    m.m[0][0] = 2.0f * znear / rl;
     m.m[0][2] = (right + left) / rl;
-    m.m[1][1] = 2 * znear / tb;
+    m.m[1][1] = 2.0f * znear / tb;
     m.m[1][2] = (top + bottom) / tb;
     m.m[2][2] = -(zfar + znear) / zfn;
-    m.m[2][3] = -2 * zfar * znear / zfn;
-    m.m[3][2] = -1;
+    m.m[2][3] = -2.0f * zfar * znear / zfn;
+    m.m[3][2] = -1.0f;
 
     return m;
 }
@@ -106,6 +106,18 @@ Mat4x4 Engine::matrix_createIdentity()
 
     m.m[0][0] = m.m[1][1] = m.m[2][2] = m.m[3][3] = 1.0f;
     
+    return m;
+}
+
+Mat4x4 Engine::matrix_createScale(const float a, const float b, const float c)
+{
+    Mat4x4 m;
+
+    m.m[0][0] = a;
+    m.m[1][1] = b;
+    m.m[2][2] = c;
+    m.m[3][3] = 1.0f;
+
     return m;
 }
 

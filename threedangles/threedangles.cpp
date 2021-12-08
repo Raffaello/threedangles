@@ -72,7 +72,11 @@ int main(int argc, char* argv[])
     const float fov = 90.0f;
     const float zfar = 100.0f;
     const float znear = 0.1f;
+    // TODO unify Projection, offsetview and matScale
+    // BODY into 1 matrix only instead of 3 distinct operations.
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
+    const Vec3d offsetView(1.0f, 1.0f, 0.0f);
+    Mat4x4 matScale = Engine::matrix_createScale(w2, h2, 1.0f);
 
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
@@ -235,18 +239,9 @@ int main(int argc, char* argv[])
             triProj = (matProj * triViewed).normByW();
             // copy the color from the other translated triangle to the projected one (this should be optimized)
             triProj.setColor(triViewed);
-
             // Scale into view
-            // TODO use a matrix instead...
-            const Vec3d offsetView(1.0f, 1.0f, 0.0f);
             triProj = triProj + offsetView;
-            
-            triProj.a.x *= w2;
-            triProj.a.y *= h2;
-            triProj.b.x *= w2;
-            triProj.b.y *= h2;
-            triProj.c.x *= w2;
-            triProj.c.y *= h2;
+            triProj = matScale * triProj;
             
             // Triangle Rasterization
             trianglesToRaster.push_back(triProj);

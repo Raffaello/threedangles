@@ -27,5 +27,12 @@ Vec3d Mat4x4::operator*(const Vec3d& i)
 
 Triangle Mat4x4::operator*(const Triangle& i)
 {
-    return { *this * i.a, *this * i.b, *this * i.c };
+    //return { *this * i.a, *this * i.b, *this * i.c };
+    Triangle t(i);
+
+    t.a = *this * i.a;
+    t.b = *this * i.b;
+    t.c = *this * i.c;
+
+    return t;
 }

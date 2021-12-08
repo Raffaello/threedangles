@@ -13,6 +13,8 @@ public:
     static Mat4x4 matrix_createRotationY(const float theta);
     static Mat4x4 matrix_createTranslation(const Vec3d& v);
     static Mat4x4 matrix_createIdentity();
+    static Mat4x4 matrix_createTranslation(const float k);
+    static Mat4x4 matrix_createScale(const float a, const float b, const float c);
     // todo those should be constant, review the operators overloading
     static Mat4x4 matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up);
     static Mat4x4 matrix_InversePointAt(Mat4x4& m);
