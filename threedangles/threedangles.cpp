@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
+    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -123,11 +123,11 @@ int main(int argc, char* argv[])
                 SDL_Log("Filling Triangles = %d", filled);
                 break;
             case SDLK_KP_PLUS:
-                offset -= 0.5f;
+                offset += 0.5f;
                 SDL_Log("offset = %f", offset);
                 break;
             case SDLK_KP_MINUS:
-                offset += 0.5f;
+                offset -= 0.5f;
                 SDL_Log("offset = %f", offset);
                 break;
             case SDLK_UP:
@@ -144,15 +144,19 @@ int main(int argc, char* argv[])
                 break;
             case SDLK_a:
                 cam_yaw -= 0.1f;
+                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
                 break;
             case SDLK_d:
                 cam_yaw += 0.1f;
+                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
                 break;
             case SDLK_w:
                 cam = cam + lookAt * 0.5f;
+                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
                 break;
             case SDLK_s:
                 cam = cam - lookAt * 0.5f;
+                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
                 break;
 
             default:
@@ -172,9 +176,9 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 0.0f;
+        alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
-        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha);
+        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
 
         // Translation
         Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
@@ -253,7 +257,7 @@ int main(int argc, char* argv[])
                 // divsion by 3.0f can be skipped
                 float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
                 float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
-                return z1 < z2;
+                return z1 > z2;
             }
         );
 

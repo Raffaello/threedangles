@@ -31,6 +31,7 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     
     const float zfn = zfar - znear;
 
+    // right hand, frustum
     m.m[0][0] = 2.0f * znear / rl;
     m.m[0][2] = (right + left) / rl;
     m.m[1][1] = 2.0f * znear / tb;
@@ -38,6 +39,13 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     m.m[2][2] = -(zfar + znear) / zfn;
     m.m[2][3] = -2.0f * zfar * znear / zfn;
     m.m[3][2] = -1.0f;
+
+    // left handed?
+    m.m[0][2] *= -1.0f;
+    m.m[1][2] *= -1.0f;
+    m.m[2][2] *= -1.0f;
+    m.m[3][2] *= -1.0f;
+
 
     return m;
 }
@@ -47,8 +55,8 @@ Mat4x4 Engine::matrix_createRotationZ(const float theta)
     Mat4x4 matRotZ;
 
     matRotZ.m[0][0] = std::cos(theta);
-    matRotZ.m[0][1] = std::sin(theta);
-    matRotZ.m[1][0] = -std::sin(theta);
+    matRotZ.m[0][1] = -std::sin(theta);
+    matRotZ.m[1][0] = std::sin(theta);
     matRotZ.m[1][1] = std::cos(theta);
     matRotZ.m[2][2] = 1.0f;
     matRotZ.m[3][3] = 1.0f;
@@ -61,10 +69,10 @@ Mat4x4 Engine::matrix_createRotationX(const float theta)
     Mat4x4 matRotX;
 
     matRotX.m[0][0] = 1.0f;
-    matRotX.m[1][1] = std::cos(theta * 0.5f);
-    matRotX.m[1][2] = std::sin(theta * 0.5f);
-    matRotX.m[2][1] = -std::sin(theta * 0.5f);
-    matRotX.m[2][2] = std::cos(theta * 0.5f);
+    matRotX.m[1][1] = std::cos(theta);
+    matRotX.m[1][2] = -std::sin(theta);
+    matRotX.m[2][1] = std::sin(theta);
+    matRotX.m[2][2] = std::cos(theta);
     matRotX.m[3][3] = 1.0f;
 
     return matRotX;

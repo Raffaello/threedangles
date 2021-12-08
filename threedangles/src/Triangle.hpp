@@ -26,6 +26,11 @@ public:
     void fill(SDL_Renderer* renderer);
 
 private:
+    // TODO review these variables and method
+    // BODY color shouldn't be used.. ?
+    // BODY the draw and fill method should 
+    // BODY call external routines
+    // BODY so remove those below vars and methods.
     uint8_t _r = 0;
     uint8_t _g = 0;
     uint8_t _b = 0;
