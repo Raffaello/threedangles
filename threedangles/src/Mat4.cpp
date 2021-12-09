@@ -125,7 +125,7 @@ Mat4 Mat4::createRotationY(const float theta)
     matRotY.m[0][2] = -std::sin(theta);
     matRotY.m[2][0] = -matRotY.m[0][2];
     matRotY.m[1][1] = 1.0f;
-    matRotY.m[2][2] = std::cos(theta);
+    matRotY.m[2][2] = matRotY.m[0][0];
     matRotY.m[3][3] = 1.0f;
 
     return matRotY;
@@ -137,8 +137,8 @@ Mat4 Mat4::createRotationZ(const float theta)
 
     matRotZ.m[0][0] = std::cos(theta);
     matRotZ.m[0][1] = std::sin(theta);
-    matRotZ.m[1][0] = -std::sin(theta);
-    matRotZ.m[1][1] = std::cos(theta);
+    matRotZ.m[1][0] = -matRotZ.m[0][1];
+    matRotZ.m[1][1] = matRotZ.m[0][0];
     matRotZ.m[2][2] = 1.0f;
     matRotZ.m[3][3] = 1.0f;
 
@@ -189,7 +189,6 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[1][2] *= -1.0f;
     m.m[2][2] *= -1.0f;
     m.m[3][2] *= -1.0f;*/
-
 
     return m;
 }

@@ -124,18 +124,44 @@ TEST(Mat4, RotX)
             EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
         }
     }
-    
-
 }
 
 TEST(Mat4, RotY)
 {
+    constexpr float e = std::numeric_limits<float>::epsilon();
+    Mat4 a = Mat4::createRotationY(Mat4::deg2rad(90));
+    Mat4 b;
+    b.m[0][0] = 0;
+    b.m[0][2] = -1;
+    b.m[1][1] = 1;
+    b.m[2][0] = 1;
+    b.m[2][2] = 0;
+    b.m[3][3] = 1;
 
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
+        }
+    }
 }
 
 TEST(Mat4, RotZ)
 {
+    constexpr float e = std::numeric_limits<float>::epsilon();
+    Mat4 a = Mat4::createRotationZ(Mat4::deg2rad(90));
+    Mat4 b;
+    b.m[0][0] = 0;
+    b.m[0][1] = 1;
+    b.m[1][0] = -1;
+    b.m[1][1] = 0;
+    b.m[2][2] = 1;
+    b.m[3][3] = 1;
 
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
+        }
+    }
 }
 
 TEST(Mat4, Projection)
