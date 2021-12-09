@@ -9,7 +9,7 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     // Perspective Projection Matrix
     // @see https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
     Mat4x4 m;
-    const float ar = static_cast<float>(w) / static_cast<float>(h);
+    //const float ar = static_cast<float>(w) / static_cast<float>(h);
     /*
     const float q = zfar / (zfar - znear);
     const float fov_rad = 1.0f / std::tan(fov * 0.5f / 180.0f * PI);
