@@ -21,9 +21,9 @@ The algorithms will be all implemented from scratch without using any modern lib
 
 Their implementation will be based on :
 
-- CPU/FPU
-- SIMD instructions
-- GPU
+- [x] CPU/FPU
+- [ ] SIMD instructions
+- [ ] GPU
 
 So it would be possible to benchmark those too.
 
