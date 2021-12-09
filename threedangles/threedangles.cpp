@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
         return -1;
     }
     
-    int width = 512;
-    int height = 512;
+    int width = 640;
+    int height = 480;
     const float w2 = 0.5f * static_cast<float>(width);
     const float h2 = 0.5f * static_cast<float>(height);
     int flags = 0; // SDL_WINDOW_FULLSCREEN
@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_mountains.obj")) {
+    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
     }
 
     // Projection Matrix
-    const float fov = 45.0f;
+    const float fov = 90.0f;
     const float zfar = 50.0f;
     const float znear = 1.f;
     // TODO unify Projection, offsetview and matScale
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
             case SDLK_c:
                 clipping = !clipping;
                 SDL_Log("clipping = %d", clipping);
-
+                break;
             default:
                 break;
             }
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
         // Camera Matrix
         //lookAt = { 0.0f, 0.0f, 1.0f };
-        Vec3d up(0.0f, 1.0f, 0.0f);
+        Vec3d up(0.0f, -1.0f, 0.0f);
         Vec3d target(0.0f, 0.0f, 1.0f);
         Mat4x4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
         lookAt = matCamRot * target;
@@ -227,6 +227,7 @@ int main(int argc, char* argv[])
                 continue;
 
             // Illumination (flat shading)
+            // todo: it should be computed during the rasterization?
             if (illuminationOn)
             {
                 Vec3d light_direction(0.0f, 0.0f,-1.0f);
@@ -276,7 +277,7 @@ int main(int argc, char* argv[])
                 triProj = (matProj * c).normByW();
                 // copy the color from the other translated triangle to the projected one (this should be optimized)
                 triProj.setColor(c);
-                // Scale into view
+                // Scale into view (viewport)
                 triProj = triProj + offsetView;
                 triProj = matScale * triProj;
 

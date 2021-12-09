@@ -1,14 +1,16 @@
 #include <Engine.hpp>
 #include <cmath>
 
-constexpr float PI = 3.14159f;//2653589793f;
+constexpr float PI = 3.141592653589793f;
+constexpr float deg2rad = (PI / 180.0f);
 
 Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov, const float zfar, const float znear)
 {
     // Perspective Projection Matrix
     // @see https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
     Mat4x4 m;
-    /*const float ar = static_cast<float>(w) / static_cast<float>(h);
+    const float ar = static_cast<float>(w) / static_cast<float>(h);
+    /*
     const float q = zfar / (zfar - znear);
     const float fov_rad = 1.0f / std::tan(fov * 0.5f / 180.0f * PI);
 
@@ -17,18 +19,19 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     m.m[2][2] = q;
     m.m[2][3] = 1.0f;
     m.m[3][2] = -(znear * q);
-    m.m[3][3] = 0.0f;*/
-
-    const float top = znear * tan(PI / 180.0f * 0.5f * fov);
+    m.m[3][3] = 0.0f;
+    */
+    
+    const float top = znear * tan(fov * 0.5f * deg2rad );
     const float bottom = -top;
     const float tb = top - bottom;
     //const float right = top * ar;
-    //const float left = -right;
     const float right = static_cast<float>(w) * tb / (2.0f * static_cast<float>(h));
+    //const float right = ar / tan(fov * 0.5f * deg2rad);
     const float left = -right;
 
     const float rl = right - left;
-    
+
     const float zfn = zfar - znear;
 
     // right hand, frustum
@@ -39,7 +42,7 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     m.m[2][2] = -(zfar + znear) / zfn;
     m.m[2][3] = -2.0f * zfar * znear / zfn;
     m.m[3][2] = -1.0f;
-
+    
     // left handed
     m.m[0][2] *= -1.0f;
     m.m[1][2] *= -1.0f;
