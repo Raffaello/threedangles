@@ -3,6 +3,15 @@
 #include <Mat4.hpp>
 #include <limits>
 
+void cmp_matrices(Mat4& a, Mat4& b)
+{
+    constexpr float e = std::numeric_limits<float>::epsilon();
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
+        }
+    }
+}
 TEST(Mat4, mulVec)
 {
     Vec3d v(1,2,3);
@@ -109,7 +118,6 @@ TEST(Mat4, Scale)
 
 TEST(Mat4, RotX)
 {
-    constexpr float e = std::numeric_limits<float>::epsilon();
     Mat4 a = Mat4::createRotationX(Mat4::deg2rad(90));
     Mat4 b;
     b.m[0][0] = 1;
@@ -118,17 +126,11 @@ TEST(Mat4, RotX)
     b.m[2][1] = -1;
     b.m[2][2] = 0;
     b.m[3][3] = 1;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
-        }
-    }
+    cmp_matrices(a, b);
 }
 
 TEST(Mat4, RotY)
 {
-    constexpr float e = std::numeric_limits<float>::epsilon();
     Mat4 a = Mat4::createRotationY(Mat4::deg2rad(90));
     Mat4 b;
     b.m[0][0] = 0;
@@ -137,17 +139,11 @@ TEST(Mat4, RotY)
     b.m[2][0] = 1;
     b.m[2][2] = 0;
     b.m[3][3] = 1;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
-        }
-    }
+    cmp_matrices(a, b);
 }
 
 TEST(Mat4, RotZ)
 {
-    constexpr float e = std::numeric_limits<float>::epsilon();
     Mat4 a = Mat4::createRotationZ(Mat4::deg2rad(90));
     Mat4 b;
     b.m[0][0] = 0;
@@ -156,12 +152,7 @@ TEST(Mat4, RotZ)
     b.m[1][1] = 0;
     b.m[2][2] = 1;
     b.m[3][3] = 1;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
-        }
-    }
+    cmp_matrices(a, b);
 }
 
 int main(int argc, char** argv)
