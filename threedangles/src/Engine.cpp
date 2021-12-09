@@ -44,10 +44,10 @@ Mat4x4 Engine::matrix_createProjection(const int w, const int h, const float fov
     m.m[3][2] = -1.0f;
     
     // left handed
-    m.m[0][2] *= -1.0f;
+    /*m.m[0][2] *= -1.0f;
     m.m[1][2] *= -1.0f;
     m.m[2][2] *= -1.0f;
-    m.m[3][2] *= -1.0f;
+    m.m[3][2] *= -1.0f;*/
 
     
     return m;
@@ -73,8 +73,8 @@ Mat4x4 Engine::matrix_createRotationX(const float theta)
 
     matRotX.m[0][0] = 1.0f;
     matRotX.m[1][1] = std::cos(theta);
-    matRotX.m[1][2] = std::sin(theta);
-    matRotX.m[2][1] = -std::sin(theta);
+    matRotX.m[1][2] = -std::sin(theta);
+    matRotX.m[2][1] = std::sin(theta);
     matRotX.m[2][2] = std::cos(theta);
     matRotX.m[3][3] = 1.0f;
 
@@ -104,9 +104,13 @@ Mat4x4 Engine::matrix_createTranslation(const Vec3d& v)
     m.m[1][1] = 1.0f;
     m.m[2][2] = 1.0f;
     m.m[3][3] = 1.0f;
-    m.m[3][0] = v.x;
+    /*m.m[3][0] = v.x;
     m.m[3][1] = v.y;
-    m.m[3][2] = v.z;
+    m.m[3][2] = v.z;*/
+    m.m[0][3] = v.x;
+    m.m[1][3] = v.y;
+    m.m[2][3] = v.z;
+
 
     return m;
 }
@@ -134,6 +138,7 @@ Mat4x4 Engine::matrix_createScale(const float a, const float b, const float c)
 
 Mat4x4 Engine::matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up)
 {
+    /// @see https://www.3dgep.com/understanding-the-view-matrix/
     Vec3d forward = (target - pos).normalize();
 
     Vec3d t = (forward * up.dotProd(forward));
@@ -142,10 +147,10 @@ Mat4x4 Engine::matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up)
 
     //Dimensioning & Translation Matrix
     Mat4x4 m;
-    m.m[0][0] = newRight.x; m.m[0][1] = newRight.y; m.m[0][2] = newRight.z; m.m[0][3] = 0.0f;
-    m.m[1][0] = newUp.x; m.m[1][1] = newUp.y; m.m[1][2] = newUp.z; m.m[1][3] = 0.0f;
-    m.m[2][0] = forward.x; m.m[2][1] = forward.y; m.m[2][2] = forward.z; m.m[2][3] = 0.0f;
-    m.m[3][0] = pos.x; m.m[3][1] = pos.y; m.m[3][2] = pos.z; m.m[3][3] = 1.0f;
+    m.m[0][0] = newRight.x; m.m[0][1] = newUp.x; m.m[0][2] = forward.x; m.m[0][3] = pos.x;
+    m.m[1][0] = newRight.y; m.m[1][1] = newUp.y; m.m[1][2] = forward.y; m.m[1][3] = pos.y;
+    m.m[2][0] = newRight.z; m.m[2][1] = newUp.z; m.m[2][2] = forward.z; m.m[2][3] = pos.z;
+    m.m[3][0] = 0.0f;       m.m[3][1] = 0.0f;    m.m[3][2] = 0.0f;      m.m[3][3] = 1.0f;
 
     return m;
 }
@@ -154,13 +159,22 @@ Mat4x4 Engine::matrix_InversePointAt(Mat4x4& m)
 {
     Mat4x4 matrix;
 
-    matrix.m[0][0] = m.m[0][0]; matrix.m[0][1] = m.m[1][0]; matrix.m[0][2] = m.m[2][0]; matrix.m[0][3] = 0.0f;
-    matrix.m[1][0] = m.m[0][1]; matrix.m[1][1] = m.m[1][1]; matrix.m[1][2] = m.m[2][1]; matrix.m[1][3] = 0.0f;
-    matrix.m[2][0] = m.m[0][2]; matrix.m[2][1] = m.m[1][2]; matrix.m[2][2] = m.m[2][2]; matrix.m[2][3] = 0.0f;
+    matrix.m[0][0] = m.m[0][0];
+    matrix.m[1][0] = m.m[0][1];
+    matrix.m[2][0] = m.m[0][2];
+    matrix.m[3][0] = 0.0f;
+    matrix.m[0][1] = m.m[1][0];
+    matrix.m[1][1] = m.m[1][1];
+    matrix.m[2][1] = m.m[1][2];
+    matrix.m[3][1] = 0.0f;
+    matrix.m[0][2] = m.m[2][0];
+    matrix.m[1][2] = m.m[2][1];
+    matrix.m[2][2] = m.m[2][2];
+    matrix.m[3][2] = 0.0f;
 
-    matrix.m[3][0] = -(m.m[3][0] * matrix.m[0][0] + m.m[3][1] * matrix.m[1][0] + m.m[3][2] * matrix.m[2][0]);
-    matrix.m[3][1] = -(m.m[3][0] * matrix.m[0][1] + m.m[3][1] * matrix.m[1][1] + m.m[3][2] * matrix.m[2][1]);
-    matrix.m[3][2] = -(m.m[3][0] * matrix.m[0][2] + m.m[3][1] * matrix.m[1][2] + m.m[3][2] * matrix.m[2][2]);
+    matrix.m[0][3] = -(m.m[0][3] * matrix.m[0][0] + m.m[1][3] * matrix.m[0][1] + m.m[2][3] * matrix.m[0][2]);
+    matrix.m[1][3] = -(m.m[0][3] * matrix.m[1][0] + m.m[1][3] * matrix.m[1][1] + m.m[2][3] * matrix.m[1][2]);
+    matrix.m[2][3] = -(m.m[0][3] * matrix.m[2][0] + m.m[1][3] * matrix.m[2][1] + m.m[2][3] * matrix.m[2][2]);
     matrix.m[3][3] = 1.0f;
 
     return matrix;

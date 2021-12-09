@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_mountains.obj")) {
+    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -79,7 +79,8 @@ int main(int argc, char* argv[])
     // BODY into 1 matrix only instead of 3 distinct operations.
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
     const Vec3d offsetView(1.0f, 1.0f, 0.0f);
-    Mat4x4 matScale = Engine::matrix_createScale(w2, h2, 1.0f);
+    //Mat4x4 matTrans = Engine::matrix_createTranslation(offsetView);
+    Mat4x4 matScale =  Engine::matrix_createScale(w2, h2, 1.0f);
 
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
@@ -182,9 +183,9 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        alpha = 0.0f;
+        //alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
-        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
+        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha *0.5f );
 
         // Translation
         Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
@@ -192,7 +193,7 @@ int main(int argc, char* argv[])
         // World Matrix
         Mat4x4 matWorld; // = Engine::matrix_createIdentity();
         // do the matrix multiplication
-        matWorld = matRotZ * matRotX * matTrans;
+        matWorld = matTrans * matRotZ * matRotX;
 
         // Camera Matrix
         //lookAt = { 0.0f, 0.0f, 1.0f };
@@ -246,19 +247,12 @@ int main(int argc, char* argv[])
             // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
 
-            // TODO clipping is like fixed!
-            // BODY when moving the camera the "frustum" is fixed
-            // BODY not following the camera ...
-            std::vector<Triangle> clips;// (clipped, clipped + nClippedTriangles);
+            std::vector<Triangle> clips;
             if (clipping) {
                 // Clipping on Znear plane (triViewd -> clipped[2])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
                 nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
-                
-                //for (int i = 0; i < nClippedTriangles; i++)
-                //    clips.push_back(clipped[i]);
-
                 // clipping on Zfar plane (clipped[2] -> vector<clippped>)
                 for (int i = 0; i < nClippedTriangles; i++)
                 {
@@ -280,6 +274,8 @@ int main(int argc, char* argv[])
                 triProj.setColor(c);
                 // Scale into view (viewport)
                 triProj = triProj + offsetView;
+                //Triangle triProj2 = triProj + offsetView;
+                //triProj = matTrans * triProj;
                 triProj = matScale * triProj;
 
                 // Triangle Rasterization
@@ -287,7 +283,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        //sorting like a "depth buffer", Z-depth sorting
+        // Z-depth sorting
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {
                 // divsion by 3.0f can be skipped
