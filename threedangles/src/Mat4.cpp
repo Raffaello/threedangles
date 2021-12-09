@@ -149,6 +149,7 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
 {
     // Perspective Projection Matrix
     // @see https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
+    // @see https://cglearn.codelight.eu/pub/computer-graphics/frames-of-reference-and-projection
     Mat4 m;
     //const float ar = static_cast<float>(w) / static_cast<float>(h);
     /*
@@ -162,7 +163,7 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[3][2] = -(znear * q);
     m.m[3][3] = 0.0f;
     */
-
+    /*
     const float top = znear * tan(fov * 0.5f * DEG2RAD);
     const float bottom = -top;
     const float tb = top - bottom;
@@ -183,7 +184,7 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[2][2] = -(zfar + znear) / zfn;
     m.m[2][3] = -2.0f * zfar * znear / zfn;
     m.m[3][2] = -1.0f;
-
+    */
     /*
     // left handed?
     m.m[0][2] *= -1.0f;
@@ -191,6 +192,16 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[2][2] *= -1.0f;
     m.m[3][2] *= -1.0f;
     */
+    
+    const float ar = static_cast<float>(w) / static_cast<float>(h);
+    
+    m.m[0][0] = 1.0f / (ar * tan(fov * 0.5f * DEG2RAD));
+    m.m[1][1] = 1.0f / tan(fov * 0.5f * DEG2RAD);
+    m.m[2][2] = (znear + zfar) / (znear - zfar);
+    m.m[2][3] = 2 * zfar - znear / (znear - zfar);
+    m.m[3][2] = -1.0f;
+    
+
 
     return m;
 }

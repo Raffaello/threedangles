@@ -75,8 +75,6 @@ int main(int argc, char* argv[])
     const float zfar = 100.0f;
     const float znear = .5f;
     
-    //Mat4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
-    //Mat4 matScale = Engine::matrix_createScale(w2, h2, 1.0f) * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f });
     Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(width, height, fov, zfar, znear);
