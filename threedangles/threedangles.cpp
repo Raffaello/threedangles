@@ -75,12 +75,12 @@ int main(int argc, char* argv[])
     const float fov = 90.0f;
     const float zfar = 100.0f;
     const float znear = .5f;
-    // TODO unify Projection, offsetview and matScale
-    // BODY into 1 matrix only instead of 3 distinct operations.
-    Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
-    const Vec3d offsetView(1.0f, 1.0f, 0.0f);
-    //Mat4x4 matTrans = Engine::matrix_createTranslation(offsetView);
-    Mat4x4 matScale =  Engine::matrix_createScale(w2, h2, 1.0f);
+    
+    //Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
+    //Mat4x4 matScale = Engine::matrix_createScale(w2, h2, 1.0f) * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f });
+    Mat4x4 matProj = Engine::matrix_createScale(w2, h2, 1.0f)
+        * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f })
+        * Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.0f;
         Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
-        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha *0.5f );
+        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
 
         // Translation
         Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
@@ -210,6 +210,7 @@ int main(int argc, char* argv[])
         std::vector<Triangle> trianglesToRaster;
         for (auto& tri : mesh.tris)
         {
+            // todo: keep only triProj as the other temporary are not useful
             Triangle triProj;
             Triangle triTransformed;
             Triangle triViewed;
@@ -269,14 +270,12 @@ int main(int argc, char* argv[])
             for (auto& c: clips)
             {
                 // Projection 3D -> 2D
-                triProj = (matProj * c).normByW();
+                triProj = (matProj * c);
                 // copy the color from the other translated triangle to the projected one (this should be optimized)
                 triProj.setColor(c);
                 // Scale into view (viewport)
-                triProj = triProj + offsetView;
-                //Triangle triProj2 = triProj + offsetView;
-                //triProj = matTrans * triProj;
-                triProj = matScale * triProj;
+                //triProj = matScale * triProj;
+                triProj = triProj.normByW();
 
                 // Triangle Rasterization
                 trianglesToRaster.push_back(triProj);
