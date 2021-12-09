@@ -278,4 +278,6 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
 
         return 2; // Return two newly formed triangles which form a quad
     }
+
+    return -1;
 }
