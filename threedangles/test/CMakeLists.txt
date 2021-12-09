@@ -35,12 +35,11 @@ macro_test(
         FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
     )
 
-macro_test(
-        EXE TestMat4
-        FILE "TestMat4.cpp"
-        FILES
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
-    )
-
+#macro_test(
+#        EXE TestMat4
+#        FILE "TestMat4.cpp"
+#        FILES
+#            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+#            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
+#            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
+#    )
