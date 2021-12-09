@@ -77,9 +77,9 @@ int main(int argc, char* argv[])
     
     //Mat4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
     //Mat4 matScale = Engine::matrix_createScale(w2, h2, 1.0f) * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f });
-    Mat4 matProj = Engine::matrix_createScale(w2, h2, 1.0f)
-        * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f })
-        * Engine::matrix_createProjection(width, height, fov, zfar, znear);
+    Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
+        * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
+        * Mat4::createProjection(width, height, fov, zfar, znear);
 
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
@@ -183,11 +183,11 @@ int main(int argc, char* argv[])
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.0f;
-        Mat4 matRotZ = Engine::matrix_createRotationZ(alpha);
-        Mat4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
+        Mat4 matRotZ = Mat4::createRotationZ(alpha);
+        Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 
         // Translation
-        Mat4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
+        Mat4 matTrans = Mat4::createTranslation({ 0.0f, 0.0f, offset });
 
         // World Matrix
         Mat4 matWorld; // = Engine::matrix_createIdentity();
@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
         //lookAt = { 0.0f, 0.0f, 1.0f };
         Vec3d up(0.0f, 1.0f, 0.0f);
         Vec3d target(0.0f, 0.0f, 1.0f);
-        Mat4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
+        Mat4 matCamRot = Mat4::createRotationY(cam_yaw);
         lookAt = matCamRot * target;
         target = cam + lookAt;
 

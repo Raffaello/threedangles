@@ -8,18 +8,19 @@ macro(macro_test) # ${ARGN} link libraries
     
     set(prefix TEST)
     set(singleValues EXE FILE)
-    set(multiValues FILES)
+    set(multiValues FILES LINKS)
     
     cmake_parse_arguments(${prefix} "${flags}" "${singleValues}" "${multiValues}" ${ARGN})
     #message("${EXE} - ${FILE} - ${LINKS}")
     #message("EXE: ${TEST_EXE}")
     #message("FILE: ${TEST_FILE}")
+    #message("FILES: ${TEST_FILES}")
     #message("LINKS: ${TEST_LINKS}")
     add_executable (${TEST_EXE} ${TEST_FILE} ${TEST_FILES})
     target_include_directories(${TEST_EXE} PUBLIC 
         ${CMAKE_SOURCE_DIR}/threedangles/src
     )
-    target_link_libraries(${TEST_EXE} PRIVATE GTest::gtest GTest::gmock)
+    target_link_libraries(${TEST_EXE} PRIVATE GTest::gtest GTest::gmock ${TEST_LINKS})
     add_custom_command(TARGET ${TEST_EXE} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:GTest::gtest_main> $<TARGET_FILE_DIR:${TEST_EXE}>
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:GTest::gtest> $<TARGET_FILE_DIR:${TEST_EXE}>
@@ -35,11 +36,12 @@ macro_test(
         FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
     )
 
-#macro_test(
-#        EXE TestMat4
-#        FILE "TestMat4.cpp"
-#        FILES
-#            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-#            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
-#            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
-#    )
+macro_test(
+        EXE TestMat4
+        FILE "TestMat4.cpp"
+        FILES
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
+        LINKS SDL2::SDL2 ${LIB_SDL2main}
+    )
