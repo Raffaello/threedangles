@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_axis.obj")) {
+    if (!mesh.loadFromOBJFile("plain_mountains.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
 
     // Projection Matrix
     const float fov = 90.0f;
-    const float zfar = 50.0f;
-    const float znear = 1.f;
+    const float zfar = 100.0f;
+    const float znear = .5f;
     // TODO unify Projection, offsetview and matScale
     // BODY into 1 matrix only instead of 3 distinct operations.
     Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
         // Camera Matrix
         //lookAt = { 0.0f, 0.0f, 1.0f };
-        Vec3d up(0.0f, -1.0f, 0.0f);
+        Vec3d up(0.0f, 1.0f, 0.0f);
         Vec3d target(0.0f, 0.0f, 1.0f);
         Mat4x4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
         lookAt = matCamRot * target;
@@ -255,17 +255,18 @@ int main(int argc, char* argv[])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
                 nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
-                for (int i = 0; i < nClippedTriangles; i++)
-                    clips.push_back(clipped[i]);
+                
+                //for (int i = 0; i < nClippedTriangles; i++)
+                //    clips.push_back(clipped[i]);
 
                 // clipping on Zfar plane (clipped[2] -> vector<clippped>)
-                /*for (int i = 0; i < nClippedTriangles; i++)
+                for (int i = 0; i < nClippedTriangles; i++)
                 {
                     Triangle clippedFar[2];
-                    int nClippedTrianglesFar = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, triViewed, clippedFar[0], clippedFar[1]);
+                    int nClippedTrianglesFar = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, clipped[i], clippedFar[0], clippedFar[1]);
                     for (int n = 0; n < nClippedTrianglesFar; n++)
                         clips.push_back(clippedFar[n]);
-                }*/
+                }
             }
             else {
                 clips.push_back(triViewed);
