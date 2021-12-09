@@ -15,7 +15,7 @@ It will feature the following algorithms:
 - [ ] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
-- Left-hand rules
+- Left-hand rules, right-hand rules
 
 The algorithms will be all implemented from scratch without using any modern library or Engine.
 

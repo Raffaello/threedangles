@@ -18,7 +18,7 @@ public:
     void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha);
     void setColor(const Triangle& that);
 
-    void draw( SDL_Renderer* renderer);
+    void draw(SDL_Renderer* renderer);
     /** @brief Fill a triangle - Bresenham method
       * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
       * @see https://www.avrfreaks.net/sites/default/files/triangles.c

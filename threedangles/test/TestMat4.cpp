@@ -114,8 +114,8 @@ TEST(Mat4, RotX)
     Mat4 b;
     b.m[0][0] = 1;
     b.m[1][1] = 0;
-    b.m[1][2] = -1;
-    b.m[2][1] = 1;
+    b.m[1][2] = 1;
+    b.m[2][1] = -1;
     b.m[2][2] = 0;
     b.m[3][3] = 1;
 
@@ -162,14 +162,6 @@ TEST(Mat4, RotZ)
             EXPECT_NEAR(a.m[i][j], b.m[i][j], e);
         }
     }
-}
-
-TEST(Mat4, Projection)
-{}
-
-TEST(Mat4, TranslateScaleRotXYZ)
-{
-
 }
 
 int main(int argc, char** argv)

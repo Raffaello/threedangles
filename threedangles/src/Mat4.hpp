@@ -4,6 +4,10 @@
 #include <Triangle.hpp>
 #include <array>
 
+/**
+ * @brief Matrix 4x4
+ * @ling  https://butterflyofdream.wordpress.com/2016/07/05/converting-rotation-matrices-of-left-handed-coordinate-system/
+*/
 class Mat4
 {
 public:
