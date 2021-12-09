@@ -17,6 +17,8 @@ public:
     Vec3d crossProd(const Vec3d& v);
     Vec3d normByW();
 
+    bool operator==(const Vec3d& v);
+
 
     float x = 0.0f;
     float y = 0.0f;

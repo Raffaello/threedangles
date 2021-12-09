@@ -53,3 +53,8 @@ Vec3d Vec3d::normByW()
 {
     return { x / w, y / w, z / w, 1.0f / w };
 }
+
+bool Vec3d::operator==(const Vec3d& v)
+{
+    return x == v.x && y == v.y && z == v.z && w == v.w;
+}

@@ -6,7 +6,6 @@
 #include <string>
 
 #include <Mesh.hpp>
-#include <Mat4x4.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
 #include <algorithm>
@@ -76,9 +75,9 @@ int main(int argc, char* argv[])
     const float zfar = 100.0f;
     const float znear = .5f;
     
-    //Mat4x4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
-    //Mat4x4 matScale = Engine::matrix_createScale(w2, h2, 1.0f) * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f });
-    Mat4x4 matProj = Engine::matrix_createScale(w2, h2, 1.0f)
+    //Mat4 matProj = Engine::matrix_createProjection(width, height, fov, zfar, znear);
+    //Mat4 matScale = Engine::matrix_createScale(w2, h2, 1.0f) * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f });
+    Mat4 matProj = Engine::matrix_createScale(w2, h2, 1.0f)
         * Engine::matrix_createTranslation({ 1.0f, 1.0f, 0.0f })
         * Engine::matrix_createProjection(width, height, fov, zfar, znear);
 
@@ -184,14 +183,14 @@ int main(int argc, char* argv[])
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.0f;
-        Mat4x4 matRotZ = Engine::matrix_createRotationZ(alpha);
-        Mat4x4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
+        Mat4 matRotZ = Engine::matrix_createRotationZ(alpha);
+        Mat4 matRotX = Engine::matrix_createRotationX(alpha * 0.5f);
 
         // Translation
-        Mat4x4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
+        Mat4 matTrans = Engine::matrix_createTranslation({ 0.0f, 0.0f, offset });
 
         // World Matrix
-        Mat4x4 matWorld; // = Engine::matrix_createIdentity();
+        Mat4 matWorld; // = Engine::matrix_createIdentity();
         // do the matrix multiplication
         matWorld = matTrans * matRotZ * matRotX;
 
@@ -199,12 +198,12 @@ int main(int argc, char* argv[])
         //lookAt = { 0.0f, 0.0f, 1.0f };
         Vec3d up(0.0f, 1.0f, 0.0f);
         Vec3d target(0.0f, 0.0f, 1.0f);
-        Mat4x4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
+        Mat4 matCamRot = Engine::matrix_createRotationY(cam_yaw);
         lookAt = matCamRot * target;
         target = cam + lookAt;
 
-        Mat4x4 matCam = Engine::matrix_pointAt(cam, target, up);
-        Mat4x4 matView = Engine::matrix_InversePointAt(matCam);
+        Mat4 matCam = Engine::matrix_pointAt(cam, target, up);
+        Mat4 matView = Engine::matrix_InversePointAt(matCam);
 
         // Process the triangles.
         std::vector<Triangle> trianglesToRaster;
@@ -269,12 +268,10 @@ int main(int argc, char* argv[])
 
             for (auto& c: clips)
             {
-                // Projection 3D -> 2D
+                // Projection 3D -> 2D & Scale into view (viewport)
                 triProj = (matProj * c);
                 // copy the color from the other translated triangle to the projected one (this should be optimized)
                 triProj.setColor(c);
-                // Scale into view (viewport)
-                //triProj = matScale * triProj;
                 triProj = triProj.normByW();
 
                 // Triangle Rasterization

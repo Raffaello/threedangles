@@ -4,10 +4,10 @@
 #include <Triangle.hpp>
 #include <array>
 
-class Mat4x4
+class Mat4
 {
 public:
-    Mat4x4 operator*(const Mat4x4& m_);
+    Mat4 operator*(const Mat4& m_);
     Vec3d operator*(const Vec3d& i);
     Triangle operator*(const Triangle& i);
 

@@ -1,8 +1,8 @@
-#include <Mat4x4.hpp>
+#include <Mat4.hpp>
 
-Mat4x4 Mat4x4::operator*(const Mat4x4& m_)
+Mat4 Mat4::operator*(const Mat4& m_)
 {
-    Mat4x4 matrix;
+    Mat4 matrix;
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -17,7 +17,7 @@ Mat4x4 Mat4x4::operator*(const Mat4x4& m_)
     return matrix;
 }
 
-Vec3d Mat4x4::operator*(const Vec3d& i)
+Vec3d Mat4::operator*(const Vec3d& i)
 {
     Vec3d v;
 
@@ -29,7 +29,7 @@ Vec3d Mat4x4::operator*(const Vec3d& i)
     return v;
 }
 
-Triangle Mat4x4::operator*(const Triangle& i)
+Triangle Mat4::operator*(const Triangle& i)
 {
     //return { *this * i.a, *this * i.b, *this * i.c };
     Triangle t(i);
