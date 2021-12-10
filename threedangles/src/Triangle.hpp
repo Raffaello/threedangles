@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Vec3d.hpp>
-#include <SDL2/SDL_render.h>
+#include <cstdint>
+//#include <SDL2/SDL_render.h>
 
 class Triangle
 {
@@ -17,16 +18,17 @@ public:
 
     void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha);
     void setColor(const Triangle& that);
+    void getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const;
 
     // todo remove SDL_Render from this class
     // body replace with an interface "Screen", "Renderer" or "Window" instead for eg
     // body "Screen" as interface should be ok.
-    void draw(SDL_Renderer* renderer);
+    //void draw(SDL_Renderer* renderer);
     /** @brief Fill a triangle - Bresenham method
       * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
       * @see https://www.avrfreaks.net/sites/default/files/triangles.c
       */
-    void fill(SDL_Renderer* renderer);
+    //void fill(SDL_Renderer* renderer);
 
 private:
     // TODO review these variables and method
@@ -34,11 +36,12 @@ private:
     // BODY the draw and fill method should 
     // BODY call external routines
     // BODY so remove those below vars and methods.
+    // BODY move the colors to vertex
     uint8_t _r = 0;
     uint8_t _g = 0;
     uint8_t _b = 0;
     uint8_t _a = 0xFF;
-
+    /*
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
 
     void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
@@ -56,4 +59,5 @@ private:
     void fill_top_flat(SDL_Renderer* renderer);
     void fill_bottom_flat(SDL_Renderer* renderer);
     void fill_update_minmax();
+    */
 };

@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         return - 1;
     }
 
-    if (!mesh.loadFromOBJFile("plain_cube.obj")) {
+    if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
         cerr << "Can't load OBJ file";
         quit_sdl(renderer, window);
         return -2;
@@ -227,6 +227,7 @@ int main(int argc, char* argv[])
 
             // Illumination (flat shading)
             // todo: it should be computed during the rasterization?
+            // body create also a Light interface / class
             if (illuminationOn)
             {
                 Vec3d light_direction(0.0f, 0.0f,-1.0f);
@@ -283,18 +284,19 @@ int main(int argc, char* argv[])
                 // divsion by 3.0f can be skipped
                 float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
                 float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
-                return z1 > z2;
+                return z1 < z2;
             }
         );
 
         if (filled >= 1) {
             for (auto& t : trianglesToRaster) {
                 if (!clipping) {
-                    t.fill(renderer);
+                    Engine::fillTriangle(renderer, t);
+                    
                     // Wire frame debug
                     if (filled == 2) {
                         t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        t.draw(renderer);
+                        Engine::drawTriangle(renderer, t);
                     }
                     continue;
                 }
@@ -354,18 +356,18 @@ int main(int argc, char* argv[])
                 // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                 for (auto& t : listTriangles)
                 {
-                    t.fill(renderer);
+                    Engine::fillTriangle(renderer, t);
                     //DrawTriangle(t.p[0].x, t.p[0].y, t.p[1].x, t.p[1].y, t.p[2].x, t.p[2].y, PIXEL_SOLID, FG_BLACK);
                     if (filled == 2) {
                         t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        t.draw(renderer);
+                        Engine::drawTriangle(renderer, t);
                     }
                 }
             }
         }
         else {
             for (auto& t : trianglesToRaster) {
-                t.draw(renderer);
+                Engine::drawTriangle(renderer, t);
             }
         }
 

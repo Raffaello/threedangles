@@ -19,5 +19,6 @@ public:
     */
     bool loadFromOBJFile(const std::string& filename);
 
+    // TODO replace with vertex buffer...
     std::vector<Triangle> tris; // ?
 };

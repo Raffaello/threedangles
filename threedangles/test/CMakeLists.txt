@@ -43,5 +43,5 @@ macro_test(
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
-        LINKS SDL2::SDL2 ${LIB_SDL2main} # remove this dependency from Mat4 class -> Triangle class
+        #LINKS SDL2::SDL2 ${LIB_SDL2main} # remove this dependency from Mat4 class -> Triangle class
     )

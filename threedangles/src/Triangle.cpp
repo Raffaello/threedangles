@@ -44,6 +44,11 @@ void Triangle::setColor(const Triangle& that)
     _a = that._a;
 }
 
+void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
+{
+    r = _r; g = _g; b = _b; a = _a;
+}
+/*
 void Triangle::draw(SDL_Renderer* renderer)
 {
     compute_int_coord();
@@ -131,8 +136,8 @@ void Triangle::fill_top_flat(SDL_Renderer* renderer)
         changed2 = true;
     }
 
-    /* here we know that v1.y <= v2.y <= v3.y */
-    /* check for trivial case of bottom-flat triangle */
+    // here we know that v1.y <= v2.y <= v3.y
+    // check for trivial case of bottom-flat triangle
 
     e2 = dx2 >> 1;
     // Flat top, just process the second half
@@ -313,3 +318,4 @@ void Triangle::fill_update_minmax()
     if (maxx < t2x)
         maxx = t2x;
 }
+*/
