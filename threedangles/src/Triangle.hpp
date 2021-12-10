@@ -18,6 +18,9 @@ public:
     void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha);
     void setColor(const Triangle& that);
 
+    // todo remove SDL_Render from this class
+    // body replace with an interface "Screen", "Renderer" or "Window" instead for eg
+    // body "Screen" as interface should be ok.
     void draw(SDL_Renderer* renderer);
     /** @brief Fill a triangle - Bresenham method
       * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html

@@ -91,7 +91,6 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
     // Now classify triangle points, and break the input triangle into 
     // smaller output triangles if required. There are four possible
     // outcomes...
-
     if (nInsidePointCount == 0)
     {
         // All points lie on the outside of plane, so clip whole triangle
