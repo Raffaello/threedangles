@@ -3,12 +3,14 @@
 #include <Mat4.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
+// TODO remove the SDL_render from here and replace with a Screen/Window/Renderer interface
 #include <SDL2/SDL_render.h>
 
 class Engine
 {
 public:
     // todo those should be constant, review the operators overloading
+    // body move to a Cam class object as are for that.
     static Mat4 matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up);
     static Mat4 matrix_InversePointAt(Mat4& m);
 
