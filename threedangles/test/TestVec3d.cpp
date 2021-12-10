@@ -2,6 +2,13 @@
 #include <gmock/gmock.h>
 #include <Vec3d.hpp>
 
+
+TEST(Vec3d, equality)
+{
+    Vec3d a;
+    EXPECT_TRUE(a == a);
+}
+
 TEST(Vec3d, sum)
 {
     Vec3d a(1, 1, 1);

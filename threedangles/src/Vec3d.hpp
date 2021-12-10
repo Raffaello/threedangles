@@ -1,5 +1,7 @@
 #pragma once
 
+#include <types.hpp>
+
 class Vec3d
 {
 public:
@@ -19,9 +21,11 @@ public:
 
     bool operator==(const Vec3d& v);
 
-
+//private:
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
     float w = 1.0f;
+
+    color_t col;
 };

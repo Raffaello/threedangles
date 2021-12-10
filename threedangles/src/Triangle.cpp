@@ -35,19 +35,11 @@ void Triangle::setColor(const color_t& c) noexcept
 void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha)
 {
     col = { r,g,blue,alpha };
-    //_r = r;
-    //_g = g;
-    //_b = blue;
-    //_a = alpha;
 }
 
 void Triangle::setColor(const Triangle& that)
 {
     col = that.col;
-    //_r = that._r;
-    //_g = that._g;
-    //_b = that._b;
-    //_a = that._a;
 }
 
 void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
@@ -58,4 +50,14 @@ void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
 color_t Triangle::getColor() const noexcept
 {
     return col;
+}
+
+Vec3d Triangle::faceNormal() const noexcept
+{
+    Vec3d line1 = b, line2 = c;
+
+    line1 = line1 - a;
+    line2 = line2 - a;
+
+    return line1.crossProd(line2).normalize();
 }

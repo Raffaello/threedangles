@@ -79,9 +79,14 @@ int main(int argc, char* argv[])
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
+    // Cam
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
+
+    // Light
+    Vec3d light_direction(0.0f, 0.0f, -1.0f);
+    Vec3d light_direction_normalized = light_direction.normalize();
 
     bool showHiddenVertexes = false;
     // 0 wire, 1 filled, 2 filled+wire
@@ -215,13 +220,15 @@ int main(int argc, char* argv[])
             triTransformed = matWorld * tri;
 
             // Normals (back-face culling)
-            Vec3d normal, line1, line2;
+            // TODO: move to Triangle or Engine class
+            Vec3d normal; // , line1, line2;
 
-            line1 = triTransformed.b - triTransformed.a;
-            line2 = triTransformed.c - triTransformed.a;
-            normal = line1.crossProd(line2).normalize();
+            //line1 = triTransformed.b - triTransformed.a;
+            //line2 = triTransformed.c - triTransformed.a;
+            //normal = line1.crossProd(line2).normalize();
+            normal = triTransformed.faceNormal();
             float norm_dp = normal.dotProd(triTransformed.a - cam);
-            
+
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
 
@@ -230,10 +237,11 @@ int main(int argc, char* argv[])
             // body create also a Light interface / class
             if (illuminationOn)
             {
-                Vec3d light_direction(0.0f, 0.0f,-1.0f);
-                float dp = normal.dotProd(light_direction.normalize());
+                float dp = normal.dotProd(light_direction_normalized);
                 uint8_t r, g, b;
-                r = g = b = static_cast<uint8_t>(std::round(dp * 0xFF));
+                r = static_cast<uint8_t>(std::round(dp * 64));
+                g = static_cast<uint8_t>(std::round(dp * 64));
+                b = static_cast<uint8_t>(std::round(dp * 64));
                 triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
             }
             else {
@@ -278,7 +286,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Z-depth sorting
+        // Z-depth sorting (could be removed storing the triangleToRaster in a minHeap)
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {
                 // divsion by 3.0f can be skipped
@@ -391,5 +399,3 @@ int main(int argc, char* argv[])
     quit_sdl(renderer, window);
     return ret;
 }
-
-
