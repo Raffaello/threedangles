@@ -2,7 +2,6 @@
 
 #include <Vec3d.hpp>
 #include <cstdint>
-//#include <SDL2/SDL_render.h>
 
 class Triangle
 {
@@ -20,44 +19,10 @@ public:
     void setColor(const Triangle& that);
     void getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const;
 
-    // todo remove SDL_Render from this class
-    // body replace with an interface "Screen", "Renderer" or "Window" instead for eg
-    // body "Screen" as interface should be ok.
-    //void draw(SDL_Renderer* renderer);
-    /** @brief Fill a triangle - Bresenham method
-      * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
-      * @see https://www.avrfreaks.net/sites/default/files/triangles.c
-      */
-    //void fill(SDL_Renderer* renderer);
-
 private:
-    // TODO review these variables and method
-    // BODY color shouldn't be used.. ?
-    // BODY the draw and fill method should 
-    // BODY call external routines
-    // BODY so remove those below vars and methods.
-    // BODY move the colors to vertex
+    // TODO move the colors to vertex
     uint8_t _r = 0;
     uint8_t _g = 0;
     uint8_t _b = 0;
     uint8_t _a = 0xFF;
-    /*
-    int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
-
-    void draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) const noexcept;
-    inline void compute_int_coord() noexcept;
-
-    int t1x = 0, t2x = 0, y = 0, minx = 0, maxx = 0, t1xp = 0, t2xp = 0;
-    bool changed1 = false;
-    bool changed2 = false;
-
-    int8_t signx1 = 0, signx2 = 0;
-
-    int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-    int e1 = 0, e2 = 0;
-
-    void fill_top_flat(SDL_Renderer* renderer);
-    void fill_bottom_flat(SDL_Renderer* renderer);
-    void fill_update_minmax();
-    */
 };
