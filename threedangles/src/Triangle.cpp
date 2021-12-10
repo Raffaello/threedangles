@@ -27,23 +27,35 @@ Triangle Triangle::normByW()
     return t;
 }
 
+void Triangle::setColor(const color_t& c) noexcept
+{
+    col = c;
+}
+
 void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha)
 {
-    _r = r;
-    _g = g;
-    _b = blue;
-    _a = alpha;
+    col = { r,g,blue,alpha };
+    //_r = r;
+    //_g = g;
+    //_b = blue;
+    //_a = alpha;
 }
 
 void Triangle::setColor(const Triangle& that)
 {
-    _r = that._r;
-    _g = that._g;
-    _b = that._b;
-    _a = that._a;
+    col = that.col;
+    //_r = that._r;
+    //_g = that._g;
+    //_b = that._b;
+    //_a = that._a;
 }
 
 void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
 {
-    r = _r; g = _g; b = _b; a = _a;
+    r = col.r; g = col.g; b = col.b; a = col.a;
+}
+
+color_t Triangle::getColor() const noexcept
+{
+    return col;
 }
