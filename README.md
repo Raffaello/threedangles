@@ -4,8 +4,8 @@ Three-D-angles is a 3D triangles engines built from scratch.
 
 It will feature the following algorithms:
 
-- [ ] Triangle drawing (bresenham)
-- [x] Triangle filling (bresenham)
+- [x] Line drawing (bresenham)
+- [ ] Triangle filling (bresenham)
 - [ ] Triangle clipping
 - [x] Transformations
 - [ ] Camera positioning
@@ -35,3 +35,5 @@ a comparision/benchmark on the algorithms implemented here.
 - Using SDL2 for window creation (and pixel drawing, soon to be removed) so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations of the engine.
+
+  Implement with Qt
