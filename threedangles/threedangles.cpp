@@ -47,6 +47,7 @@ int main(int argc, char* argv[])
     }
 
     // Projection Matrix
+    // TODO move to Engine
     const float fov = 50.0f;
     const float zfar = 100.0f;
     const float znear = .5f;
