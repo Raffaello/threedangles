@@ -60,6 +60,9 @@ int main(int argc, char* argv[])
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
+    //lookAt = { 0.0f, 0.0f, 1.0f };
+    Vec3d up(0.0f, 1.0f, 0.0f);
+    Vec3d target(0.0f, 0.0f, 1.0f);
 
     // Light
     Vec3d light_direction(0.0f, 0.0f, -1.0f);
@@ -174,13 +177,9 @@ int main(int argc, char* argv[])
         matWorld = matTrans * matRotZ * matRotX;
 
         // Camera Matrix
-        //lookAt = { 0.0f, 0.0f, 1.0f };
-        Vec3d up(0.0f, 1.0f, 0.0f);
-        Vec3d target(0.0f, 0.0f, 1.0f);
         Mat4 matCamRot = Mat4::createRotationY(cam_yaw);
         lookAt = matCamRot * target;
         target = cam + lookAt;
-
         Mat4 matCam = engine->matrix_pointAt(cam, target, up);
         Mat4 matView = engine->matrix_InversePointAt(matCam);
 
@@ -197,12 +196,7 @@ int main(int argc, char* argv[])
 
             // Normals (back-face culling)
             // TODO: move to Triangle or Engine class
-            Vec3d normal; // , line1, line2;
-
-            //line1 = triTransformed.b - triTransformed.a;
-            //line2 = triTransformed.c - triTransformed.a;
-            //normal = line1.crossProd(line2).normalize();
-            normal = triTransformed.faceNormal();
+            Vec3d normal = triTransformed.faceNormal();
             float norm_dp = normal.dotProd(triTransformed.a - cam);
 
             if (!showHiddenVertexes && norm_dp >= 0.0f)

@@ -37,6 +37,7 @@ public:
     // TODO color vertex interpolation? let see later...
     void draw_hline(int x1, int x2, const int y, const color_t& c) noexcept;
     void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) noexcept;
+    //void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c1, const color_t& c2) noexcept;
 private:
     //static inline void compute_int_coord(float& x1, float& y1, float& x2, float& y2, float& x3, float& y3) noexcept;
     std::shared_ptr<Screen> _screen;
