@@ -19,6 +19,7 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
 )
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src

@@ -4,69 +4,45 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <algorithm>
+#include <list>
 
-#include <Mesh.hpp>
 #include <Vec3d.hpp>
 #include <Triangle.hpp>
-#include <algorithm>
+#include <Mesh.hpp>
 #include <Engine.hpp>
 
 #include <SDL2/SDL.h>
-
-
-#include <list>
 
 using std::cerr;
 using std::endl;
 using std::cout;
 
-void quit_sdl(SDL_Renderer* renderer, SDL_Window* window)
-{
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-}
 
 int main(int argc, char* argv[])
 {
-    int ret = 0;
-
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        cerr << SDL_GetError() << endl;
-        return -1;
-    }
-    
     int width = 640;
     int height = 480;
     const float w2 = 0.5f * static_cast<float>(width);
     const float h2 = 0.5f * static_cast<float>(height);
-    int flags = 0; // SDL_WINDOW_FULLSCREEN
-    int r_flags = SDL_RENDERER_SOFTWARE;
-    std::string title = "ThreeDangles";
     int FPS = 60;
     int frameTime_ms = 1000 / FPS;
     Mesh mesh;
-
+    color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
+    
+    std::string title = "ThreeDangles";
+    auto engine = Engine::createEngineSDL(title, width, height);
+    if (engine == nullptr) {
+        cerr << "can't init engine" << endl;
+        return -1;
+    }
+    auto screen = engine->getScreen();
+    
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    SDL_Window* window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
-    if (nullptr == window) {
-        cerr << SDL_GetError() << endl;
-        quit_sdl(nullptr, nullptr);
-        return -1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, r_flags);
-    if (nullptr == renderer) {
-        cerr << SDL_GetError() << endl;
-        quit_sdl(nullptr, window);
-        return - 1;
-    }
-
     if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
         cerr << "Can't load OBJ file";
-        quit_sdl(renderer, window);
         return -2;
     }
 
@@ -180,8 +156,7 @@ int main(int argc, char* argv[])
         }
 
         // Clear the screen/buffer
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-        SDL_RenderClear(renderer);
+        screen->clear(black);
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
@@ -205,8 +180,8 @@ int main(int argc, char* argv[])
         lookAt = matCamRot * target;
         target = cam + lookAt;
 
-        Mat4 matCam = Engine::matrix_pointAt(cam, target, up);
-        Mat4 matView = Engine::matrix_InversePointAt(matCam);
+        Mat4 matCam = engine->matrix_pointAt(cam, target, up);
+        Mat4 matView = engine->matrix_InversePointAt(matCam);
 
         // Process the triangles.
         std::vector<Triangle> trianglesToRaster;
@@ -259,12 +234,12 @@ int main(int argc, char* argv[])
                 // Clipping on Znear plane (triViewd -> clipped[2])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
-                nClippedTriangles = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
+                nClippedTriangles = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
                 // clipping on Zfar plane (clipped[2] -> vector<clippped>)
                 for (int i = 0; i < nClippedTriangles; i++)
                 {
                     Triangle clippedFar[2];
-                    int nClippedTrianglesFar = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, clipped[i], clippedFar[0], clippedFar[1]);
+                    int nClippedTrianglesFar = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, clipped[i], clippedFar[0], clippedFar[1]);
                     for (int n = 0; n < nClippedTrianglesFar; n++)
                         clips.push_back(clippedFar[n]);
                 }
@@ -286,7 +261,8 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Z-depth sorting (could be removed storing the triangleToRaster in a minHeap)
+        // Z-depth sorting 
+        // (could be removed storing the triangleToRaster in a minHeap)
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {
                 // divsion by 3.0f can be skipped
@@ -299,12 +275,12 @@ int main(int argc, char* argv[])
         if (filled >= 1) {
             for (auto& t : trianglesToRaster) {
                 if (!clipping) {
-                    Engine::fillTriangle(renderer, t);
+                    engine->fillTriangle(t);
                     
                     // Wire frame debug
                     if (filled == 2) {
                         t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        Engine::drawTriangle(renderer, t);
+                        engine->drawTriangle(t);
                     }
                     continue;
                 }
@@ -337,16 +313,16 @@ int main(int argc, char* argv[])
                         switch (p)
                         {
                         case 0:
-                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, test, clipped[0], clipped[1]);
                             break;
                         case 1:
-                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, (float)height - 1, 0.0f }, { 0.0f, -1.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, (float)height - 1, 0.0f }, { 0.0f, -1.0f, 0.0f }, test, clipped[0], clipped[1]);
                             break;
                         case 2:
-                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
                             break;
                         case 3:
-                            nTrisToAdd = Engine::Triangle_ClipAgainstPlane({ (float)width - 1, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
+                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ (float)width - 1, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
                             break;
                         default:
                             break;
@@ -364,23 +340,22 @@ int main(int argc, char* argv[])
                 // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
                 for (auto& t : listTriangles)
                 {
-                    Engine::fillTriangle(renderer, t);
-                    //DrawTriangle(t.p[0].x, t.p[0].y, t.p[1].x, t.p[1].y, t.p[2].x, t.p[2].y, PIXEL_SOLID, FG_BLACK);
+                    engine->fillTriangle(t);
                     if (filled == 2) {
                         t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        Engine::drawTriangle(renderer, t);
+                        engine->drawTriangle(t);
                     }
                 }
             }
         }
         else {
             for (auto& t : trianglesToRaster) {
-                Engine::drawTriangle(renderer, t);
+                engine->drawTriangle(t);
             }
         }
 
         // Swap buffers
-        SDL_RenderPresent(renderer);
+        screen->flip();
 
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();
@@ -391,11 +366,10 @@ int main(int argc, char* argv[])
         if (totTicks < frameTime_ms)
             frameDelay = frameTime_ms - totTicks;
         
-        SDL_SetWindowTitle(window, (title + " FPS: ~" + std::to_string(1000.0f/totTicks)).c_str());
+        screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks));
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
     }
 
-    quit_sdl(renderer, window);
-    return ret;
+    return 0;
 }

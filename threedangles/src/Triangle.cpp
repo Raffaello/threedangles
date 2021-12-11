@@ -54,7 +54,7 @@ color_t Triangle::getColor() const noexcept
 
 Vec3d Triangle::faceNormal() const noexcept
 {
-    Vec3d line1 = b, line2 = c;
+    Vec3d line1(b), line2(c);
 
     line1 = line1 - a;
     line2 = line2 - a;

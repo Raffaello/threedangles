@@ -1,5 +1,31 @@
 #include <Engine.hpp>
 #include <cmath>
+#include <sdl/Screen_SDL.hpp>
+
+Engine::Engine(const std::shared_ptr<Screen> screen)
+{
+    _screen = screen;
+}
+
+std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const int width, const int height)
+{
+    std::shared_ptr<Screen> s = std::make_shared<sdl::Screen_SDL>(title, width, height);
+    bool init = s->init();
+
+    if (!init)
+        return nullptr;
+
+    Engine* e = new Engine(s);
+    std::shared_ptr<Engine> se;
+    se.reset(e);
+
+    return se;
+}
+
+std::shared_ptr<Screen> Engine::getScreen() const noexcept
+{
+    return _screen;
+}
 
 Mat4 Engine::matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up)
 {
@@ -160,7 +186,7 @@ int Engine::Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in
     return -1;
 }
 
-void Engine::drawTriangle(SDL_Renderer* renderer, const Triangle& triangle)
+void Engine::drawTriangle(const Triangle& triangle)
 {
     //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
@@ -170,17 +196,15 @@ void Engine::drawTriangle(SDL_Renderer* renderer, const Triangle& triangle)
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
-    uint8_t r, g, b, a;
-    triangle.getColor(r, g, b, a);
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    auto c = triangle.getColor();
 
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-    SDL_RenderDrawLine(renderer, x2, y2, x3, y3);
-    SDL_RenderDrawLine(renderer, x3, y3, x1, y1);
+    drawLine(x1, y1, x2, y2, c);
+    drawLine(x2, y2, x3, y3, c);
+    drawLine(x3, y3, x1, y1, c);
 
 }
 
-void Engine::fillTriangle(SDL_Renderer* renderer, const Triangle& triangle)
+void Engine::fillTriangle(const Triangle& triangle)
 {
     //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
@@ -190,9 +214,8 @@ void Engine::fillTriangle(SDL_Renderer* renderer, const Triangle& triangle)
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
     
-    uint8_t r, g, b, a;
-    triangle.getColor(r, g, b, a);
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    auto c = triangle.getColor();
+    //SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
     if (y1 > y2) {
@@ -325,7 +348,7 @@ void Engine::fillTriangle(SDL_Renderer* renderer, const Triangle& triangle)
         if (maxx < t2x)
             maxx = t2x;
         // Draw line from min to max points found on the y
-        draw_hline(renderer, minx, maxx, y);
+        draw_hline(minx, maxx, y, c);
         // Now increase y
         if (!changed1)
             t1x += signx1;
@@ -425,7 +448,7 @@ next:
         if (maxx < t2x)
             maxx = t2x;
         // Draw line from min to max points found on the y
-        draw_hline(renderer, minx, maxx, y);
+        draw_hline(minx, maxx, y, c);
         // Now increase y
         if (!changed1)
             t1x += signx1;
@@ -439,10 +462,45 @@ next:
     }
 }
 
-void Engine::draw_hline(SDL_Renderer* renderer, int x1, int x2, const int y) noexcept
+void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
-        SDL_RenderDrawPoint(renderer, x1, y);
+        //SDL_RenderDrawPoint(renderer, x1, y);
+        _screen->drawPixel(x1, y, c);
     }
+}
+
+void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) noexcept
+{
+    int dx = abs(x2 - x1);
+    int sx = x1 < x2 ? 1 : -1;
+    int dy = -abs(y2 - y1);
+    int sy = y1 < y2 ? 1 : -1;
+    int err = dx + dy;  // error value e_xy
+    
+    
+    while (true)
+    {
+        _screen->drawPixel(x1, y1, c);
+        if (x1 == x2 && y1 == y2)
+            break;
+        
+        int e2 = err << 1;
+        
+        if (e2 >= dy)
+        {
+            // e_xy+e_x > 0
+            err += dy;
+            x1 += sx;
+        }
+
+        if (e2 <= dx)
+        {
+            // e_xy+e_y < 0
+            err += dx;
+            y1 += sy;
+        }
+    }
+
 }
