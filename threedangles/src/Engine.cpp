@@ -72,6 +72,7 @@ Mat4 Engine::matrix_InversePointAt(const Mat4& m) const
 
 void Engine::drawTriangle(const Triangle& triangle)
 {
+    // triangle.normByW();
     //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
@@ -81,15 +82,17 @@ void Engine::drawTriangle(const Triangle& triangle)
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
     auto c = triangle.getColor();
-
-    drawLine(x1, y1, x2, y2, c);
-    drawLine(x2, y2, x3, y3, c);
-    drawLine(x3, y3, x1, y1, c);
+    
+    _screen->setDrawColor(c);
+    drawLine(x1, y1, x2, y2);
+    drawLine(x2, y2, x3, y3);
+    drawLine(x3, y3, x1, y1);
 
 }
 
 void Engine::fillTriangle(const Triangle& triangle)
 {
+    // triangle.normByW();
     //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
@@ -99,7 +102,7 @@ void Engine::fillTriangle(const Triangle& triangle)
     int y3 = static_cast<int>(std::round(triangle.c.y));
     
     auto c = triangle.getColor();
-    //SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    _screen->setDrawColor(c);
 
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
     if (y1 > y2) {
@@ -232,7 +235,7 @@ void Engine::fillTriangle(const Triangle& triangle)
         if (maxx < t2x)
             maxx = t2x;
         // Draw line from min to max points found on the y
-        draw_hline(minx, maxx, y, c);
+        draw_hline(minx, maxx, y);
         // Now increase y
         if (!changed1)
             t1x += signx1;
@@ -332,7 +335,7 @@ next:
         if (maxx < t2x)
             maxx = t2x;
         // Draw line from min to max points found on the y
-        draw_hline(minx, maxx, y, c);
+        draw_hline(minx, maxx, y);
         // Now increase y
         if (!changed1)
             t1x += signx1;
@@ -346,15 +349,21 @@ next:
     }
 }
 
-void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) noexcept
+void Engine::draw_hline(int x1, int x2, const int y) noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
-        _screen->drawPixel(x1, y, c);
+        _screen->drawPixel(x1, y);
     }
 }
 
-void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) noexcept
+void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) noexcept
+{
+    _screen->setDrawColor(c);
+    draw_hline(x1, x2, y);
+}
+
+void Engine::drawLine(int x1, int y1, const int x2, const int y2) noexcept
 {
     int dx = abs(x2 - x1);
     int sx = x1 < x2 ? 1 : -1;
@@ -364,12 +373,12 @@ void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t
 
     while (true)
     {
-        _screen->drawPixel(x1, y1, c);
+        _screen->drawPixel(x1, y1);
         if (x1 == x2 && y1 == y2)
             break;
-        
+
         int e2 = err << 1;
-        
+
         if (e2 >= dy)
         {
             // e_xy+e_x > 0
@@ -384,5 +393,10 @@ void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t
             y1 += sy;
         }
     }
+}
 
+void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) noexcept
+{
+    _screen->setDrawColor(c);
+    drawLine(x1, y1, x2, y2);
 }

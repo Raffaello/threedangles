@@ -46,11 +46,13 @@ namespace sdl
         return true;
     }
 
-    void Screen_SDL::drawPixel(const int x, const int y, const color_t& c)
+    void Screen_SDL::setDrawColor(const color_t& c) noexcept
     {
-        SDL_assert(nullptr != renderer);
-
         SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+    }
+
+    void Screen_SDL::drawPixel(const int x, const int y) noexcept
+    {
         SDL_RenderDrawPoint(renderer, x, y);
     }
 

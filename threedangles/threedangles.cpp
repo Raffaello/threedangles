@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
     // Cam
+    // TODO fix the camera
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
@@ -131,11 +132,11 @@ int main(int argc, char* argv[])
                 break;
             case SDLK_a:
                 cam_yaw -= 0.1f;
-                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
+                SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
                 break;
             case SDLK_d:
                 cam_yaw += 0.1f;
-                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
+                SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
                 break;
             case SDLK_w:
                 cam = cam + lookAt * 0.5f;

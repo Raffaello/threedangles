@@ -36,7 +36,10 @@ public:
     void fillTriangle(const Triangle& triangle);
 
     // TODO color vertex interpolation? let see later...
+    void draw_hline(int x1, int x2, const int y) noexcept;
     void draw_hline(int x1, int x2, const int y, const color_t& c) noexcept;
+
+    void drawLine(int x1, int y1, const int x2, const int y2) noexcept;
     void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) noexcept;
     //void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c1, const color_t& c2) noexcept;
 private:
