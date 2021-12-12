@@ -4,7 +4,6 @@ namespace sdl
 {
     Screen_SDL::Screen_SDL(const std::string& title, const int width, const int height) : Screen(title, width, height)
     {
-
     }
 
 
@@ -55,7 +54,7 @@ namespace sdl
         SDL_RenderDrawPoint(renderer, x, y);
     }
 
-    void Screen_SDL::setTitle(const std::string title) noexcept
+    void Screen_SDL::setTitle(const std::string& title) noexcept
     {
         _title = title;
         SDL_SetWindowTitle(window, title.c_str());

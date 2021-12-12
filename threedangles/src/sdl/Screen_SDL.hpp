@@ -14,7 +14,7 @@ namespace sdl
         
         virtual bool init() override;
         virtual void drawPixel(const int x, const int y, const color_t& c) override;
-        virtual void setTitle(const std::string title) noexcept override;
+        virtual void setTitle(const std::string& title) noexcept override;
         virtual void clear(const color_t& c) noexcept override;
         virtual void flip() noexcept override;
 
