@@ -13,6 +13,7 @@
 #include <Engine.hpp>
 
 #include <SDL2/SDL.h>
+#include <array>
 
 using std::cerr;
 using std::endl;
@@ -61,12 +62,12 @@ int main(int argc, char* argv[])
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
     //lookAt = { 0.0f, 0.0f, 1.0f };
-    Vec3d up(0.0f, 1.0f, 0.0f);
+    const Vec3d up(0.0f, 1.0f, 0.0f);
     Vec3d target(0.0f, 0.0f, 1.0f);
 
     // Light
-    Vec3d light_direction(0.0f, 0.0f, -1.0f);
-    Vec3d light_direction_normalized = light_direction.normalize();
+    const Vec3d light_direction(0.0f, 0.0f, -1.5f);
+    const Vec3d light_direction_normalized = light_direction.normalize();
 
     bool showHiddenVertexes = false;
     // 0 wire, 1 filled, 2 filled+wire
@@ -224,17 +225,21 @@ int main(int argc, char* argv[])
             // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
 
+            const Vec3d plane_p_near(0.0f, 0.0f, znear);
+            const Vec3d plane_n_near = Vec3d(0.0f, 0.0f, 1.0f).normalize();
+            const Vec3d plane_p_far(0.0f, 0.0f, zfar);
+            const Vec3d plane_n_far = Vec3d(0.0f, 0.0f, -1.0f).normalize();
             std::vector<Triangle> clips;
             if (clipping) {
                 // Clipping on Znear plane (triViewd -> clipped[2])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
-                nClippedTriangles = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, znear }, { 0.0f, 0.0f, 1.0f }, triViewed, clipped[0], clipped[1]);
+                nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
                 // clipping on Zfar plane (clipped[2] -> vector<clippped>)
                 for (int i = 0; i < nClippedTriangles; i++)
                 {
                     Triangle clippedFar[2];
-                    int nClippedTrianglesFar = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, zfar }, { 0.0f, 0.0f, -1.0f }, clipped[i], clippedFar[0], clippedFar[1]);
+                    int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
                     for (int n = 0; n < nClippedTrianglesFar; n++)
                         clips.push_back(clippedFar[n]);
                 }
@@ -289,14 +294,25 @@ int main(int argc, char* argv[])
                 // Add initial triangle
                 listTriangles.push_back(t);
                 int nNewTriangles = 1;
+                const Vec3d plane_p0(0.0f, 0.0f, 0.0f);
+                const Vec3d plane_n0 = Vec3d(0.0f, 1.0f, 0.0f).normalize();
+                const Vec3d plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
+                const Vec3d plane_n1 = Vec3d(0.0f, -1.0f, 0.0f).normalize();
+                const Vec3d plane_p2 = plane_p0;
+                const Vec3d plane_n2 = Vec3d(1.0f, 0.0f, 0.0f).normalize();
+                const Vec3d plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f);
+                const Vec3d plane_n3 = Vec3d(-1.0f, 0.0f, 0.0f).normalize();
 
+                const std::array<const Vec3d, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
+                const std::array<const Vec3d, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
+                
                 for (int p = 0; p < 4; p++)
                 {
                     int nTrisToAdd = 0;
                     while (nNewTriangles > 0)
                     {
                         // Take triangle from front of queue
-                        Triangle test = listTriangles.front();
+                        Triangle tri = listTriangles.front();
                         listTriangles.pop_front();
                         nNewTriangles--;
 
@@ -305,23 +321,7 @@ int main(int argc, char* argv[])
                         // as all triangles after a plane clip are guaranteed
                         // to lie on the inside of the plane. I like how this
                         // comment is almost completely and utterly justified
-                        switch (p)
-                        {
-                        case 0:
-                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, test, clipped[0], clipped[1]);
-                            break;
-                        case 1:
-                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, (float)height - 1, 0.0f }, { 0.0f, -1.0f, 0.0f }, test, clipped[0], clipped[1]);
-                            break;
-                        case 2:
-                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
-                            break;
-                        case 3:
-                            nTrisToAdd = engine->Triangle_ClipAgainstPlane({ (float)width - 1, 0.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, test, clipped[0], clipped[1]);
-                            break;
-                        default:
-                            break;
-                        }
+                        nTrisToAdd = tri.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
 
                         // Clipping may yield a variable number of triangles, so
                         // add these new ones to the back of the queue for subsequent

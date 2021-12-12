@@ -13,22 +13,23 @@ private:
     Engine(const std::shared_ptr<Screen> screen);
 public:
     
-    static std::shared_ptr<Engine> createEngineSDL(const std::string& title, const int width, const int height);
+    static std::shared_ptr<Engine> createEngineSDL(const std::string& title, const int width, const int height) noexcept;
 
     std::shared_ptr<Screen> getScreen() const noexcept;
 
     // todo those should be constant, review the operators overloading
     // body move to a Cam class object as are for that.
-    Mat4 matrix_pointAt(Vec3d& pos, Vec3d& target, Vec3d& up);
-    Mat4 matrix_InversePointAt(Mat4& m);
+    Mat4 matrix_pointAt(const Vec3d& pos, const Vec3d& target, const Vec3d& up) const;
+    Mat4 matrix_InversePointAt(const Mat4& m) const;
 
-    // todo review those 2. replace with Cohen-Sutherland / Sutherland-Hodgman algo 
-    Vec3d Vector_IntersectPlane(Vec3d& plane_p, Vec3d& plane_n, Vec3d& lineStart, Vec3d& lineEnd);
-    int Triangle_ClipAgainstPlane(Vec3d plane_p, Vec3d plane_n, Triangle& in_tri, Triangle& out_tri1, Triangle& out_tri2);
-
-    
+    /**
+     * @brief Triangle is already normalized by w. Only x,y coord will be used
+     * @param triangle 
+    */
     void drawTriangle(const Triangle& triangle);
+
     /** @brief Fill a triangle - Bresenham method
+     *         Triangle is already normalized by w. Only x,y coord will be usd 
      * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
      * @see https://www.avrfreaks.net/sites/default/files/triangles.c
      */
