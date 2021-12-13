@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
     int height = 480;
     const float w2 = 0.5f * static_cast<float>(width);
     const float h2 = 0.5f * static_cast<float>(height);
-    int FPS = 60;
-    int frameTime_ms = 1000 / FPS;
+    uint32_t FPS = 60;
+    uint32_t frameTime_ms = 1000 / FPS;
     Mesh mesh;
     color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
     
@@ -58,14 +58,11 @@ int main(int argc, char* argv[])
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
     // Cam
-    // TODO fix the camera
     Vec3d cam(0.0f, 0.0f, -1.0f);
     Vec3d lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
-    //lookAt = { 0.0f, 0.0f, 1.0f };
     const Vec3d up(0.0f, 1.0f, 0.0f);
     Vec3d target(0.0f, 0.0f, 1.0f);
-
     // Light
     const Vec3d light_direction(0.0f, 0.0f, -1.5f);
     const Vec3d light_direction_normalized = light_direction.normalize();
@@ -180,6 +177,9 @@ int main(int argc, char* argv[])
 
         // Camera Matrix
         Mat4 matCamRot = Mat4::createRotationY(cam_yaw);
+        Mat4 matCamRotOld = matCamRot;
+        // TODO: this doesn't look right
+        target.x = 0.0f; target.y = 0.0f; target.z = 1.0f;
         lookAt = matCamRot * target;
         target = cam + lookAt;
         Mat4 matCam = engine->matrix_pointAt(cam, target, up);
@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
 
                 // Add initial triangle
                 listTriangles.push_back(t);
-                int nNewTriangles = 1;
+                size_t nNewTriangles = 1;
                 const Vec3d plane_p0(0.0f, 0.0f, 0.0f);
                 const Vec3d plane_n0 = Vec3d(0.0f, 1.0f, 0.0f).normalize();
                 const Vec3d plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
