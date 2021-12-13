@@ -15,7 +15,7 @@ public:
     virtual bool init() = 0;
     virtual void setDrawColor(const color_t& c)noexcept = 0;
     virtual void drawPixel(const int x, const int y) noexcept = 0;
-    virtual void drawPixel(const int x, const int y, const color_t& c) {
+    inline void drawPixel(const int x, const int y, const color_t& c) {
         setDrawColor(c);
         drawPixel(x, y);
     }

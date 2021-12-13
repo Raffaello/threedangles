@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Z-depth sorting 
+        // Z-depth sorting
         // (could be removed storing the triangleToRaster in a minHeap)
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {

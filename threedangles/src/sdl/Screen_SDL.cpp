@@ -53,7 +53,8 @@ namespace sdl
 
     void Screen_SDL::drawPixel(const int x, const int y) noexcept
     {
-        SDL_RenderDrawPoint(renderer, x, y);
+        //if (x >= 0 && x < width && y >= 0 && y < height)
+            SDL_RenderDrawPoint(renderer, x, y);
     }
 
     void Screen_SDL::setTitle(const std::string& title) noexcept

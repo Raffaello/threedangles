@@ -82,7 +82,25 @@ void Engine::drawTriangle(const Triangle& triangle)
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
     auto c = triangle.getColor();
-    
+    // rasterization clipping,
+    // not working when the triangle is out of the screen
+    // as it could still draw something
+    // as the coords are just capped in the max and min values
+    // instead should just not be drawn
+    /*if (x1 < 0) x1 = 0;
+    if (y1 < 0) y1 = 0;
+    if (x2 < 0) x2 = 0;
+    if (y2 < 0) y2 = 0;
+    if (x3 < 0) x3 = 0;
+    if (y3 < 0) y3 = 0;
+
+    if (x1 > _screen->width)  x1 = _screen->width;
+    if (y1 > _screen->height) y1 = _screen->height;
+    if (x2 > _screen->width)  x2 = _screen->width;
+    if (y2 > _screen->height) y2 = _screen->height;
+    if (x3 > _screen->width)  x3 = _screen->width;
+    if (y3 > _screen->height) y3 = _screen->height;*/
+
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);
     drawLine(x2, y2, x3, y3);
