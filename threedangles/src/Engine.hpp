@@ -10,7 +10,7 @@
 class Engine
 {
 private:
-    Engine(const std::shared_ptr<Screen> screen);
+    explicit Engine(const std::shared_ptr<Screen> screen);
 public:
     
     static std::shared_ptr<Engine> createEngineSDL(const std::string& title, const int width, const int height) noexcept;

@@ -309,9 +309,9 @@ int main(int argc, char* argv[])
                 
                 for (int p = 0; p < 4; p++)
                 {
-                    int nTrisToAdd = 0;
                     while (nNewTriangles > 0)
                     {
+                        int nTrisToAdd = 0;
                         // Take triangle from front of queue
                         Triangle tri = listTriangles.front();
                         listTriangles.pop_front();
