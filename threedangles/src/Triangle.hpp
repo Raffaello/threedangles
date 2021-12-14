@@ -1,19 +1,19 @@
 #pragma once
 
-#include <Vec3d.hpp>
+#include <Vec4.hpp>
 #include <cstdint>
 #include <types.hpp>
 
 class Triangle
 {
 public:
-    Triangle(const Vec3d& a_, const Vec3d& b_, const Vec3d& c_);
+    Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_);
     Triangle() = default;
 
-    Vec3d a, b, c;
+    Vec4 a, b, c;
     
 
-    Triangle operator+(const Vec3d& v) const noexcept;
+    Triangle operator+(const Vec4& v) const noexcept;
 
     Triangle normByW() const noexcept;
 
@@ -27,9 +27,9 @@ public:
     void getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
     color_t getColor() const noexcept;
 
-    Vec3d faceNormal() const noexcept;
+    Vec4 faceNormal() const noexcept;
 
-    int clipAgainstPlane(const Vec3d &plane_p, const Vec3d& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept;
+    int clipAgainstPlane(const Vec4 &plane_p, const Vec4& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept;
 
 private:
     // TODO move the colors to vertex

@@ -8,7 +8,7 @@ bool Mesh::loadFromOBJFile(const std::string& filename)
 {
     std::ifstream file(filename, std::ifstream::in);
     std::string line;
-    std::vector<Vec3d> vertexes;
+    std::vector<Vec4> vertexes;
 
     tris.clear();
     if (!file.is_open())
@@ -29,7 +29,7 @@ bool Mesh::loadFromOBJFile(const std::string& filename)
         else if (type == "v")
         {
             // vertex
-            Vec3d v;
+            Vec4 v;
             ss >> v.x >> v.y >> v.z;
             vertexes.push_back(v);
         }

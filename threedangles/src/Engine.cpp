@@ -26,14 +26,14 @@ std::shared_ptr<Screen> Engine::getScreen() const noexcept
     return _screen;
 }
 
-Mat4 Engine::matrix_pointAt(const Vec3d& pos, const Vec3d& target, const Vec3d& up) const
+Mat4 Engine::matrix_pointAt(const Vec4& pos, const Vec4& target, const Vec4& up) const
 {
     /// @see https://www.3dgep.com/understanding-the-view-matrix/
-    Vec3d forward = (target - pos).normalize();
+    Vec4 forward = (target - pos).normalize();
 
-    Vec3d t = (forward * up.dotProd(forward));
-    Vec3d newUp = (up - t).normalize();
-    Vec3d newRight = newUp.crossProd(forward);
+    Vec4 t = (forward * up.dotProd(forward));
+    Vec4 newUp = (up - t).normalize();
+    Vec4 newRight = newUp.crossProd(forward);
 
     //Dimensioning & Translation Matrix
     Mat4 m;

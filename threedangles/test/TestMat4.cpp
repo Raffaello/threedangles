@@ -14,7 +14,7 @@ void cmp_matrices(Mat4& a, Mat4& b)
 }
 TEST(Mat4, mulVec)
 {
-    Vec3d v(1,2,3);
+    Vec4 v(1,2,3);
     Mat4 m;
     m.m[0][0] = 1;
     m.m[0][1] = 2;
@@ -30,8 +30,8 @@ TEST(Mat4, mulVec)
 
     m.m[3][3] = 1.0f;
     
-    Vec3d u = m * v;
-    Vec3d w(1 * 1 + 2 * 2 + 3 * 3, 1 * 4 + 2 * 5 + 3 * 6, 1 * 7 + 2 * 8 + 3 * 9);
+    Vec4 u = m * v;
+    Vec4 w(1 * 1 + 2 * 2 + 3 * 3, 1 * 4 + 2 * 5 + 3 * 6, 1 * 7 + 2 * 8 + 3 * 9);
 
     EXPECT_TRUE(u == w);
 }
@@ -90,7 +90,7 @@ TEST(Mat4, identity)
 
 TEST(Mat4, Translation)
 {
-    Vec3d v(1, 2, 3);
+    Vec4 v(1, 2, 3);
     Mat4 b;
     b.m[0][3] = v.x;
     b.m[1][3] = v.y;

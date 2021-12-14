@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Mat4.hpp>
-#include <Vec3d.hpp>
+#include <Vec4.hpp>
 #include <Triangle.hpp>
 #include <Screen.hpp>
 #include <memory>
@@ -19,7 +19,7 @@ public:
 
     // todo those should be constant, review the operators overloading
     // body move to a Cam class object as are for that.
-    Mat4 matrix_pointAt(const Vec3d& pos, const Vec3d& target, const Vec3d& up) const;
+    Mat4 matrix_pointAt(const Vec4& pos, const Vec4& target, const Vec4& up) const;
     Mat4 matrix_InversePointAt(const Mat4& m) const;
 
     /**

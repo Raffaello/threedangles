@@ -21,9 +21,9 @@ Mat4 Mat4::operator*(const Mat4& m_)
     return matrix;
 }
 
-Vec3d Mat4::operator*(const Vec3d& i)
+Vec4 Mat4::operator*(const Vec4& i)
 {
-    Vec3d v;
+    Vec4 v;
 
     v.x = i.x * this->m[0][0] + i.y * this->m[0][1] + i.z * this->m[0][2] + i.w * this->m[0][3];
     v.y = i.x * this->m[1][0] + i.y * this->m[1][1] + i.z * this->m[1][2] + i.w * this->m[1][3];
@@ -71,7 +71,7 @@ Mat4 Mat4::createIdentity()
     return m;
 }
 
-Mat4 Mat4::createTranslation(const Vec3d& v)
+Mat4 Mat4::createTranslation(const Vec4& v)
 {
     Mat4 m;
 

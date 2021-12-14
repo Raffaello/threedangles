@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Vec3d.hpp>
+#include <Vec4.hpp>
 #include <Triangle.hpp>
 #include <array>
 
@@ -12,13 +12,13 @@ class Mat4
 {
 public:
     Mat4 operator*(const Mat4& m_);
-    Vec3d operator*(const Vec3d& i);
+    Vec4 operator*(const Vec4& i);
     Triangle operator*(const Triangle& i);
 
     bool operator==(const Mat4& m);
     static float deg2rad(const float deg);
     static Mat4 createIdentity();
-    static Mat4 createTranslation(const Vec3d& v);
+    static Mat4 createTranslation(const Vec4& v);
     static Mat4 createTranslation(const float k);
     static Mat4 createScale(const float a, const float b, const float c);
     static Mat4 createRotationX(const float theta);

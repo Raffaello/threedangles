@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <list>
 
-#include <Vec3d.hpp>
+#include <Vec4.hpp>
 #include <Triangle.hpp>
 #include <Mesh.hpp>
 #include <Engine.hpp>
@@ -58,14 +58,14 @@ int main(int argc, char* argv[])
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
     // Cam
-    Vec3d cam(0.0f, 0.0f, -1.0f);
-    Vec3d lookAt(0.0f, 0.0f, 0.0f);
+    Vec4 cam(0.0f, 0.0f, -1.0f);
+    Vec4 lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
-    const Vec3d up(0.0f, 1.0f, 0.0f);
-    Vec3d target(0.0f, 0.0f, 1.0f);
+    const Vec4 up(0.0f, 1.0f, 0.0f);
+    Vec4 target(0.0f, 0.0f, 1.0f);
     // Light
-    const Vec3d light_direction(0.0f, 0.0f, -1.5f);
-    const Vec3d light_direction_normalized = light_direction.normalize();
+    const Vec4 light_direction(0.0f, 0.0f, -1.5f);
+    const Vec4 light_direction_normalized = light_direction.normalize();
 
     bool showHiddenVertexes = false;
     // 0 wire, 1 filled, 2 filled+wire
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
             // Normals (back-face culling)
             // TODO: move to Triangle or Engine class
-            Vec3d normal = triTransformed.faceNormal();
+            Vec4 normal = triTransformed.faceNormal();
             float norm_dp = normal.dotProd(triTransformed.a - cam);
 
             if (!showHiddenVertexes && norm_dp >= 0.0f)
@@ -224,10 +224,10 @@ int main(int argc, char* argv[])
             // BODY color from the mesh instead, and traingle is "private" for rasterization?
             triViewed.setColor(triTransformed);
 
-            const Vec3d plane_p_near(0.0f, 0.0f, znear);
-            const Vec3d plane_n_near = Vec3d(0.0f, 0.0f, 1.0f).normalize();
-            const Vec3d plane_p_far(0.0f, 0.0f, zfar);
-            const Vec3d plane_n_far = Vec3d(0.0f, 0.0f, -1.0f).normalize();
+            const Vec4 plane_p_near(0.0f, 0.0f, znear);
+            const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
+            const Vec4 plane_p_far(0.0f, 0.0f, zfar);
+            const Vec4 plane_n_far = Vec4(0.0f, 0.0f, -1.0f).normalize();
             std::vector<Triangle> clips;
             if (clipping) {
                 // Clipping on Znear plane (triViewd -> clipped[2])
@@ -293,17 +293,17 @@ int main(int argc, char* argv[])
                 // Add initial triangle
                 listTriangles.push_back(t);
                 size_t nNewTriangles = 1;
-                const Vec3d plane_p0(0.0f, 0.0f, 0.0f);
-                const Vec3d plane_n0 = Vec3d(0.0f, 1.0f, 0.0f).normalize();
-                const Vec3d plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
-                const Vec3d plane_n1 = Vec3d(0.0f, -1.0f, 0.0f).normalize();
-                const Vec3d plane_p2 = plane_p0;
-                const Vec3d plane_n2 = Vec3d(1.0f, 0.0f, 0.0f).normalize();
-                const Vec3d plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f);
-                const Vec3d plane_n3 = Vec3d(-1.0f, 0.0f, 0.0f).normalize();
+                const Vec4 plane_p0(0.0f, 0.0f, 0.0f);
+                const Vec4 plane_n0 = Vec4(0.0f, 1.0f, 0.0f).normalize();
+                const Vec4 plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
+                const Vec4 plane_n1 = Vec4(0.0f, -1.0f, 0.0f).normalize();
+                const Vec4 plane_p2 = plane_p0;
+                const Vec4 plane_n2 = Vec4(1.0f, 0.0f, 0.0f).normalize();
+                const Vec4 plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f);
+                const Vec4 plane_n3 = Vec4(-1.0f, 0.0f, 0.0f).normalize();
 
-                const std::array<const Vec3d, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
-                const std::array<const Vec3d, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
+                const std::array<const Vec4, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
+                const std::array<const Vec4, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
                 
                 for (int p = 0; p < 4; p++)
                 {

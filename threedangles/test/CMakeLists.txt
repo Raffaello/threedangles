@@ -32,8 +32,8 @@ endmacro()
 
 macro_test(
         EXE TestVec3d
-        FILE "TestVec3d.cpp"
-        FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
+        FILE "TestVec4.cpp"
+        FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
     )
 
 macro_test(
@@ -41,7 +41,7 @@ macro_test(
         FILE "TestMat4.cpp"
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec3d.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
         #LINKS SDL2::SDL2 ${LIB_SDL2main} # remove this dependency from Mat4 class -> Triangle class
     )

@@ -2,11 +2,11 @@
 #include <cassert>
 
 
-Triangle::Triangle(const Vec3d& a_, const Vec3d& b_, const Vec3d& c_) : a(a_), b(b_), c(c_)
+Triangle::Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_) : a(a_), b(b_), c(c_)
 {
 }
 
-Triangle Triangle::operator+(const Vec3d& v) const noexcept
+Triangle Triangle::operator+(const Vec4& v) const noexcept
 {
     Triangle t(*this);
 
@@ -53,9 +53,9 @@ color_t Triangle::getColor() const noexcept
     return col;
 }
 
-Vec3d Triangle::faceNormal() const noexcept
+Vec4 Triangle::faceNormal() const noexcept
 {
-    Vec3d line1(b), line2(c);
+    Vec4 line1(b), line2(c);
 
     line1 = line1 - a;
     line2 = line2 - a;
@@ -63,7 +63,7 @@ Vec3d Triangle::faceNormal() const noexcept
     return line1.crossProd(line2).normalize();
 }
 
-int Triangle::clipAgainstPlane(const Vec3d& plane_p, const Vec3d& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept
+int Triangle::clipAgainstPlane(const Vec4& plane_p, const Vec4& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept
 {
     // Make sure plane normal is indeed normal
     //plane_n = plane_n.normalize();
@@ -71,16 +71,16 @@ int Triangle::clipAgainstPlane(const Vec3d& plane_p, const Vec3d& plane_n, Trian
 
     // Return signed shortest distance from point to plane, plane normal must be normalised
     const float dpnp = plane_n.dotProd(plane_p);
-    auto dist = [&](const Vec3d& p)
+    auto dist = [&](const Vec4& p)
     {
-        Vec3d n = p.normalize();
+        Vec4 n = p.normalize();
         return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - dpnp);
     };
 
     // Create two temporary storage arrays to classify points either side of plane
     // If distance sign is positive, point lies on "inside" of plane
-    const Vec3d* inside_points[3]{};  int nInsidePointCount = 0;
-    const Vec3d* outside_points[3]{}; int nOutsidePointCount = 0;
+    const Vec4* inside_points[3]{};  int nInsidePointCount = 0;
+    const Vec4* outside_points[3]{}; int nOutsidePointCount = 0;
 
     // Get signed distance of each point in triangle to plane
     float d0 = dist(this->a);
