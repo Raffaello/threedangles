@@ -2,6 +2,8 @@
 
 #include <types.hpp>
 
+// TODO renane Vec4
+//      add vertex normal, vertex texture, color etc..
 class Vec3d
 {
 public:

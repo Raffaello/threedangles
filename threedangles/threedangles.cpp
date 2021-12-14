@@ -77,87 +77,86 @@ int main(int argc, char* argv[])
 
     bool quit = false;
     while (!quit) {
-        SDL_Event e;
-        SDL_PollEvent(&e);
-
         uint32_t startTicks = SDL_GetTicks();
         //uint64_t start_perf = SDL_GetPerformanceCounter();
-
-        switch (e.type)
+        SDL_Event e;
+        while (SDL_PollEvent(&e))
         {
-        case SDL_KEYDOWN:
-            switch (e.key.keysym.sym)
+            switch (e.type)
             {
-            case SDLK_ESCAPE:
-            {
-                SDL_Event esc = { 0 };
-                esc.type = SDL_QUIT;
-                SDL_PushEvent(&esc);
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_ESCAPE:
+                {
+                    SDL_Event esc = { 0 };
+                    esc.type = SDL_QUIT;
+                    SDL_PushEvent(&esc);
+                    break;
+                }
+                case SDLK_h:
+                    showHiddenVertexes = !showHiddenVertexes;
+                    SDL_Log("Show Hidden Vertexes = %d", showHiddenVertexes);
+                    break;
+                case SDLK_l:
+                    illuminationOn = !illuminationOn;
+                    SDL_Log("Illumination ON = %d", illuminationOn);
+                    break;
+                case SDLK_f:
+                    filled++; filled %= 3;
+                    SDL_Log("Filling Triangles = %d", filled);
+                    break;
+                case SDLK_KP_PLUS:
+                    offset += 0.5f;
+                    SDL_Log("offset = %f", offset);
+                    break;
+                case SDLK_KP_MINUS:
+                    offset -= 0.5f;
+                    SDL_Log("offset = %f", offset);
+                    break;
+                case SDLK_UP:
+                    cam.y += 1.0f;
+                    break;
+                case SDLK_DOWN:
+                    cam.y -= 1.0f;
+                    break;
+                case SDLK_LEFT:
+                    cam.x += 1.0f;
+                    break;
+                case SDLK_RIGHT:
+                    cam.x -= 1.0f;
+                    break;
+                case SDLK_a:
+                    cam_yaw -= 0.1f;
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
+                    break;
+                case SDLK_d:
+                    cam_yaw += 0.1f;
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
+                    break;
+                case SDLK_w:
+                    cam = cam + lookAt * 0.5f;
+                    SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
+                    break;
+                case SDLK_s:
+                    cam = cam - lookAt * 0.5f;
+                    SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
+                    break;
+                case SDLK_c:
+                    clipping = !clipping;
+                    SDL_Log("clipping = %d", clipping);
+                    break;
+                default:
+                    break;
+                }
                 break;
-            }
-            case SDLK_h:
-                showHiddenVertexes = !showHiddenVertexes;
-                SDL_Log("Show Hidden Vertexes = %d", showHiddenVertexes);
-                break;
-            case SDLK_l:
-                illuminationOn = !illuminationOn;
-                SDL_Log("Illumination ON = %d", illuminationOn);
-                break;
-            case SDLK_f:
-                filled++; filled %= 3;
-                SDL_Log("Filling Triangles = %d", filled);
-                break;
-            case SDLK_KP_PLUS:
-                offset += 0.5f;
-                SDL_Log("offset = %f", offset);
-                break;
-            case SDLK_KP_MINUS:
-                offset -= 0.5f;
-                SDL_Log("offset = %f", offset);
-                break;
-            case SDLK_UP:
-                cam.y += 1.0f;
-                break;
-            case SDLK_DOWN:
-                cam.y -= 1.0f;
-                break;
-            case SDLK_LEFT:
-                cam.x += 1.0f;
-                break;
-            case SDLK_RIGHT:
-                cam.x -= 1.0f;
-                break;
-            case SDLK_a:
-                cam_yaw -= 0.1f;
-                SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
-                break;
-            case SDLK_d:
-                cam_yaw += 0.1f;
-                SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
-                break;
-            case SDLK_w:
-                cam = cam + lookAt * 0.5f;
-                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
-                break;
-            case SDLK_s:
-                cam = cam - lookAt * 0.5f;
-                SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
-                break;
-            case SDLK_c:
-                clipping = !clipping;
-                SDL_Log("clipping = %d", clipping);
+            case SDL_QUIT:
+                quit = true;
                 break;
             default:
                 break;
             }
-            break;
-        case SDL_QUIT:
-            quit = true;
-            break;
-        default:
-            break;
         }
-
         // Clear the screen/buffer
         screen->clear(black);
 
@@ -177,7 +176,6 @@ int main(int argc, char* argv[])
 
         // Camera Matrix
         Mat4 matCamRot = Mat4::createRotationY(cam_yaw);
-        Mat4 matCamRotOld = matCamRot;
         // TODO: this doesn't look right
         target.x = 0.0f; target.y = 0.0f; target.z = 1.0f;
         lookAt = matCamRot * target;
@@ -262,8 +260,8 @@ int main(int argc, char* argv[])
             }
         }
 
-        // Z-depth sorting
-        // (could be removed storing the triangleToRaster in a minHeap)
+        // Z-depth sorting (Painter's Algorithm)
+        // TODO: add a Z buffer when rasterizing to minimize redrawing pixels nore then once per frame.
         std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
             [](Triangle& t1, Triangle& t2) {
                 // divsion by 3.0f can be skipped

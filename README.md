@@ -15,15 +15,15 @@ It will feature the following algorithms:
 - [ ] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
-- Left-hand rules, right-hand rules
-
+- Left-hand rules
+- Quaternions for optimizing matrixes rotations.
 The algorithms will be all implemented from scratch without using any modern library or Engine.
 
 Their implementation will be based on :
 
 - [x] CPU/FPU
-- [ ] SIMD instructions
-- [ ] GPU
+- [ ] SIMD instructions (Intel)
+- [ ] GPU (CUDA)
 
 So it would be possible to benchmark those too.
 
@@ -36,4 +36,10 @@ a comparision/benchmark on the algorithms implemented here.
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations of the engine.
 
-  Implement with Qt
+
+## windows
+- WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
+- WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
+
+## SIMD
+- [ ] SSE for float 32 bit and Vec4 / Mat4 operations
