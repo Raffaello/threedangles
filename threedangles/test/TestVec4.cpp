@@ -69,8 +69,8 @@ TEST(Vec4, normalize)
     Vec4 a(1, 2, 3);
     Vec4 b(3, 4, 5);
 
-    EXPECT_TRUE(a.normalize() == a / sqrt(1 * 1 + 2 * 2 + 3 * 3));
-    EXPECT_TRUE(b.normalize() == b / sqrt(3 * 3 + 4 * 4 + 5 * 5));
+    EXPECT_TRUE(a.normalize() == a / sqrt(1.0f * 1.0f + 2.0f * 2.0f + 3.0f * 3.0f));
+    EXPECT_TRUE(b.normalize() == b / sqrt(3.0f * 3.0f + 4.0f * 4.0f + 5.0f * 5.0f));
 }
 
 TEST(Vec4, crossProd)

@@ -25,6 +25,8 @@ public:
     static Mat4 createRotationY(const float theta);
     static Mat4 createRotationZ(const float theta);
     static Mat4 createProjection(const int w, const int h, const float fov, const float zfar, const float znear);
+    static Mat4 createRotation(const float theta, const Vec4& n) noexcept;
+
 
     // todo move to private
     std::array<std::array<float, 4>, 4> m = {};

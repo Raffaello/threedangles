@@ -88,7 +88,7 @@ Mat4 Mat4::createTranslation(const Vec4& v)
 
 Mat4 Mat4::createTranslation(const float k)
 {
-    return createTranslation({ k, k, k });
+    return createTranslation(Vec4( k, k, k ));
 }
 
 Mat4 Mat4::createScale(const float a, const float b, const float c)
@@ -204,4 +204,27 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
 
 
     return m;
+}
+
+Mat4 Mat4::createRotation(const float theta, const Vec4& n) noexcept
+{
+    Mat4 r;
+    float c = cos(theta);
+    float c1 = 1 - c;
+    float s = sin(theta);
+    r.m[0][0] = n.x * n.x * c1 + c;
+    r.m[0][1] = n.z * n.y * c1 + n.z * s;
+    r.m[0][2] = n.x * n.z * c1 - n.y * s;
+
+    r.m[1][0] = n.z * n.y * c1 - n.z * s;
+    r.m[1][1] = n.y * n.y * c1 + c;
+    r.m[1][2] = n.y * n.z * c1 + n.x * s;
+
+    r.m[2][0] = n.x * n.z * c1 + n.y * s;
+    r.m[2][1] = n.y * n.z * c1 - n.x * s;
+    r.m[2][2] = n.z*n.z*c1+c;
+
+    r.m[3][3] = 1.0f;
+
+    return r;
 }

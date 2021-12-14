@@ -58,9 +58,10 @@ int main(int argc, char* argv[])
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
     // Cam
-    Vec4 cam(0.0f, 0.0f, -1.0f);
+    Vec4 cam(0.0f, 0.0f, -5.0f);
     Vec4 lookAt(0.0f, 0.0f, 0.0f);
     float cam_yaw = 0.0f;
+    float cam_pitch = 0.0f;
     const Vec4 up(0.0f, 1.0f, 0.0f);
     Vec4 target(0.0f, 0.0f, 1.0f);
     // Light
@@ -73,7 +74,7 @@ int main(int argc, char* argv[])
     bool illuminationOn = true;
     bool clipping = true;
     // offset params
-    float offset = 5.0f;
+    float offset = 0.0f;
 
     bool quit = false;
     while (!quit) {
@@ -121,10 +122,12 @@ int main(int argc, char* argv[])
                     cam.y -= 1.0f;
                     break;
                 case SDLK_LEFT:
-                    cam.x += 1.0f;
+                    cam_pitch +=  0.1f;
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_pitch);
                     break;
                 case SDLK_RIGHT:
-                    cam.x -= 1.0f;
+                    cam_pitch -= 0.1f;
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_pitch);
                     break;
                 case SDLK_a:
                     cam_yaw -= 0.1f;
@@ -162,12 +165,12 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 0.0f;
+        alpha = 0.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 
         // Translation
-        Mat4 matTrans = Mat4::createTranslation({ 0.0f, 0.0f, offset });
+        Mat4 matTrans = Mat4::createTranslation(Vec4(0.0f, 0.0f, offset));
 
         // World Matrix
         Mat4 matWorld; // = Engine::matrix_createIdentity();
@@ -179,6 +182,9 @@ int main(int argc, char* argv[])
         // TODO: this doesn't look right
         target.x = 0.0f; target.y = 0.0f; target.z = 1.0f;
         lookAt = matCamRot * target;
+        Vec4 F = lookAt.normalize();
+        Vec4 L = up.crossProd(F).normalize();
+        lookAt = Mat4::createRotation(cam_pitch, L) * lookAt;
         target = cam + lookAt;
         Mat4 matCam = engine->matrix_pointAt(cam, target, up);
         Mat4 matView = engine->matrix_InversePointAt(matCam);

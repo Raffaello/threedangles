@@ -5,13 +5,13 @@ Cam::Cam(const Vec4& verticalOffset, const Vec4& targetOffset, const Vec4& cam_p
     eye = verticalOffset + cam_position;
     target = eye + targetOffset;
     up = Vec4(0.0f, 1.0f, 0.0f);
-    CreateLookAt(eye, target, up);
+    CreateLookAt();
 }
 
-void Cam::CreateLookAt(const Vec4& eye, const Vec4& target, const Vec4& Up) noexcept
+void Cam::CreateLookAt() noexcept
 {
     Vec4 F = (target - eye).normalize();
-    Vec4 L = Up.crossProd(F).normalize();
+    Vec4 L = up.crossProd(F).normalize();
     Vec4 U = F.crossProd(L);
     Vec4 T(-L.dotProd(eye), -U.dotProd(eye), -F.dotProd(eye));
 
@@ -39,6 +39,25 @@ void Cam::Update(const float delta_yaw, const float delta_pitch) noexcept
     Vec4 actualOffset = matY * targetOffset;
     Vec4 F = actualOffset.normalize();
     Vec4 L = up.crossProd(F).normalize();
-    // TODO: to be finished transformation around pitch
+    // Rotate actual offset about left for pitch
+    
+
+
+    // Cross products to calculate camera left, then camera up
+    /*Vector3 cameraLeft = CrossProduct(tUp, cameraForward)
+        cameraLeft.Normalize()
+        Vector3 cameraUp = CrossProduct(cameraForward, cameraLeft)
+        cameraUp.Normalize()*/
+
+
+        // Rotate actual offset about left for pitch
+    //Quaternion quatPitch = CreateFromAxisAngle(left, totalPitch)
+    //    actualOffset = Transform(acutalOffset, quatPitch)
+    //    // Now construct the camera matrix
+    //    Vector3 eye = player.position + verticalOffset
+    //    Vector3 target = eye + actualOffset
+    //    // In this case we can just pass in world up, since we can never
+    //    // rotate upside-down.
+    //    cameraMatrix = CreateLookAt(eye, target, Vector3(0, 1, 0))
 
 }
