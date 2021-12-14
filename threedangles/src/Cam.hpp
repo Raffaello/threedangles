@@ -17,21 +17,17 @@ public:
     Vec4 cam;
     Vec4 up;
     
-    //Mat4 matCamRot;
-    //Mat4 matCam;
-    //Mat4 matView;
+    void createLookAt() noexcept;
+    void update(const float delta_yaw, const float delta_pitch) noexcept;
+    void set(const float yaw, const float pitch) noexcept;
 
-    void CreateLookAt() noexcept;
-    void Update(const float delta_yaw, const float delta_pitch) noexcept;
-
-protected:
+//protected:
     // Camera offset from player character position
     // For a y-up world, the vector would be (0, value, 0)
     Vec4 verticalOffset;
     // Target position offset from camera
     // For a z-forward world, vector would be (0, 0, value)
     Vec4 targetOffset;
-
     float yaw = 0.0f;
     float pitch = 0.0f;
     //float roll = 0.0f; // TODO: not implemented yet

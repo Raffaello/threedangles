@@ -11,6 +11,7 @@
 #include <Triangle.hpp>
 #include <Mesh.hpp>
 #include <Engine.hpp>
+#include <Cam.hpp>
 
 #include <SDL2/SDL.h>
 #include <array>
@@ -64,6 +65,7 @@ int main(int argc, char* argv[])
     float cam_pitch = 0.0f;
     const Vec4 up(0.0f, 1.0f, 0.0f);
     Vec4 target(0.0f, 0.0f, 1.0f);
+
     // Light
     const Vec4 light_direction(0.0f, 0.0f, -1.5f);
     const Vec4 light_direction_normalized = light_direction.normalize();
@@ -188,6 +190,10 @@ int main(int argc, char* argv[])
         target = cam + lookAt;
         Mat4 matCam = engine->matrix_pointAt(cam, target, up);
         Mat4 matView = engine->matrix_InversePointAt(matCam);
+
+
+        /*cam.set(cam_yaw, cam_pitch);
+        Mat4 matView = engine->matrix_InversePointAt(cam.matLookAt)*/
 
         // Process the triangles.
         std::vector<Triangle> trianglesToRaster;
