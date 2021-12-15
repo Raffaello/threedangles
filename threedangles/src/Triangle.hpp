@@ -11,7 +11,6 @@ public:
     Triangle() = default;
 
     Vec4 a, b, c;
-    
 
     Triangle operator+(const Vec4& v) const noexcept;
 
@@ -35,3 +34,9 @@ private:
     // TODO move the colors to vertex
     color_t col;
 };
+
+typedef struct raster_t
+{
+    Triangle t;
+    Vec4 faceNormal;
+} raster_t;

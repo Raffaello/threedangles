@@ -42,4 +42,4 @@ a comparision/benchmark on the algorithms implemented here.
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
 ## SIMD
-- [ ] SSE for float 32 bit and Vec4 / Mat4 operations
+- [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations
