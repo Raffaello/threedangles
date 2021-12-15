@@ -8,8 +8,29 @@ set (CMAKE_DEBUG_POSTFIX d)
 
 find_package(SDL2 CONFIG REQUIRED)
 
+if (WIN32)
+    set(LIB_SDL2main SDL2::SDL2main)
+endif()
 
-# Add source to this project's executable.
-add_executable (threedangles "threedangles.cpp" "threedangles.h")
+add_executable(threedangles "threedangles.cpp")
+target_sources(threedangles PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Triangle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Cam.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
+)
+target_include_directories(threedangles PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
-# TODO: Add tests and install targets if needed.
+target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main})
+
+############################### tests ########################################
+if(BUILD_TESTING)
+    add_subdirectory("test")
+endif()

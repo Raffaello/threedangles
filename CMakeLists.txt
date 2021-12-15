@@ -9,6 +9,7 @@ endif()
 
 
 project ("threedangles")
+include(CTest)
 
 # Include sub-projects.
 add_subdirectory ("threedangles")
