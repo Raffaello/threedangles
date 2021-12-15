@@ -26,9 +26,7 @@ int main(int argc, char* argv[])
     uint32_t FPS = 60;
     uint32_t frameTime_ms = 1000 / FPS;
     color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
-    color_t a;
-    
-    
+
     std::string title = "ThreeDangles";
     auto engine = Engine::createEngineSDL(title, width, height);
     if (engine == nullptr) {

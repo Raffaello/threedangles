@@ -57,23 +57,23 @@ private:
     //static inline void compute_int_coord(float& x1, float& y1, float& x2, float& y2, float& x3, float& y3) noexcept;
     
     void draw_hline(int x1, int x2, const int y) const noexcept;
-    void draw_hline(int x1, int x2, const int y, const color_t& c) noexcept;
+    void draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept;
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
      * @param triangle
     */
-    void drawTriangle(const Triangle& triangle);
+    void drawTriangle(const Triangle& triangle) const noexcept;
 
     /** @brief Fill a triangle - Bresenham method
      *         Triangle is already normalized by w. Only x,y coord will be usd
      * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
      * @see https://www.avrfreaks.net/sites/default/files/triangles.c
      */
-    void fillTriangle(const Triangle& triangle);
+    void fillTriangle(const Triangle& triangle) const noexcept;
 
     // TODO color vertex interpolation? let see later...
-    void drawLine(int x1, int y1, const int x2, const int y2) noexcept;
-    void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) noexcept;
+    void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
+    void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) const noexcept;
 
     Mat4 matProjection;
     Mat4 matWorld;

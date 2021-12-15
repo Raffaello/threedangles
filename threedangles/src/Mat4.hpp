@@ -11,12 +11,14 @@
 class Mat4
 {
 public:
-    Mat4 operator*(const Mat4& m_);
-    Vec4 operator*(const Vec4& i);
-    Triangle operator*(const Triangle& i);
+    Mat4 operator*(const Mat4& m_) const noexcept;
+    Vec4 operator*(const Vec4& i) const noexcept;
+    Triangle operator*(const Triangle& i) const noexcept;
 
-    bool operator==(const Mat4& m);
+    bool operator==(const Mat4& m) const noexcept;
+    
     static float deg2rad(const float deg);
+    
     static Mat4 createIdentity();
     static Mat4 createTranslation(const Vec4& v);
     static Mat4 createTranslation(const float k);

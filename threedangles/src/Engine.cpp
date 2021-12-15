@@ -59,38 +59,14 @@ void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_
     trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
-    
+
     for (const auto& mesh : meshes)
     {
         // should be move to Mesh.render?
-        for (const auto& tri : mesh.tris)
-        {
-            Triangle triTransformed;
-
-            triTransformed = matWorld * tri;
-
-            // Normals (back-face culling)
-            Vec4 normal = triTransformed.faceNormal();
-            float norm_dp = normal.dotProd(triTransformed.a - cam.position);
-
-            if (!showHiddenVertexes && norm_dp >= 0.0f)
-                continue;
-
-            // World Space -> View Space
-            triTransformed = matView * triTransformed;
-            // Clipping section 
-            std::vector<Triangle> clips;
-            _clipping->clipZ(triTransformed, clips);
-
-            for (const auto& c : clips)
-            {
-                // Projection 3D -> 2D & Scale into view (viewport)
-                raster_t r;
-                r.t = (matProjection * c).normByW();
-                r.faceNormal = normal;
-                trianglesToRaster.push_back(r);
-            }
-        }
+        // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
+        // and then compute the "MeshTransformed already" to be ready to be reused
+        // unless something changes ?
+        mesh.render(matProjection, matWorld, matView, showHiddenVertexes, cam, _clipping, trianglesToRaster);
     }
 
     // Z-depth sorting (Painter's Algorithm)
@@ -239,7 +215,7 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
     return true;
 }
 
-inline void Engine::drawTriangle(const Triangle& triangle)
+inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
 {
     // triangle.normByW();
     //compute_int_coord();
@@ -277,7 +253,7 @@ inline void Engine::drawTriangle(const Triangle& triangle)
 
 }
 
-inline void Engine::fillTriangle(const Triangle& triangle)
+inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
 {
     // triangle.normByW();
     //compute_int_coord();
@@ -555,13 +531,13 @@ inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept
     }
 }
 
-inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) noexcept
+inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept
 {
     _screen->setDrawColor(c);
     draw_hline(x1, x2, y);
 }
 
-inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) noexcept
+inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) const noexcept
 {
     int dx = abs(x2 - x1);
     int sx = x1 < x2 ? 1 : -1;
@@ -593,7 +569,7 @@ inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) noexcep
     }
 }
 
-inline void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) noexcept
+inline void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) const noexcept
 {
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);

@@ -31,6 +31,6 @@ private:
     const Vec4 plane_p3;
     const Vec4 plane_n3;
 
-    const std::array<const Vec4, 4> plane_p;
-    const std::array<const Vec4, 4> plane_n;
+    const std::array<const Vec4, 4> planes_p;
+    const std::array<const Vec4, 4> planes_n;
 };

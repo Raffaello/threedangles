@@ -3,13 +3,20 @@
 #include <vector>
 #include <Triangle.hpp>
 #include <string>
+#include <Vec4.hpp>
+#include <Mat4.hpp>
+#include <Cam.hpp>
+#include <memory>
+#include <Clipping.hpp>
 
 class Mesh
 {
 public:
     Mesh() = default;
 
-    //void render() noexcept;
+    void render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
+        const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
+        std::vector<raster_t>& out) const noexcept;
     // TODO add mesh position in the world. ?
 
     // TODO replace with vertex buffer?...

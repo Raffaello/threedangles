@@ -17,8 +17,8 @@ Clipping::Clipping(const float near, const float far, const int width, const int
     plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f),
     plane_n3(Vec4(-1.0f, 0.0f, 0.0f).normalize()),
 
-    plane_p { plane_p0, plane_p1, plane_p2, plane_p3 },
-    plane_n { plane_n0, plane_n1, plane_n2, plane_n3 }
+    planes_p { plane_p0, plane_p1, plane_p2, plane_p3 },
+    planes_n { plane_n0, plane_n1, plane_n2, plane_n3 }
 {
 }
 
@@ -60,7 +60,7 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
             // as all triangles after a plane clip are guaranteed
             // to lie on the inside of the plane. I like how this
             // comment is almost completely and utterly justified
-            nTrisToAdd = againstPlane(r.t, plane_p[p], plane_n[p], clipped[0], clipped[1]);
+            nTrisToAdd = againstPlane(r.t, planes_p[p], planes_n[p], clipped[0], clipped[1]);
 
             // Clipping may yield a variable number of triangles, so
             // add these new ones to the back of the queue for subsequent
