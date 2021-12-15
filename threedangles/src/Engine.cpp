@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <list>
 
-
-
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {
 }
