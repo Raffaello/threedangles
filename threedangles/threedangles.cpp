@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     const float h2 = 0.5f * static_cast<float>(height);
     uint32_t FPS = 60;
     uint32_t frameTime_ms = 1000 / FPS;
-    Mesh mesh;
+    //Mesh mesh;
     color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
     
     std::string title = "ThreeDangles";
@@ -43,7 +43,12 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
+    /*if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
+        cerr << "Can't load OBJ file";
+        return -2;
+    }*/
+
+    if (!engine->loadMeshFromOBJFile("plain_teapot.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
     }
@@ -54,17 +59,17 @@ int main(int argc, char* argv[])
     const float zfar = 100.0f;
     const float znear = .5f;
     
-    Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
+    /*Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(width, height, fov, zfar, znear);
-    engine->setMatrixProjection(matProj);
-    //engine->initPerspectiveProjection(fov, zfar, znear);
+    engine->setMatrixProjection(matProj);*/
+    engine->initPerspectiveProjection(fov, zfar, znear);
 
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
 
     // Light
-    const Vec4 light_direction(0.0f, 0.0f, -1.5f);
+    const Vec4 light_direction(0.0f, 0.0f, -1.0f);
     const Vec4 light_direction_normalized = light_direction.normalize();
 
     bool showHiddenVertexes = false;
@@ -166,85 +171,87 @@ int main(int argc, char* argv[])
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
         // World Matrix
-        Mat4 matWorld; // = Engine::matrix_createIdentity();
+        //Mat4 matWorld; // = Engine::matrix_createIdentity();
         // do the matrix multiplication
-        matWorld = matTrans * matRotZ * matRotX;
+        //matWorld = matTrans * matRotZ * matRotX;
         // Camera Matrix
-        Mat4 matView = cam.matrixView();
+        //Mat4 matView = cam.matrixView();
        
-        engine->setMatrixWorld(matWorld);
-        engine->setMatrixView(matView);
+        engine->setMatrixWorld(matTrans * matRotZ * matRotX);
+        engine->setMatrixView(cam.matrixView());
 
         // Process the triangles.
         // TODO move to Mesh or Engine?
         std::vector<Triangle> trianglesToRaster;
-        for (auto& tri : mesh.tris)
-        {
-            // todo: keep only triProj as the other temporary are not useful
-            Triangle triProj;
-            Triangle triTransformed;
-            Triangle triViewed;
-
-            triTransformed = matWorld * tri;
-
-            // Normals (back-face culling)
-            // TODO: move to Triangle or Engine class
-            Vec4 normal = triTransformed.faceNormal();
-            float norm_dp = normal.dotProd(triTransformed.a - cam.position);
-
-            if (!showHiddenVertexes && norm_dp >= 0.0f)
-                continue;
-
-            // Illumination (flat shading)
-            // todo: it should be computed during the rasterization?
-            // body create also a Light interface / class
-            if (illuminationOn)
+        for (auto& mesh : engine->meshes) {
+            for (auto& tri : mesh.tris)
             {
-                float dp = normal.dotProd(light_direction_normalized);
-                uint8_t r, g, b;
-                r = static_cast<uint8_t>(std::round(dp * 64));
-                g = static_cast<uint8_t>(std::round(dp * 64));
-                b = static_cast<uint8_t>(std::round(dp * 64));
-                triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
-            }
-            else {
-                triTransformed.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-            }
+                // todo: keep only triProj as the other temporary are not useful
+                Triangle triProj;
+                Triangle triTransformed;
+                Triangle triViewed;
 
-            // World Space -> View Space
-            triViewed = matView * triTransformed;
-            // TODO avoid to setColor ...
-            // BODY color from the mesh instead, and traingle is "private" for rasterization?
-            triViewed.setColor(triTransformed);
+                triTransformed = engine->matWorld * tri;
 
-            const Vec4 plane_p_near(0.0f, 0.0f, znear);
-            const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
-            const Vec4 plane_p_far(0.0f, 0.0f, zfar);
-            const Vec4 plane_n_far = Vec4(0.0f, 0.0f, -1.0f).normalize();
-            std::vector<Triangle> clips;
-            // Clipping on Znear plane (triViewd -> clipped[2])
-            int nClippedTriangles = 0;
-            Triangle clipped[2];
-            nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
-            // clipping on Zfar plane (clipped[2] -> vector<clippped>)
-            for (int i = 0; i < nClippedTriangles; i++)
-            {
-                Triangle clippedFar[2];
-                int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
-                for (int n = 0; n < nClippedTrianglesFar; n++)
-                    clips.push_back(clippedFar[n]);
-            }
+                // Normals (back-face culling)
+                // TODO: move to Triangle or Engine class
+                Vec4 normal = triTransformed.faceNormal();
+                float norm_dp = normal.dotProd(triTransformed.a - cam.position);
 
-            for (auto& c : clips)
-            {
-                // Projection 3D -> 2D & Scale into view (viewport)
-                triProj = (matProj * c);
-                // copy the color from the other translated triangle to the projected one (this should be optimized)
-                triProj.setColor(c);
-                triProj = triProj.normByW();
+                if (!showHiddenVertexes && norm_dp >= 0.0f)
+                    continue;
 
-                // Triangle Rasterization
-                trianglesToRaster.push_back(triProj);
+                // Illumination (flat shading)
+                // todo: it should be computed during the rasterization?
+                // body create also a Light interface / class
+                if (illuminationOn)
+                {
+                    float dp = normal.dotProd(light_direction_normalized);
+                    uint8_t r, g, b;
+                    r = static_cast<uint8_t>(std::round(dp * 64));
+                    g = static_cast<uint8_t>(std::round(dp * 64));
+                    b = static_cast<uint8_t>(std::round(dp * 64));
+                    triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
+                }
+                else {
+                    triTransformed.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+                }
+
+                // World Space -> View Space
+                triViewed = engine->matView * triTransformed;
+                // TODO avoid to setColor ...
+                // BODY color from the mesh instead, and traingle is "private" for rasterization?
+                triViewed.setColor(triTransformed);
+
+                const Vec4 plane_p_near(0.0f, 0.0f, znear);
+                const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
+                const Vec4 plane_p_far(0.0f, 0.0f, zfar);
+                const Vec4 plane_n_far = Vec4(0.0f, 0.0f, -1.0f).normalize();
+                std::vector<Triangle> clips;
+                // Clipping on Znear plane (triViewd -> clipped[2])
+                int nClippedTriangles = 0;
+                Triangle clipped[2];
+                nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
+                // clipping on Zfar plane (clipped[2] -> vector<clippped>)
+                for (int i = 0; i < nClippedTriangles; i++)
+                {
+                    Triangle clippedFar[2];
+                    int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
+                    for (int n = 0; n < nClippedTrianglesFar; n++)
+                        clips.push_back(clippedFar[n]);
+                }
+
+                for (auto& c : clips)
+                {
+                    // Projection 3D -> 2D & Scale into view (viewport)
+                    triProj = (engine->matProjection * c);
+                    // copy the color from the other translated triangle to the projected one (this should be optimized)
+                    triProj.setColor(c);
+                    triProj = triProj.normByW();
+
+                    // Triangle Rasterization
+                    trianglesToRaster.push_back(triProj);
+                }
             }
         }
 

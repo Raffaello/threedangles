@@ -7,18 +7,9 @@
 class Mesh
 {
 public:
-    Mesh(Mesh&&) = delete;
-    Mesh(const Mesh&) = delete;
     Mesh() = default;
-
-    /**
-     * @brief Load .OBJ file
-     * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file
-     * @param filename 
-     * @return 
-    */
-    bool loadFromOBJFile(const std::string& filename);
 
     // TODO replace with vertex buffer...
     std::vector<Triangle> tris; // ?
+    std::string name;
 };

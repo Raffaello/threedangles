@@ -4,8 +4,11 @@
 #include <Vec4.hpp>
 #include <Triangle.hpp>
 #include <Screen.hpp>
+#include <Mesh.hpp>
 #include <memory>
 #include <string>
+#include <vector>
+#include <Cam.hpp>
 
 class Engine
 {
@@ -23,7 +26,20 @@ public:
     void setMatrixWorld(const Mat4& matWorld) noexcept;
     void setMatrixView(const Mat4& matView) noexcept;
 
-    void initPerspectiveProjection(const float fov, const float far, const near) noexcept;
+    void initPerspectiveProjection(const float fov, const float far, const float near) noexcept;
+
+    //void processFrame(const Cam& cam) noexcept;
+
+    bool showHiddenVertexes = false;
+    bool illuminationOn = true;
+
+    /**
+     * @brief Load .OBJ file
+     * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file
+     * @param filename
+     * @return
+    */
+    bool loadMeshFromOBJFile(const std::string& filename);
 
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
@@ -48,8 +64,10 @@ public:
 private:
     //static inline void compute_int_coord(float& x1, float& y1, float& x2, float& y2, float& x3, float& y3) noexcept;
     std::shared_ptr<Screen> _screen;
-
+public: // todo make them private again after..
     Mat4 matProjection;
     Mat4 matWorld;
     Mat4 matView;
+
+    std::vector<Mesh> meshes;
 };
