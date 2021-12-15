@@ -7,6 +7,7 @@
  * @brief FPS Camera
  * @link https://www.3dgep.com/understanding-the-view-matrix/
 */
+/*
 class Cam
 {
     // Must "return" the View matrix
@@ -39,4 +40,28 @@ public:
 
     Vec4 eye;
     Vec4 target;
+};
+*/
+
+class Cam
+{
+public:
+    Cam() = delete;
+    Cam(const Vec4& pos, const Vec4& up);
+
+    Mat4 matrixView(const float yaw, const float pitch);
+
+    Vec4 position;
+    Vec4 lookAt;
+
+
+    //float yaw = 0.0f;
+    //float pitch = 0.0f;
+
+protected:
+    Mat4 matrixLookAt(const Vec4& pos, const Vec4& target, const Vec4& up) const;
+    Mat4 matrixLookAtInverse(const Mat4& m) const;
+    const Vec4 up; //(0.0f, 1.0f, 0.0f);
+    Vec4 target; // (0.0f, 0.0f, 1.0f);
+
 };

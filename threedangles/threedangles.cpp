@@ -59,12 +59,8 @@ int main(int argc, char* argv[])
         * Mat4::createProjection(width, height, fov, zfar, znear);
 
     // Cam
-    Vec4 cam(0.0f, 0.0f, -5.0f);
-    Vec4 lookAt(0.0f, 0.0f, 0.0f);
-    float cam_yaw = 0.0f;
-    float cam_pitch = 0.0f;
-    const Vec4 up(0.0f, 1.0f, 0.0f);
-    Vec4 target(0.0f, 0.0f, 1.0f);
+    Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
+    float cam_pitch = 0.0f, cam_yaw = 0.0f;
 
     // Light
     const Vec4 light_direction(0.0f, 0.0f, -1.5f);
@@ -74,9 +70,8 @@ int main(int argc, char* argv[])
     // 0 wire, 1 filled, 2 filled+wire
     short filled = 1;
     bool illuminationOn = true;
-    bool clipping = true;
     // offset params
-    float offset = 0.0f;
+    Vec4 translation(0.0f, 0.0f, 0.0f);
 
     bool quit = false;
     while (!quit) {
@@ -110,46 +105,42 @@ int main(int argc, char* argv[])
                     SDL_Log("Filling Triangles = %d", filled);
                     break;
                 case SDLK_KP_PLUS:
-                    offset += 0.5f;
-                    SDL_Log("offset = %f", offset);
+                    translation.z += 0.5f;
+                    SDL_Log("offset = %f", translation.z);
                     break;
                 case SDLK_KP_MINUS:
-                    offset -= 0.5f;
-                    SDL_Log("offset = %f", offset);
+                    translation.z -= 0.5f;
+                    SDL_Log("offset = %f", translation.z);
                     break;
                 case SDLK_UP:
-                    cam.y += 1.0f;
+                    cam.position.y += 1.0f;
                     break;
                 case SDLK_DOWN:
-                    cam.y -= 1.0f;
+                    cam.position.y -= 1.0f;
                     break;
                 case SDLK_LEFT:
-                    cam_pitch +=  0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_pitch);
+                    cam_pitch += 0.1f;
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_pitch);
                     break;
                 case SDLK_RIGHT:
                     cam_pitch -= 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_pitch);
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_pitch);
                     break;
                 case SDLK_a:
                     cam_yaw -= 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_yaw);
                     break;
                 case SDLK_d:
                     cam_yaw += 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.x, cam.y, cam.z, cam_yaw);
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_yaw);
                     break;
                 case SDLK_w:
-                    cam = cam + lookAt * 0.5f;
-                    SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
+                    cam.position = cam.position + cam.lookAt * 0.5f;
+                    SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
                 case SDLK_s:
-                    cam = cam - lookAt * 0.5f;
-                    SDL_Log("cam (%f, %f, %f)", cam.x, cam.y, cam.z);
-                    break;
-                case SDLK_c:
-                    clipping = !clipping;
-                    SDL_Log("clipping = %d", clipping);
+                    cam.position = cam.position - cam.lookAt * 0.5f;
+                    SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
                 default:
                     break;
@@ -172,7 +163,7 @@ int main(int argc, char* argv[])
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 
         // Translation
-        Mat4 matTrans = Mat4::createTranslation(Vec4(0.0f, 0.0f, offset));
+        Mat4 matTrans = Mat4::createTranslation(translation);
 
         // World Matrix
         Mat4 matWorld; // = Engine::matrix_createIdentity();
@@ -180,20 +171,7 @@ int main(int argc, char* argv[])
         matWorld = matTrans * matRotZ * matRotX;
 
         // Camera Matrix
-        Mat4 matCamRot = Mat4::createRotationY(cam_yaw);
-        // TODO: this doesn't look right
-        target.x = 0.0f; target.y = 0.0f; target.z = 1.0f;
-        lookAt = matCamRot * target;
-        Vec4 F = lookAt.normalize();
-        Vec4 L = up.crossProd(F).normalize();
-        lookAt = Mat4::createRotation(cam_pitch, L) * lookAt;
-        target = cam + lookAt;
-        Mat4 matCam = engine->matrix_pointAt(cam, target, up);
-        Mat4 matView = engine->matrix_InversePointAt(matCam);
-
-
-        /*cam.set(cam_yaw, cam_pitch);
-        Mat4 matView = engine->matrix_InversePointAt(cam.matLookAt)*/
+        Mat4 matView = cam.matrixView(cam_yaw, cam_pitch);
 
         // Process the triangles.
         std::vector<Triangle> trianglesToRaster;
@@ -209,7 +187,7 @@ int main(int argc, char* argv[])
             // Normals (back-face culling)
             // TODO: move to Triangle or Engine class
             Vec4 normal = triTransformed.faceNormal();
-            float norm_dp = normal.dotProd(triTransformed.a - cam);
+            float norm_dp = normal.dotProd(triTransformed.a - cam.position);
 
             if (!showHiddenVertexes && norm_dp >= 0.0f)
                 continue;
@@ -241,25 +219,20 @@ int main(int argc, char* argv[])
             const Vec4 plane_p_far(0.0f, 0.0f, zfar);
             const Vec4 plane_n_far = Vec4(0.0f, 0.0f, -1.0f).normalize();
             std::vector<Triangle> clips;
-            if (clipping) {
-                // Clipping on Znear plane (triViewd -> clipped[2])
-                int nClippedTriangles = 0;
-                Triangle clipped[2];
-                nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
-                // clipping on Zfar plane (clipped[2] -> vector<clippped>)
-                for (int i = 0; i < nClippedTriangles; i++)
-                {
-                    Triangle clippedFar[2];
-                    int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
-                    for (int n = 0; n < nClippedTrianglesFar; n++)
-                        clips.push_back(clippedFar[n]);
-                }
-            }
-            else {
-                clips.push_back(triViewed);
+            // Clipping on Znear plane (triViewd -> clipped[2])
+            int nClippedTriangles = 0;
+            Triangle clipped[2];
+            nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
+            // clipping on Zfar plane (clipped[2] -> vector<clippped>)
+            for (int i = 0; i < nClippedTriangles; i++)
+            {
+                Triangle clippedFar[2];
+                int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
+                for (int n = 0; n < nClippedTrianglesFar; n++)
+                    clips.push_back(clippedFar[n]);
             }
 
-            for (auto& c: clips)
+            for (auto& c : clips)
             {
                 // Projection 3D -> 2D & Scale into view (viewport)
                 triProj = (matProj * c);
@@ -283,80 +256,67 @@ int main(int argc, char* argv[])
             }
         );
 
-        if (filled >= 1) {
-            for (auto& t : trianglesToRaster) {
-                if (!clipping) {
-                    engine->fillTriangle(t);
-                    
-                    // Wire frame debug
-                    if (filled == 2) {
-                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        engine->drawTriangle(t);
-                    }
-                    continue;
-                }
+        for (auto& t : trianglesToRaster) {
+            // Clip triangles against all four screen edges, this could yield
+            // a bunch of triangles, so create a queue that we traverse to 
+            //  ensure we only test new triangles generated against planes
+            Triangle clipped[2];
+            std::list<Triangle> listTriangles;
 
-                // Clip triangles against all four screen edges, this could yield
-                // a bunch of triangles, so create a queue that we traverse to 
-                //  ensure we only test new triangles generated against planes
-                Triangle clipped[2];
-                std::list<Triangle> listTriangles;
+            // Add initial triangle
+            listTriangles.push_back(t);
+            size_t nNewTriangles = 1;
+            const Vec4 plane_p0(0.0f, 0.0f, 0.0f);
+            const Vec4 plane_n0 = Vec4(0.0f, 1.0f, 0.0f).normalize();
+            const Vec4 plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
+            const Vec4 plane_n1 = Vec4(0.0f, -1.0f, 0.0f).normalize();
+            const Vec4 plane_p2 = plane_p0;
+            const Vec4 plane_n2 = Vec4(1.0f, 0.0f, 0.0f).normalize();
+            const Vec4 plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f);
+            const Vec4 plane_n3 = Vec4(-1.0f, 0.0f, 0.0f).normalize();
 
-                // Add initial triangle
-                listTriangles.push_back(t);
-                size_t nNewTriangles = 1;
-                const Vec4 plane_p0(0.0f, 0.0f, 0.0f);
-                const Vec4 plane_n0 = Vec4(0.0f, 1.0f, 0.0f).normalize();
-                const Vec4 plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f);
-                const Vec4 plane_n1 = Vec4(0.0f, -1.0f, 0.0f).normalize();
-                const Vec4 plane_p2 = plane_p0;
-                const Vec4 plane_n2 = Vec4(1.0f, 0.0f, 0.0f).normalize();
-                const Vec4 plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f);
-                const Vec4 plane_n3 = Vec4(-1.0f, 0.0f, 0.0f).normalize();
+            const std::array<const Vec4, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
+            const std::array<const Vec4, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
 
-                const std::array<const Vec4, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
-                const std::array<const Vec4, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
-                
-                for (int p = 0; p < 4; p++)
+            for (int p = 0; p < 4; p++)
+            {
+                while (nNewTriangles > 0)
                 {
-                    while (nNewTriangles > 0)
-                    {
-                        int nTrisToAdd = 0;
-                        // Take triangle from front of queue
-                        Triangle tri = listTriangles.front();
-                        listTriangles.pop_front();
-                        nNewTriangles--;
+                    int nTrisToAdd = 0;
+                    // Take triangle from front of queue
+                    Triangle tri = listTriangles.front();
+                    listTriangles.pop_front();
+                    nNewTriangles--;
 
-                        // Clip it against a plane. We only need to test each 
-                        // subsequent plane, against subsequent new triangles
-                        // as all triangles after a plane clip are guaranteed
-                        // to lie on the inside of the plane. I like how this
-                        // comment is almost completely and utterly justified
-                        nTrisToAdd = tri.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
+                    // Clip it against a plane. We only need to test each 
+                    // subsequent plane, against subsequent new triangles
+                    // as all triangles after a plane clip are guaranteed
+                    // to lie on the inside of the plane. I like how this
+                    // comment is almost completely and utterly justified
+                    nTrisToAdd = tri.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
 
-                        // Clipping may yield a variable number of triangles, so
-                        // add these new ones to the back of the queue for subsequent
-                        // clipping against next planes
-                        for (int w = 0; w < nTrisToAdd; w++)
-                            listTriangles.push_back(clipped[w]);
-                    }
-                    nNewTriangles = listTriangles.size();
+                    // Clipping may yield a variable number of triangles, so
+                    // add these new ones to the back of the queue for subsequent
+                    // clipping against next planes
+                    for (int w = 0; w < nTrisToAdd; w++)
+                        listTriangles.push_back(clipped[w]);
                 }
-
-                // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
-                for (auto& t : listTriangles)
-                {
-                    engine->fillTriangle(t);
-                    if (filled == 2) {
-                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        engine->drawTriangle(t);
-                    }
-                }
+                nNewTriangles = listTriangles.size();
             }
-        }
-        else {
-            for (auto& t : trianglesToRaster) {
-                engine->drawTriangle(t);
+
+            // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+            for (auto& t : listTriangles)
+            {
+                if (filled >= 1) {
+                    engine->fillTriangle(t);
+                    if (filled == 2) {
+                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                        engine->drawTriangle(t);
+                    }
+                }
+                else {
+                    engine->drawTriangle(t);
+                }
             }
         }
 

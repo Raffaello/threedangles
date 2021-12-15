@@ -17,11 +17,6 @@ public:
 
     std::shared_ptr<Screen> getScreen() const noexcept;
 
-    // todo those should be constant, review the operators overloading
-    // body move to a Cam class object as are for that.
-    Mat4 matrix_pointAt(const Vec4& pos, const Vec4& target, const Vec4& up) const;
-    Mat4 matrix_InversePointAt(const Mat4& m) const;
-
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
      * @param triangle 

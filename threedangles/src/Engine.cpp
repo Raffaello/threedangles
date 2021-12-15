@@ -26,50 +26,6 @@ std::shared_ptr<Screen> Engine::getScreen() const noexcept
     return _screen;
 }
 
-Mat4 Engine::matrix_pointAt(const Vec4& pos, const Vec4& target, const Vec4& up) const
-{
-    /// @see https://www.3dgep.com/understanding-the-view-matrix/
-    Vec4 forward = (target - pos).normalize();
-
-    Vec4 t = (forward * up.dotProd(forward));
-    Vec4 newUp = (up - t).normalize();
-    Vec4 newRight = newUp.crossProd(forward);
-
-    //Dimensioning & Translation Matrix
-    Mat4 m;
-    m.m[0][0] = newRight.x; m.m[0][1] = newUp.x; m.m[0][2] = forward.x; m.m[0][3] = pos.x;
-    m.m[1][0] = newRight.y; m.m[1][1] = newUp.y; m.m[1][2] = forward.y; m.m[1][3] = pos.y;
-    m.m[2][0] = newRight.z; m.m[2][1] = newUp.z; m.m[2][2] = forward.z; m.m[2][3] = pos.z;
-    m.m[3][0] = 0.0f;       m.m[3][1] = 0.0f;    m.m[3][2] = 0.0f;      m.m[3][3] = 1.0f;
-
-    return m;
-}
-
-Mat4 Engine::matrix_InversePointAt(const Mat4& m) const
-{
-    Mat4 matrix;
-
-    matrix.m[0][0] = m.m[0][0];
-    matrix.m[1][0] = m.m[0][1];
-    matrix.m[2][0] = m.m[0][2];
-    matrix.m[3][0] = 0.0f;
-    matrix.m[0][1] = m.m[1][0];
-    matrix.m[1][1] = m.m[1][1];
-    matrix.m[2][1] = m.m[1][2];
-    matrix.m[3][1] = 0.0f;
-    matrix.m[0][2] = m.m[2][0];
-    matrix.m[1][2] = m.m[2][1];
-    matrix.m[2][2] = m.m[2][2];
-    matrix.m[3][2] = 0.0f;
-
-    matrix.m[0][3] = -(m.m[0][3] * matrix.m[0][0] + m.m[1][3] * matrix.m[0][1] + m.m[2][3] * matrix.m[0][2]);
-    matrix.m[1][3] = -(m.m[0][3] * matrix.m[1][0] + m.m[1][3] * matrix.m[1][1] + m.m[2][3] * matrix.m[1][2]);
-    matrix.m[2][3] = -(m.m[0][3] * matrix.m[2][0] + m.m[1][3] * matrix.m[2][1] + m.m[2][3] * matrix.m[2][2]);
-    matrix.m[3][3] = 1.0f;
-
-    return matrix;
-}
-
 void Engine::drawTriangle(const Triangle& triangle)
 {
     // triangle.normByW();
