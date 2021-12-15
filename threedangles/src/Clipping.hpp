@@ -22,14 +22,6 @@ private:
     const Vec4 plane_n_near;
     const Vec4 plane_p_far;
     const Vec4 plane_n_far;
-    const Vec4 plane_p0;
-    const Vec4 plane_n0;
-    const Vec4 plane_p1;
-    const Vec4 plane_n1;
-    const Vec4 plane_p2;
-    const Vec4 plane_n2;
-    const Vec4 plane_p3;
-    const Vec4 plane_n3;
 
     const std::array<const Vec4, 4> planes_p;
     const std::array<const Vec4, 4> planes_n;

@@ -62,7 +62,6 @@ void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_
 
     for (const auto& mesh : meshes)
     {
-        // should be move to Mesh.render?
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?
@@ -73,33 +72,7 @@ void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_
     sortZ();
 
     // Triangle Rasterization
-    for (const auto& t : trianglesToRaster)
-    {
-        std::list<raster_t> listTriangles;
-        _clipping->clipScreen(t, listTriangles);
-        
-        // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
-        for (auto& t : listTriangles)
-        {
-            // Illumination (flat shading)
-            // todo: it should be computed during the rasterization?
-            // body create also a Light interface / class
-            // If more lights? this need to be moved to the rasterization phase
-            if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
-            else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-
-            if (filled >= 1) {
-                fillTriangle(t.t);
-                if (filled == 2) {
-                    t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    drawTriangle(t.t);
-                }
-            }
-            else {
-                drawTriangle(t.t);
-            }
-        }
-    }
+    raster(light);
 
     // Swap buffers
     _screen->flip();
@@ -521,6 +494,37 @@ inline void Engine::sortZ() noexcept
             return z1 < z2;
         }
     );
+}
+
+void Engine::raster(const Light& light) noexcept
+{
+    for (const auto& t : trianglesToRaster)
+    {
+        std::list<raster_t> listTriangles;
+        _clipping->clipScreen(t, listTriangles);
+
+        // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+        for (auto& t : listTriangles)
+        {
+            // Illumination (flat shading)
+            // todo: it should be computed during the rasterization?
+            // body create also a Light interface / class
+            // If more lights? this need to be moved to the rasterization phase
+            if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
+            else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+
+            if (filled >= 1) {
+                fillTriangle(t.t);
+                if (filled == 2) {
+                    t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                    drawTriangle(t.t);
+                }
+            }
+            else {
+                drawTriangle(t.t);
+            }
+        }
+    }
 }
 
 inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept

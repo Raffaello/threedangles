@@ -6,10 +6,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
 {
     for (const auto& tri : tris)
     {
-        Triangle triTransformed;
-
-        triTransformed = matWorld * tri;
-
+        Triangle triTransformed = matWorld * tri;
         // Normals (back-face culling)
         Vec4 normal = triTransformed.faceNormal();
         float norm_dp = normal.dotProd(triTransformed.a - cam.position);

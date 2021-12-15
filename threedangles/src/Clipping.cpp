@@ -8,17 +8,18 @@ Clipping::Clipping(const float near, const float far, const int width, const int
     plane_p_far(0.0f, 0.0f, far),
     plane_n_far(0.0f, 0.0f, -1.0f),
 
-    plane_p0(0.0f, 0.0f, 0.0f),
-    plane_n0(Vec4(0.0f, 1.0f, 0.0f).normalize()),
-    plane_p1(0.0f, static_cast<float>(height) - 1.0f, 0.0f),
-    plane_n1(Vec4(0.0f, -1.0f, 0.0f).normalize()),
-    plane_p2(plane_p0),
-    plane_n2(Vec4(1.0f, 0.0f, 0.0f).normalize()),
-    plane_p3(static_cast<float>(width) - 1.0f, 0.0f, 0.0f),
-    plane_n3(Vec4(-1.0f, 0.0f, 0.0f).normalize()),
-
-    planes_p { plane_p0, plane_p1, plane_p2, plane_p3 },
-    planes_n { plane_n0, plane_n1, plane_n2, plane_n3 }
+    planes_p {
+        Vec4(0.0f, 0.0f, 0.0f),
+        Vec4(0.0f, static_cast<float>(height) - 1.0f, 0.0f),
+        Vec4(0.0f, 0.0f, 0.0f),
+        Vec4(static_cast<float>(width) - 1.0f, 0.0f, 0.0f)
+    },
+    planes_n {
+        Vec4(0.0f, 1.0f, 0.0f).normalize(),
+        Vec4(0.0f, -1.0f, 0.0f).normalize(),
+        Vec4(1.0f, 0.0f, 0.0f).normalize(),
+        Vec4(-1.0f, 0.0f, 0.0f).normalize()
+    }
 {
 }
 
@@ -27,7 +28,7 @@ void Clipping::clipZ(const Triangle& t, std::vector<Triangle>& out) const noexce
     // Clipping on Znear plane (triViewd -> clipped[2])
     int nClippedTriangles = 0;
     std::array<Triangle, 2> clipped;
-    nClippedTriangles = t.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
+    nClippedTriangles = againstPlane(t, plane_p_near, plane_n_near, clipped[0], clipped[1]);
     // clipping on Zfar plane (clipped[2] -> vector<clippped>)
     for (int i = 0; i < nClippedTriangles; i++)
     {

@@ -53,6 +53,7 @@ private:
      * @brief  Z-depth sorting (Painter's Algorithm)
     */
     void sortZ() noexcept;
+    void raster(const Light& light) noexcept;
 
     //static inline void compute_int_coord(float& x1, float& y1, float& x2, float& y2, float& x3, float& y3) noexcept;
     
