@@ -33,6 +33,13 @@ public:
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
 
+    typedef struct raster_t
+    {
+        Triangle t;
+        Vec4 faceNormal;
+    } raster_t;
+
+    std::vector<raster_t> trianglesToRaster;
     /**
      * @brief Load .OBJ file
      * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file

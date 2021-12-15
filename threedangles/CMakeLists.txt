@@ -22,6 +22,7 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Cam.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
 )
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src

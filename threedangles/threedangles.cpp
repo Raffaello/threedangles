@@ -12,6 +12,7 @@
 #include <Mesh.hpp>
 #include <Engine.hpp>
 #include <Cam.hpp>
+#include <Light.hpp>
 
 #include <SDL2/SDL.h>
 #include <array>
@@ -29,7 +30,6 @@ int main(int argc, char* argv[])
     const float h2 = 0.5f * static_cast<float>(height);
     uint32_t FPS = 60;
     uint32_t frameTime_ms = 1000 / FPS;
-    //Mesh mesh;
     color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
     
     std::string title = "ThreeDangles";
@@ -43,11 +43,6 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    /*if (!mesh.loadFromOBJFile("plain_teapot.obj")) {
-        cerr << "Can't load OBJ file";
-        return -2;
-    }*/
-
     if (!engine->loadMeshFromOBJFile("plain_teapot.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -59,18 +54,11 @@ int main(int argc, char* argv[])
     const float zfar = 100.0f;
     const float znear = .5f;
     
-    /*Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
-        * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
-        * Mat4::createProjection(width, height, fov, zfar, znear);
-    engine->setMatrixProjection(matProj);*/
     engine->initPerspectiveProjection(fov, zfar, znear);
-
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
-
     // Light
-    const Vec4 light_direction(0.0f, 0.0f, -1.0f);
-    const Vec4 light_direction_normalized = light_direction.normalize();
+    Light light(Vec4(0.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
 
     bool showHiddenVertexes = false;
     // 0 wire, 1 filled, 2 filled+wire
@@ -171,58 +159,37 @@ int main(int argc, char* argv[])
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
         // World Matrix
-        //Mat4 matWorld; // = Engine::matrix_createIdentity();
-        // do the matrix multiplication
-        //matWorld = matTrans * matRotZ * matRotX;
-        // Camera Matrix
-        //Mat4 matView = cam.matrixView();
-       
         engine->setMatrixWorld(matTrans * matRotZ * matRotX);
+        // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-
+        
+        // TODO move Engine
         // Process the triangles.
-        // TODO move to Mesh or Engine?
-        std::vector<Triangle> trianglesToRaster;
+        //std::vector<Triangle> trianglesToRaster;
         for (auto& mesh : engine->meshes) {
             for (auto& tri : mesh.tris)
             {
-                // todo: keep only triProj as the other temporary are not useful
-                Triangle triProj;
                 Triangle triTransformed;
-                Triangle triViewed;
 
                 triTransformed = engine->matWorld * tri;
 
                 // Normals (back-face culling)
                 // TODO: move to Triangle or Engine class
+                // BODY: probably better stored in the same "vector" of triangle to raster
+                //       as a component of the triangle
                 Vec4 normal = triTransformed.faceNormal();
                 float norm_dp = normal.dotProd(triTransformed.a - cam.position);
 
                 if (!showHiddenVertexes && norm_dp >= 0.0f)
                     continue;
 
-                // Illumination (flat shading)
-                // todo: it should be computed during the rasterization?
-                // body create also a Light interface / class
-                if (illuminationOn)
-                {
-                    float dp = normal.dotProd(light_direction_normalized);
-                    uint8_t r, g, b;
-                    r = static_cast<uint8_t>(std::round(dp * 64));
-                    g = static_cast<uint8_t>(std::round(dp * 64));
-                    b = static_cast<uint8_t>(std::round(dp * 64));
-                    triTransformed.setColor(r, g, b, SDL_ALPHA_OPAQUE);
-                }
-                else {
-                    triTransformed.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-                }
-
                 // World Space -> View Space
-                triViewed = engine->matView * triTransformed;
+                triTransformed = engine->matView * triTransformed;
                 // TODO avoid to setColor ...
                 // BODY color from the mesh instead, and traingle is "private" for rasterization?
-                triViewed.setColor(triTransformed);
 
+                // Clipping section 
+                // TODO move to engine
                 const Vec4 plane_p_near(0.0f, 0.0f, znear);
                 const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
                 const Vec4 plane_p_far(0.0f, 0.0f, zfar);
@@ -231,7 +198,7 @@ int main(int argc, char* argv[])
                 // Clipping on Znear plane (triViewd -> clipped[2])
                 int nClippedTriangles = 0;
                 Triangle clipped[2];
-                nClippedTriangles = triViewed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
+                nClippedTriangles = triTransformed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
                 // clipping on Zfar plane (clipped[2] -> vector<clippped>)
                 for (int i = 0; i < nClippedTriangles; i++)
                 {
@@ -244,34 +211,38 @@ int main(int argc, char* argv[])
                 for (auto& c : clips)
                 {
                     // Projection 3D -> 2D & Scale into view (viewport)
-                    triProj = (engine->matProjection * c);
+                    triTransformed = (engine->matProjection * c);
                     // copy the color from the other translated triangle to the projected one (this should be optimized)
-                    triProj.setColor(c);
-                    triProj = triProj.normByW();
-
+                    triTransformed = triTransformed.normByW();
                     // Triangle Rasterization
-                    trianglesToRaster.push_back(triProj);
+                    Engine::raster_t r;
+                    r.t = triTransformed;
+                    r.faceNormal = normal;
+                    engine->trianglesToRaster.push_back(r);
                 }
             }
         }
 
         // Z-depth sorting (Painter's Algorithm)
-        // TODO: add a Z buffer when rasterizing to minimize redrawing pixels nore then once per frame.
-        std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
-            [](Triangle& t1, Triangle& t2) {
+        // TODO: add a Z buffer when rasterizing to minimize redrawing pixels more then once per frame.
+        std::sort(engine->trianglesToRaster.begin(), engine->trianglesToRaster.end(),
+            [](const Engine::raster_t& r1, const Engine::raster_t& r2) {
                 // divsion by 3.0f can be skipped
-                float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
-                float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
+                float z1 = (r1.t.a.z + r1.t.b.z + r1.t.c.z); // / 3.0f;
+                float z2 = (r2.t.a.z + r2.t.b.z + r2.t.c.z); // / 3.0f;
                 return z1 < z2;
             }
         );
 
-        for (auto& t : trianglesToRaster) {
+        for (auto& t : engine->trianglesToRaster)
+        {
+            // CLIPPING on Screen size
+            // ---
             // Clip triangles against all four screen edges, this could yield
             // a bunch of triangles, so create a queue that we traverse to 
-            //  ensure we only test new triangles generated against planes
+            // ensure we only test new triangles generated against planes
             Triangle clipped[2];
-            std::list<Triangle> listTriangles;
+            std::list<Engine::raster_t> listTriangles;
 
             // Add initial triangle
             listTriangles.push_back(t);
@@ -294,7 +265,7 @@ int main(int argc, char* argv[])
                 {
                     int nTrisToAdd = 0;
                     // Take triangle from front of queue
-                    Triangle tri = listTriangles.front();
+                    Engine::raster_t r = listTriangles.front();
                     listTriangles.pop_front();
                     nNewTriangles--;
 
@@ -303,35 +274,48 @@ int main(int argc, char* argv[])
                     // as all triangles after a plane clip are guaranteed
                     // to lie on the inside of the plane. I like how this
                     // comment is almost completely and utterly justified
-                    nTrisToAdd = tri.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
+                    nTrisToAdd = r.t.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
 
                     // Clipping may yield a variable number of triangles, so
                     // add these new ones to the back of the queue for subsequent
                     // clipping against next planes
-                    for (int w = 0; w < nTrisToAdd; w++)
-                        listTriangles.push_back(clipped[w]);
+                    for (int w = 0; w < nTrisToAdd; w++) {
+                        Engine::raster_t rr;
+                        rr.faceNormal = r.faceNormal;
+                        rr.t = clipped[w];
+                        listTriangles.push_back(rr);
+                    }
                 }
                 nNewTriangles = listTriangles.size();
             }
 
             // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+            light.direction_normalized = cam.position.normalize();
             for (auto& t : listTriangles)
             {
+                // Illumination (flat shading)
+                // todo: it should be computed during the rasterization?
+                // body create also a Light interface / class
+                // If more lights? this need to be moved to the rasterization phase
+                if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
+                else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+
                 if (filled >= 1) {
-                    engine->fillTriangle(t);
+                    engine->fillTriangle(t.t);
                     if (filled == 2) {
-                        t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                        engine->drawTriangle(t);
+                        t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                        engine->drawTriangle(t.t);
                     }
                 }
                 else {
-                    engine->drawTriangle(t);
+                    engine->drawTriangle(t.t);
                 }
             }
         }
 
         // Swap buffers
         screen->flip();
+        engine->trianglesToRaster.clear();
 
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();

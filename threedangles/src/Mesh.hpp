@@ -9,7 +9,9 @@ class Mesh
 public:
     Mesh() = default;
 
-    // TODO replace with vertex buffer...
+    // TODO add mesh position in the world. ?
+
+    // TODO replace with vertex buffer?...
     std::vector<Triangle> tris; // ?
     std::string name;
 };

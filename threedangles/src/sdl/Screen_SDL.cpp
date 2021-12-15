@@ -44,7 +44,7 @@ namespace sdl
         }
 
         if (surface->format->BytesPerPixel != 4) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "scree is not 32bit (SDL surface has not 4 bytes per pixel)");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "screen is not 32bit (SDL surface has not 4 bytes per pixel)");
             return false;
         }
 
