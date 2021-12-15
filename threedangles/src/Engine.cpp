@@ -49,6 +49,7 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
     matProjection = Mat4::createScale(_screen->width / 2.0f, _screen->height / 2.0f, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(_screen->width, _screen->height, fov, far, near);
+    _clipping = std::make_shared<Clipping>(near, far, _screen->width, _screen->height); 
 }
 
 void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_col) noexcept
@@ -56,142 +57,20 @@ void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_
     trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
+
     for (const auto& mesh : meshes)
     {
-        for (const auto& tri : mesh.tris)
-        {
-            Triangle triTransformed;
-
-            triTransformed = matWorld * tri;
-
-            // Normals (back-face culling)
-            Vec4 normal = triTransformed.faceNormal();
-            float norm_dp = normal.dotProd(triTransformed.a - cam.position);
-
-            if (!showHiddenVertexes && norm_dp >= 0.0f)
-                continue;
-
-            // World Space -> View Space
-            triTransformed = matView * triTransformed;
-            // Clipping section 
-            const Vec4 plane_p_near(0.0f, 0.0f, near);
-            const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
-            const Vec4 plane_p_far(0.0f, 0.0f, far);
-            const Vec4 plane_n_far = Vec4(0.0f, 0.0f, -1.0f).normalize();
-            std::vector<Triangle> clips;
-            // Clipping on Znear plane (triViewd -> clipped[2])
-            int nClippedTriangles = 0;
-            Triangle clipped[2];
-            nClippedTriangles = triTransformed.clipAgainstPlane(plane_p_near, plane_n_near, clipped[0], clipped[1]);
-            // clipping on Zfar plane (clipped[2] -> vector<clippped>)
-            for (int i = 0; i < nClippedTriangles; i++)
-            {
-                Triangle clippedFar[2];
-                int nClippedTrianglesFar = clipped[i].clipAgainstPlane(plane_p_far, plane_n_far, clippedFar[0], clippedFar[1]);
-                for (int n = 0; n < nClippedTrianglesFar; n++)
-                    clips.push_back(clippedFar[n]);
-            }
-
-            for (const auto& c : clips)
-            {
-                // Projection 3D -> 2D & Scale into view (viewport)
-                Engine::raster_t r;
-                r.t = (matProjection * c).normByW();
-                r.faceNormal = normal;
-                trianglesToRaster.push_back(r);
-            }
-        }
+        // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
+        // and then compute the "MeshTransformed already" to be ready to be reused
+        // unless something changes ?
+        mesh.render(matProjection, matWorld, matView, showHiddenVertexes, cam, _clipping, trianglesToRaster);
     }
 
     // Z-depth sorting (Painter's Algorithm)
-        // TODO: add a Z buffer when rasterizing to minimize redrawing pixels more then once per frame.
-    std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
-        [](const Engine::raster_t& r1, const Engine::raster_t& r2) {
-            // divsion by 3.0f can be skipped
-            float z1 = (r1.t.a.z + r1.t.b.z + r1.t.c.z); // / 3.0f;
-            float z2 = (r2.t.a.z + r2.t.b.z + r2.t.c.z); // / 3.0f;
-            return z1 < z2;
-        }
-    );
+    sortZ();
 
     // Triangle Rasterization
-    for (const auto& t : trianglesToRaster)
-    {
-        // CLIPPING on Screen size
-        // ---
-        // Clip triangles against all four screen edges, this could yield
-        // a bunch of triangles, so create a queue that we traverse to 
-        // ensure we only test new triangles generated against planes
-        Triangle clipped[2];
-        std::list<raster_t> listTriangles;
-
-        // Add initial triangle
-        listTriangles.push_back(t);
-        size_t nNewTriangles = 1;
-        const Vec4 plane_p0(0.0f, 0.0f, 0.0f);
-        const Vec4 plane_n0 = Vec4(0.0f, 1.0f, 0.0f).normalize();
-        const Vec4 plane_p1(0.0f, static_cast<float>(_screen->height) - 1.0f, 0.0f);
-        const Vec4 plane_n1 = Vec4(0.0f, -1.0f, 0.0f).normalize();
-        const Vec4 plane_p2 = plane_p0;
-        const Vec4 plane_n2 = Vec4(1.0f, 0.0f, 0.0f).normalize();
-        const Vec4 plane_p3(static_cast<float>(_screen->width) - 1.0f, 0.0f, 0.0f);
-        const Vec4 plane_n3 = Vec4(-1.0f, 0.0f, 0.0f).normalize();
-
-        const std::array<const Vec4, 4> plane_p = { plane_p0, plane_p1, plane_p2, plane_p3 };
-        const std::array<const Vec4, 4> plane_n = { plane_n0, plane_n1, plane_n2, plane_n3 };
-
-        for (int p = 0; p < 4; p++)
-        {
-            while (nNewTriangles > 0)
-            {
-                int nTrisToAdd = 0;
-                // Take triangle from front of queue
-                Engine::raster_t r = listTriangles.front();
-                listTriangles.pop_front();
-                nNewTriangles--;
-
-                // Clip it against a plane. We only need to test each 
-                // subsequent plane, against subsequent new triangles
-                // as all triangles after a plane clip are guaranteed
-                // to lie on the inside of the plane. I like how this
-                // comment is almost completely and utterly justified
-                nTrisToAdd = r.t.clipAgainstPlane(plane_p[p], plane_n[p], clipped[0], clipped[1]);
-
-                // Clipping may yield a variable number of triangles, so
-                // add these new ones to the back of the queue for subsequent
-                // clipping against next planes
-                for (int w = 0; w < nTrisToAdd; w++) {
-                    Engine::raster_t rr;
-                    rr.faceNormal = r.faceNormal;
-                    rr.t = clipped[w];
-                    listTriangles.push_back(rr);
-                }
-            }
-            nNewTriangles = listTriangles.size();
-        }
-
-        // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
-        for (auto& t : listTriangles)
-        {
-            // Illumination (flat shading)
-            // todo: it should be computed during the rasterization?
-            // body create also a Light interface / class
-            // If more lights? this need to be moved to the rasterization phase
-            if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
-            else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-
-            if (filled >= 1) {
-                fillTriangle(t.t);
-                if (filled == 2) {
-                    t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    drawTriangle(t.t);
-                }
-            }
-            else {
-                drawTriangle(t.t);
-            }
-        }
-    }
+    raster(light);
 
     // Swap buffers
     _screen->flip();
@@ -307,7 +186,7 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
     return true;
 }
 
-void Engine::drawTriangle(const Triangle& triangle)
+inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
 {
     // triangle.normByW();
     //compute_int_coord();
@@ -345,7 +224,7 @@ void Engine::drawTriangle(const Triangle& triangle)
 
 }
 
-void Engine::fillTriangle(const Triangle& triangle)
+inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
 {
     // triangle.normByW();
     //compute_int_coord();
@@ -603,7 +482,50 @@ next:
     }
 }
 
-void Engine::draw_hline(int x1, int x2, const int y) const noexcept
+inline void Engine::sortZ() noexcept
+{
+    std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
+        [](const raster_t& r1, const raster_t& r2) {
+            // divsion by 3.0f can be skipped
+            float z1 = (r1.t.a.z + r1.t.b.z + r1.t.c.z); // / 3.0f;
+            float z2 = (r2.t.a.z + r2.t.b.z + r2.t.c.z); // / 3.0f;
+            return z1 < z2;
+        }
+    );
+}
+
+void Engine::raster(const Light& light) noexcept
+{
+    for (const auto& t : trianglesToRaster)
+    {
+        std::list<raster_t> listTriangles;
+        _clipping->clipScreen(t, listTriangles);
+
+        // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
+        for (auto& t : listTriangles)
+        {
+            // Illumination (flat shading)
+            // todo: it should be computed during the rasterization?
+            // body create also a Light interface / class
+            // If more lights? this need to be moved to the rasterization phase
+            if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
+            else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+
+            if (filled >= 1) {
+                fillTriangle(t.t);
+                if (filled == 2) {
+                    t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                    drawTriangle(t.t);
+                }
+            }
+            else {
+                drawTriangle(t.t);
+            }
+        }
+    }
+}
+
+inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
@@ -611,13 +533,13 @@ void Engine::draw_hline(int x1, int x2, const int y) const noexcept
     }
 }
 
-void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) noexcept
+inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept
 {
     _screen->setDrawColor(c);
     draw_hline(x1, x2, y);
 }
 
-void Engine::drawLine(int x1, int y1, const int x2, const int y2) noexcept
+inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) const noexcept
 {
     int dx = abs(x2 - x1);
     int sx = x1 < x2 ? 1 : -1;
@@ -649,7 +571,7 @@ void Engine::drawLine(int x1, int y1, const int x2, const int y2) noexcept
     }
 }
 
-void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) noexcept
+inline void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const color_t& c) const noexcept
 {
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);

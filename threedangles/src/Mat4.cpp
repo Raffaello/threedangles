@@ -4,7 +4,7 @@
 constexpr float PI = 3.141592653589793f;
 constexpr float DEG2RAD = (PI / 180.0f);
 
-Mat4 Mat4::operator*(const Mat4& m_)
+Mat4 Mat4::operator*(const Mat4& m_) const noexcept
 {
     Mat4 matrix;
 
@@ -21,7 +21,7 @@ Mat4 Mat4::operator*(const Mat4& m_)
     return matrix;
 }
 
-Vec4 Mat4::operator*(const Vec4& i)
+Vec4 Mat4::operator*(const Vec4& i) const noexcept
 {
     Vec4 v;
 
@@ -33,7 +33,7 @@ Vec4 Mat4::operator*(const Vec4& i)
     return v;
 }
 
-Triangle Mat4::operator*(const Triangle& i)
+Triangle Mat4::operator*(const Triangle& i) const noexcept
 {
     //return { *this * i.a, *this * i.b, *this * i.c };
     Triangle t(i);
@@ -45,7 +45,7 @@ Triangle Mat4::operator*(const Triangle& i)
     return t;
 }
 
-bool Mat4::operator==(const Mat4& m)
+bool Mat4::operator==(const Mat4& m) const noexcept
 {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {

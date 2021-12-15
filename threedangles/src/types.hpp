@@ -9,3 +9,4 @@ typedef struct color_t
         b = 0,
         a = 255;
 } color_t;
+
