@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <Cam.hpp>
+#include <Light.hpp>
 
 class Engine
 {
@@ -28,10 +29,17 @@ public:
 
     void initPerspectiveProjection(const float fov, const float far, const float near) noexcept;
 
-    //void processFrame(const Cam& cam) noexcept;
+    // TODO remove light as parameter and create a vector of lights in the engine itself.
+    void processFrame(const Cam& cam, Light& light, const color_t& bg_col) noexcept;
+
 
     bool showHiddenVertexes = false;
     bool illuminationOn = true;
+    // 0 wire, 1 filled, 2 filled+wire
+    short filled = 1;
+    float fov = 0.0f;
+    float far = 0.0f;
+    float near = 0.0f;
 
     typedef struct raster_t
     {
@@ -46,7 +54,7 @@ public:
      * @param filename
      * @return
     */
-    bool loadMeshFromOBJFile(const std::string& filename);
+    bool addMeshFromOBJFile(const std::string& filename);
 
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
