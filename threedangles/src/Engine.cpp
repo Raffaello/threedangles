@@ -15,9 +15,8 @@ Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const int width, const int height) noexcept
 {
     std::shared_ptr<Screen> s = std::make_shared<sdl::Screen_SDL>(title, width, height);
-    bool init = s->init();
 
-    if (!init)
+    if (!s->init())
         return nullptr;
 
     Engine* e = new Engine(s);
@@ -47,28 +46,25 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
     this->fov = fov;
     this->far = far;
     this->near = near;
-    matProjection = Mat4::createScale(_screen->width / 2, _screen->height / 2, 1.0f)
+    matProjection = Mat4::createScale(_screen->width / 2.0f, _screen->height / 2.0f, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(_screen->width, _screen->height, fov, far, near);
 }
 
-void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) noexcept
+void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_col) noexcept
 {
     trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
-    for (auto& mesh : meshes)
+    for (const auto& mesh : meshes)
     {
-        for (auto& tri : mesh.tris)
+        for (const auto& tri : mesh.tris)
         {
             Triangle triTransformed;
 
             triTransformed = matWorld * tri;
 
             // Normals (back-face culling)
-            // TODO: move to Triangle or Engine class
-            // BODY: probably better stored in the same "vector" of triangle to raster
-            //       as a component of the triangle
             Vec4 normal = triTransformed.faceNormal();
             float norm_dp = normal.dotProd(triTransformed.a - cam.position);
 
@@ -77,11 +73,7 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
 
             // World Space -> View Space
             triTransformed = matView * triTransformed;
-            // TODO avoid to setColor ...
-            // BODY color from the mesh instead, and traingle is "private" for rasterization?
-
             // Clipping section 
-            // TODO move to engine
             const Vec4 plane_p_near(0.0f, 0.0f, near);
             const Vec4 plane_n_near = Vec4(0.0f, 0.0f, 1.0f).normalize();
             const Vec4 plane_p_far(0.0f, 0.0f, far);
@@ -100,12 +92,11 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
                     clips.push_back(clippedFar[n]);
             }
 
-            for (auto& c : clips)
+            for (const auto& c : clips)
             {
                 // Projection 3D -> 2D & Scale into view (viewport)
                 Engine::raster_t r;
                 r.t = (matProjection * c).normByW();
-                //r.t.setColor(triTransformed.getColor());
                 r.faceNormal = normal;
                 trianglesToRaster.push_back(r);
             }
@@ -124,7 +115,7 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
     );
 
     // Triangle Rasterization
-    for (auto& t : trianglesToRaster)
+    for (const auto& t : trianglesToRaster)
     {
         // CLIPPING on Screen size
         // ---
@@ -590,7 +581,7 @@ next:
     next4:
         //fill_update_minmax();
         if (minx > t1x)
-        minx = t1x;
+            minx = t1x;
         if (minx > t2x)
             minx = t2x;
         if (maxx < t1x)
@@ -612,7 +603,7 @@ next:
     }
 }
 
-void Engine::draw_hline(int x1, int x2, const int y) noexcept
+void Engine::draw_hline(int x1, int x2, const int y) const noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {

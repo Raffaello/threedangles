@@ -73,7 +73,6 @@ int Triangle::clipAgainstPlane(const Vec4& plane_p, const Vec4& plane_n, Triangl
     const float dpnp = plane_n.dotProd(plane_p);
     auto dist = [&](const Vec4& p)
     {
-        Vec4 n = p.normalize();
         return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - dpnp);
     };
 

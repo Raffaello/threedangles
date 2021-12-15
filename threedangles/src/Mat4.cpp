@@ -2,7 +2,7 @@
 #include <cmath>
 
 constexpr float PI = 3.141592653589793f;
-constexpr float DEG2RAD = ((PI) / 180.0f);
+constexpr float DEG2RAD = (PI / 180.0f);
 
 Mat4 Mat4::operator*(const Mat4& m_)
 {

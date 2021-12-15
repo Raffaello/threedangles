@@ -30,7 +30,7 @@ public:
     void initPerspectiveProjection(const float fov, const float far, const float near) noexcept;
 
     // TODO remove light as parameter and create a vector of lights in the engine itself.
-    void processFrame(const Cam& cam, Light& light, const color_t& bg_col) noexcept;
+    void processFrame(const Cam& cam, const Light& light, const color_t& bg_col) noexcept;
 
 
     bool showHiddenVertexes = false;
@@ -70,7 +70,7 @@ public:
     void fillTriangle(const Triangle& triangle);
 
     // TODO color vertex interpolation? let see later...
-    void draw_hline(int x1, int x2, const int y) noexcept;
+    void draw_hline(int x1, int x2, const int y) const noexcept;
     void draw_hline(int x1, int x2, const int y, const color_t& c) noexcept;
 
     void drawLine(int x1, int y1, const int x2, const int y2) noexcept;

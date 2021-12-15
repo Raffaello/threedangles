@@ -9,15 +9,15 @@ namespace sdl
     {
     public:
         Screen_SDL(const std::string& title, const int width, const int height);
-        virtual ~Screen_SDL();
+        ~Screen_SDL() override;
 
-        virtual bool init() override;
-        virtual void setDrawColor(const color_t& c) noexcept override;
-        virtual void drawPixel(const int x, const int y) noexcept override;
-        virtual void setTitle(const std::string& title) noexcept override;
-        virtual void clear(const color_t& c) noexcept override;
-        virtual void flip() noexcept override;
-    protected:
+        bool init() override;
+        void setDrawColor(const color_t& c) noexcept override;
+        void drawPixel(const int x, const int y) noexcept override;
+        void setTitle(const std::string& title) noexcept override;
+        void clear(const color_t& c) noexcept override;
+        void flip() noexcept override;
+    private:
         bool inited_sdl = false;
         SDL_Window* window = nullptr;
         

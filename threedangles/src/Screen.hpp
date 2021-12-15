@@ -9,7 +9,7 @@ public:
     const int width;
     const int height;
 
-    Screen(const std::string& title, const int width, const int height) : _title(title), width(width), height(height) {}
+    Screen(const std::string& title, const int width, const int height) : width(width), height(height), _title(title) {}
     virtual ~Screen() = default;
 
     virtual bool init() = 0;

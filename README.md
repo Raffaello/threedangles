@@ -18,7 +18,6 @@ It will feature the following algorithms:
 - Left-hand rules
 - Quaternions
 
-
 The algorithms are all implemented from scratch without using any modern library or Engine.
 
 Their implementation will be based on :
@@ -37,7 +36,6 @@ a comparision/benchmark on the algorithms implemented here.
 - Using SDL2 for window creation (and pixel drawing, soon to be removed) so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations of the engine.
-
 
 ## windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples

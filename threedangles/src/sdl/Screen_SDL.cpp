@@ -28,7 +28,7 @@ namespace sdl
         int flags = 0; // SDL_WINDOW_FULLSCREEN
 
         // disable 3d acceleration
-        SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, 0);
+        SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, nullptr);
 
         window = SDL_CreateWindow(_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags);
         if (nullptr == window) {
@@ -79,7 +79,7 @@ namespace sdl
     void Screen_SDL::clear(const color_t& c) noexcept
     {
         setDrawColor(c);
-        SDL_FillRect(surface, NULL, col);
+        SDL_FillRect(surface, nullptr, col);
     }
 
     void Screen_SDL::flip() noexcept

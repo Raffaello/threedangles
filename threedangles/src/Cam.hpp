@@ -33,10 +33,9 @@ public:
     float moveFactor = 0.5f;
     float turnFactor = 0.1f;
 
-protected:
+private:
     Mat4 matrixLookAt() const;
     Mat4 matrixLookAtInverse(const Mat4& m) const;
-    const Vec4 up; //(0.0f, 1.0f, 0.0f);
-    Vec4 target; // (0.0f, 0.0f, 1.0f);
-
+    const Vec4 up;
+    Vec4 target;
 };
