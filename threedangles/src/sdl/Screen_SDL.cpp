@@ -26,7 +26,6 @@ namespace sdl
         inited_sdl = true;
 
         int flags = 0; // SDL_WINDOW_FULLSCREEN
-        int r_flags = SDL_RENDERER_SOFTWARE;
 
         // disable 3d acceleration
         SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, 0);
