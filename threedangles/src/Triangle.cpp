@@ -110,6 +110,7 @@ int Triangle::clipAgainstPlane(const Vec4& plane_p, const Vec4& plane_n, Triangl
         // All points lie on the inside of plane, so do nothing
         // and allow the triangle to simply pass through
         out_tri1 = *this;
+        out_tri1.setColor(*this);
 
         return 1; // Just the one returned original triangle is valid
     }

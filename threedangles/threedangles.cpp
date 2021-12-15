@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light
-    // TODO there is a bug on the normal and light when "mounted on the cam"
     Light light(Vec4(1.0f, 3.0f, -1.0f), { 80, 32, 64, 255 });
     
     // offset params
@@ -152,8 +151,9 @@ int main(int argc, char* argv[])
         engine->setMatrixWorld(matTrans * matRotZ * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-        // Process the triangles.
+        // TODO there is a bug on the normal and light when "mounted on the cam"
         //light.direction_normalized = cam.position.normalize();
+        // Process the triangles.
         engine->processFrame(cam, light, black);
         tot_frames++;
         // FPS frame rate cap
