@@ -103,12 +103,9 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
             for (auto& c : clips)
             {
                 // Projection 3D -> 2D & Scale into view (viewport)
-                triTransformed = (matProjection * c);
-                // copy the color from the other translated triangle to the projected one (this should be optimized)
-                triTransformed = triTransformed.normByW();
-                // Triangle Rasterization
                 Engine::raster_t r;
-                r.t = triTransformed;
+                r.t = (matProjection * c).normByW();
+                //r.t.setColor(triTransformed.getColor());
                 r.faceNormal = normal;
                 trianglesToRaster.push_back(r);
             }
@@ -126,6 +123,7 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
         }
     );
 
+    // Triangle Rasterization
     for (auto& t : trianglesToRaster)
     {
         // CLIPPING on Screen size
@@ -182,7 +180,6 @@ void Engine::processFrame(const Cam& cam, Light& light, const color_t& bg_col) n
         }
 
         // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
-        light.direction_normalized = cam.position.normalize();
         for (auto& t : listTriangles)
         {
             // Illumination (flat shading)
@@ -368,8 +365,7 @@ void Engine::fillTriangle(const Triangle& triangle)
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
     
-    auto c = triangle.getColor();
-    _screen->setDrawColor(c);
+    _screen->setDrawColor(triangle.getColor());
 
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
     if (y1 > y2) {

@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!engine->addMeshFromOBJFile("plain_teapot.obj")) {
+    if (!engine->addMeshFromOBJFile("plain_mountains.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
     }
@@ -51,11 +51,14 @@ int main(int argc, char* argv[])
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light
-    Light light(Vec4(0.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
+    // TODO there is a bug on the normal and light when "mounted on the cam"
+    Light light(Vec4(1.0f, 3.0f, -1.0f), { 80, 32, 64, 255 });
     
     // offset params
     Vec4 translation(0.0f, 0.0f, 0.0f);
     bool quit = false;
+    unsigned int tot_frames = 0;
+    uint32_t frame_start_ticks = SDL_GetTicks();
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
@@ -150,19 +153,26 @@ int main(int argc, char* argv[])
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
         // Process the triangles.
+        //light.direction_normalized = cam.position.normalize();
         engine->processFrame(cam, light, black);
+        tot_frames++;
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();
         //uint64_t endPerf = SDL_GetPerformanceCounter();
         const uint32_t totTicks = (endTicks - startTicks);
+        const uint32_t frameTicks = endTicks - frame_start_ticks;
         uint32_t frameDelay = 0;
 
         if (totTicks < frameTime_ms)
             frameDelay = frameTime_ms - totTicks;
         
-        screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks));
+        screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks) + " AVG: " + std::to_string(tot_frames * 1000.0f / frameTicks));
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
+        if (frameTicks >= 1000) {
+            tot_frames = 0;
+            frame_start_ticks = SDL_GetTicks();
+        }
     }
 
     return 0;
