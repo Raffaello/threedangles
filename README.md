@@ -5,19 +5,21 @@ Three-D-angles is a 3D triangles engines built from scratch.
 It will feature the following algorithms:
 
 - [x] Line drawing (bresenham)
-- [ ] Triangle filling (bresenham)
-- [ ] Triangle clipping
+- [/] Triangle filling (bresenham)
+- [/] Triangle clipping
 - [x] Transformations
-- [ ] Camera positioning
-- [ ] Loading 3D file for objects
+- [/] Camera positioning
+- [/] Loading 3D file for objects
 - [ ] Textures
 - [x] Flat-Shading
 - [ ] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
 - Left-hand rules
-- Quaternions for optimizing matrixes rotations.
-The algorithms will be all implemented from scratch without using any modern library or Engine.
+- Quaternions
+
+
+The algorithms are all implemented from scratch without using any modern library or Engine.
 
 Their implementation will be based on :
 
