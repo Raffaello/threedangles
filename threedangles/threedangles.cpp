@@ -57,10 +57,11 @@ int main(int argc, char* argv[])
     Mat4 matProj = Mat4::createScale(w2, h2, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(width, height, fov, zfar, znear);
+    engine->setMatrixProjection(matProj);
+    //engine->initPerspectiveProjection(fov, zfar, znear);
 
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
-    float cam_pitch = 0.0f, cam_yaw = 0.0f;
 
     // Light
     const Vec4 light_direction(0.0f, 0.0f, -1.5f);
@@ -119,27 +120,27 @@ int main(int argc, char* argv[])
                     cam.position.y -= 1.0f;
                     break;
                 case SDLK_LEFT:
-                    cam_pitch += 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_pitch);
+                    cam.turnUp();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.pitch);
                     break;
                 case SDLK_RIGHT:
-                    cam_pitch -= 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_pitch);
+                    cam.turnDown();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.pitch);
                     break;
                 case SDLK_a:
-                    cam_yaw -= 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_yaw);
+                    cam.turnLeft();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.yaw);
                     break;
                 case SDLK_d:
-                    cam_yaw += 0.1f;
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam_yaw);
+                    cam.turnRight();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.yaw);
                     break;
                 case SDLK_w:
-                    cam.position = cam.position + cam.lookAt * 0.5f;
+                    cam.moveForward();
                     SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
                 case SDLK_s:
-                    cam.position = cam.position - cam.lookAt * 0.5f;
+                    cam.moveBackward();
                     SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
                 default:
@@ -164,16 +165,18 @@ int main(int argc, char* argv[])
 
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
-
         // World Matrix
         Mat4 matWorld; // = Engine::matrix_createIdentity();
         // do the matrix multiplication
         matWorld = matTrans * matRotZ * matRotX;
-
         // Camera Matrix
-        Mat4 matView = cam.matrixView(cam_yaw, cam_pitch);
+        Mat4 matView = cam.matrixView();
+       
+        engine->setMatrixWorld(matWorld);
+        engine->setMatrixView(matView);
 
         // Process the triangles.
+        // TODO move to Mesh or Engine?
         std::vector<Triangle> trianglesToRaster;
         for (auto& tri : mesh.tris)
         {

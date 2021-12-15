@@ -212,6 +212,7 @@ Mat4 Mat4::createRotation(const float theta, const Vec4& n) noexcept
     float c = cos(theta);
     float c1 = 1 - c;
     float s = sin(theta);
+
     r.m[0][0] = n.x * n.x * c1 + c;
     r.m[0][1] = n.z * n.y * c1 + n.z * s;
     r.m[0][2] = n.x * n.z * c1 - n.y * s;
@@ -222,7 +223,7 @@ Mat4 Mat4::createRotation(const float theta, const Vec4& n) noexcept
 
     r.m[2][0] = n.x * n.z * c1 + n.y * s;
     r.m[2][1] = n.y * n.z * c1 - n.x * s;
-    r.m[2][2] = n.z*n.z*c1+c;
+    r.m[2][2] = n.z * n.z * c1 + c;
 
     r.m[3][3] = 1.0f;
 

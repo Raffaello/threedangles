@@ -15,7 +15,15 @@ public:
     
     static std::shared_ptr<Engine> createEngineSDL(const std::string& title, const int width, const int height) noexcept;
 
-    std::shared_ptr<Screen> getScreen() const noexcept;
+    inline std::shared_ptr<Screen> getScreen() const noexcept {
+        return _screen;
+    }
+
+    void setMatrixProjection(const Mat4& matProj) noexcept;
+    void setMatrixWorld(const Mat4& matWorld) noexcept;
+    void setMatrixView(const Mat4& matView) noexcept;
+
+    void initPerspectiveProjection(const float fov, const float far, const near) noexcept;
 
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
@@ -40,4 +48,8 @@ public:
 private:
     //static inline void compute_int_coord(float& x1, float& y1, float& x2, float& y2, float& x3, float& y3) noexcept;
     std::shared_ptr<Screen> _screen;
+
+    Mat4 matProjection;
+    Mat4 matWorld;
+    Mat4 matView;
 };

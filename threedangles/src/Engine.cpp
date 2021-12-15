@@ -21,9 +21,27 @@ std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const 
     return se;
 }
 
-std::shared_ptr<Screen> Engine::getScreen() const noexcept
+void Engine::setMatrixProjection(const Mat4& matProj) noexcept
 {
-    return _screen;
+    matProjection = matProj;
+}
+
+void Engine::setMatrixWorld(const Mat4& matWorld) noexcept
+{
+    this->matWorld = matWorld;
+}
+
+void Engine::setMatrixView(const Mat4& matView) noexcept
+{
+    this->matView = matView;
+}
+
+void Engine::initPerspectiveProjection(const float fov, const float far, const float near) noexcept
+{
+    matProjection = Mat4::createScale(_screen->width / 2, _screen->height / 2, 1.0f)
+        * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
+        * Mat4::createProjection(_screen->width, _screen->height, fov, far, near);
+
 }
 
 void Engine::drawTriangle(const Triangle& triangle)
