@@ -43,3 +43,8 @@ a comparision/benchmark on the algorithms implemented here.
 
 ## SIMD
 - [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations
+
+
+## C/C++ compiler optimization
+
+- [ ] `__vectorcall`, `__fastcall`
