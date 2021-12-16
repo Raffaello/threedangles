@@ -13,12 +13,127 @@
 
 #include <SDL2/SDL.h>
 
+#include <intrin.h>
+#include <bitset>
+
 using std::cerr;
 using std::endl;
 using std::cout;
 
+void cpu_features()
+{
+    std::vector<std::array<int, 4>> data_;
+    std::vector<std::array<int, 4>> exData_;
+    std::array<int, 4> cpuinfo;
+
+    std::bitset<32> f_1_ECX_;
+    std::bitset<32> f_1_EDX_;
+    std::bitset<32> f_7_EBX_;
+    std::bitset<32> f_7_ECX_;
+    std::bitset<32> f_81_ECX_;
+    std::bitset<32> f_81_EDX_;
+
+    // Calling __cpuid with 0x0 as the function_id argument
+    // gets the number of the highest valid function ID.
+    __cpuid(cpuinfo.data(), 0);
+    int nIds_ = cpuinfo[0];
+
+    for (int i = 0; i < nIds_; i++) {
+        __cpuidex(cpuinfo.data(), i, 0);
+        data_.push_back(cpuinfo);
+    }
+
+    // Capture vendor string
+    char vendor[0x20];
+    memset(vendor, 0, sizeof(vendor));
+    *reinterpret_cast<int*>(vendor) = data_[0][1];
+    *reinterpret_cast<int*>(vendor + 4) = data_[0][3];
+    *reinterpret_cast<int*>(vendor + 8) = data_[0][2];
+    cout << "CPU vendor: " << vendor << endl;
+    // load bitset with flags for function 0x00000001
+    if (nIds_ >= 1)
+    {
+        f_1_ECX_ = data_[1][2];
+        f_1_EDX_ = data_[1][3];
+    }
+
+    // load bitset with flags for function 0x00000007
+    if (nIds_ >= 7)
+    {
+        f_7_EBX_ = data_[7][1];
+        f_7_ECX_ = data_[7][2];
+    }
+
+    // --------------------------------------
+
+    // Calling __cpuid with 0x80000000 as the function_id argument
+    // gets the number of the highest valid extended ID.
+    __cpuid(cpuinfo.data(), 0x80000000);
+    int nExIds_ = cpuinfo[0];
+
+    char brand[0x40];
+    memset(brand, 0, sizeof(brand));
+
+    for (int i = 0x80000000; i <= nExIds_; ++i)
+    {
+        __cpuidex(cpuinfo.data(), i, 0);
+        exData_.push_back(cpuinfo);
+    }
+
+    // load bitset with flags for function 0x80000001
+    if (nExIds_ >= 0x80000001)
+    {
+        f_81_ECX_ = exData_[1][2];
+        f_81_EDX_ = exData_[1][3];
+    }
+
+    // Interpret CPU brand string if reported
+    if (nExIds_ >= 0x80000004)
+    {
+        memcpy(brand, exData_[2].data(), sizeof(cpuinfo));
+        memcpy(brand + 16, exData_[3].data(), sizeof(cpuinfo));
+        memcpy(brand + 32, exData_[4].data(), sizeof(cpuinfo));
+        //brand_ = brand;
+    }
+
+    cout << "CPU Brand: " << brand << endl;
+    // ----------------------------------------------------------
+
+    bool MMX = f_1_EDX_[23];
+    bool SSE = f_1_EDX_[25];
+    bool SSE2 = f_1_EDX_[26];
+    bool SSE3 = f_1_ECX_[0];
+    bool SSSE3 = f_1_ECX_[9];
+    bool SSE41 = f_1_ECX_[19];
+    bool SSE42 = f_1_ECX_[20];
+    bool AVX = f_1_ECX_[28];
+    bool AVX2 = f_7_EBX_[5];
+    bool AVX512F = f_7_EBX_[16];
+    bool AVX512PF = f_7_EBX_[26];
+    bool AVX512ER = f_7_EBX_[27];
+    bool AVX512CD = f_7_EBX_[28];
+
+    cout << "Instrcuctions Sets:" << endl;
+    if (MMX) cout << "MMX" << endl;
+    if (SSE) cout << "SSE" << endl;
+    if (SSE2) cout << "SSE2" << endl;
+    if (SSE3) cout << "SSE3" << endl;
+    if (SSSE3) cout << "SSSE3" << endl;
+    if (SSE41) cout << "SSE41" << endl;
+    if (SSE42) cout << "SSE42" << endl;
+    if (AVX) cout << "AVX" << endl;
+    if (AVX2) cout << "AVX2" << endl;
+    if (AVX512F) cout << "AVX512F" << endl;
+    if (AVX512PF) cout << "AVX512PF" << endl;
+    if (AVX512ER) cout << "AVX512ER" << endl;
+    if (AVX512CD) cout << "AVX512CD" << endl;
+}
+
 int main(int argc, char* argv[])
 {
+    cpu_features();
+
+
     int width = 640;
     int height = 480;
     const float w2 = 0.5f * static_cast<float>(width);

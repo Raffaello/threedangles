@@ -138,7 +138,7 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
                     int vt = std::stoi(svt);
                     //vt_[i] = vt;
                 }
-                catch (const std::invalid_argument& e) {}
+                catch (const std::invalid_argument&) {}
                 try
                 {
                     int vn = std::stoi(svn);

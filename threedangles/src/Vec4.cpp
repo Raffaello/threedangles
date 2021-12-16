@@ -11,22 +11,22 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
 
 Vec4 Vec4::operator+(const Vec4& v) const
 {
-    return { x + v.x, y + v.y, z + v.z };
+    return Vec4(x + v.x, y + v.y, z + v.z);
 }
 
 Vec4 Vec4::operator-(const Vec4& v) const
 {
-    return { x - v.x, y - v.y, z - v.z };
+    return Vec4(x - v.x, y - v.y, z - v.z);
 }
 
 Vec4 Vec4::operator*(const float k) const
 {
-    return { x * k, y * k, z * k };
+    return Vec4(x * k, y * k, z * k);
 }
 
 Vec4 Vec4::operator/(const float k) const
 {
-    return { x / k, y / k, z / k };
+    return Vec4(x / k, y / k, z / k);
 }
 
 float Vec4::dotProd(const Vec4& v) const
@@ -46,12 +46,12 @@ Vec4 Vec4::normalize() const
 
 Vec4 Vec4::crossProd(const Vec4& v) const
 {
-    return { y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x };
+    return Vec4(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x );
 }
 
 Vec4 Vec4::normByW() const
 {
-    return { x / w, y / w, z / w, 1.0f / w };
+    return Vec4(x / w, y / w, z / w, 1.0f / w );
 }
 
 bool Vec4::operator==(const Vec4& v) const
