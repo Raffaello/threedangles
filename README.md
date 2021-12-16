@@ -46,11 +46,9 @@ a comparision/benchmark on the algorithms implemented here.
 
 
 ## C/C++ compiler optimization
-
 - [ ] `__vectorcall`, `__fastcall`
 
 #### Note on compilers
-
 It looks like that some intrinsics might not be required as the compiler is already addressing where it can some SIMD optimization.
 
 - [ ] add specific compiler options on CMAKE configuration, to enhanche performances.

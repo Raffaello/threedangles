@@ -13,9 +13,9 @@ CPUID::CPUID()
     std::bitset<32> f_1_ECX_;
     std::bitset<32> f_1_EDX_;
     std::bitset<32> f_7_EBX_;
-    std::bitset<32> f_7_ECX_;
-    std::bitset<32> f_81_ECX_;
-    std::bitset<32> f_81_EDX_;
+    //std::bitset<32> f_7_ECX_;
+    //std::bitset<32> f_81_ECX_;
+    //std::bitset<32> f_81_EDX_;
 
     // Calling __cpuid with 0x0 as the function_id argument
 // gets the number of the highest valid function ID.
@@ -51,7 +51,7 @@ CPUID::CPUID()
     if (nIds_ >= 7)
     {
         f_7_EBX_ = data_[7][1];
-        f_7_ECX_ = data_[7][2];
+        //f_7_ECX_ = data_[7][2];
     }
 
     // --------------------------------------
@@ -77,8 +77,8 @@ CPUID::CPUID()
     // load bitset with flags for function 0x80000001
     if (nExIds_ >= 0x80000001)
     {
-        f_81_ECX_ = exData_[1][2];
-        f_81_EDX_ = exData_[1][3];
+        //f_81_ECX_ = exData_[1][2];
+        //f_81_EDX_ = exData_[1][3];
     }
 
     // Interpret CPU brand string if reported
