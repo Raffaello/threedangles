@@ -5,9 +5,17 @@
 class Vec4
 {
 public:
+    enum class eImpl
+    {
+        CPU = 0,
+        SSE = 1
+    };
+
+    const static eImpl implementation = eImpl::CPU;
+
     Vec4(const float x, const float y, const float z);
     Vec4(const float x, const float y, const float z, const float w);
-    Vec4() = default;
+    Vec4();
 
     // TODO: review the const to allow mutability
     //       in the this ptr, so can be more
