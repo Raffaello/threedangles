@@ -9,10 +9,13 @@ Vec4::eImpl Vec4::impl = Vec4::eImpl::CPU;
 Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(y), z(z), w(w)
 {
     // This is an overhead for every single Vector...
-    // Must be done at compile time with MACRO so no need of using function pointers
+    // Must be done at compile time with MACROs so no need of using function pointers
     // the macro can just put the right namespace (cpu::, sse::) for eg.
-    // cons only at compile time a feature is enabled, can't fallback on CPU without SSE for eg.
-    // unless there is a specifc pattern to do it.
+    // cons only at compile time a feature is enabled, can't fallback on CPU without SSE.
+    // unless there is a specifc pattern to do it, 
+    // but anyway it is compiled already with SSE even the CPU implementation due
+    // to compiler optimization
+    // probably can just be removed then.
     switch (impl)
     {
     case eImpl::CPU:

@@ -226,8 +226,6 @@ inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
 
 inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
 {
-    // triangle.normByW();
-    //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
     int x2 = static_cast<int>(std::round(triangle.b.x));
@@ -529,6 +527,9 @@ inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept
 {
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
+        // this could be done more efficientily
+        // addressing the hline directly on the buffer.
+        // instead of recomputing each time the y coord
         _screen->drawPixel(x1, y);
     }
 }

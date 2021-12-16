@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
         engine->setMatrixWorld(matTrans * matRotZ * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-        // TODO there is a bug on the normal and light when "mounted on the cam"
+        // TODO there is a bug on the normal and light when "mounted on the cam"?
         //light.direction_normalized = cam.position.normalize();
         // Process the triangles.
         engine->processFrame(cam, light, black);
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
         screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks) + " AVG: " + std::to_string(tot_frames * 1000.0f / frameTicks));
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
-        if (frameTicks >= 3000) {
+        if (frameTicks >= 5000) {
             tot_frames = 0;
             frame_start_ticks = SDL_GetTicks();
         }
