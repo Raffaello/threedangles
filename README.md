@@ -22,7 +22,7 @@ The algorithms are all implemented from scratch without using any modern library
 
 Their implementation will be based on :
 
-- [x] CPU/FPU
+- [x] compiler based (can be using whatever instruction the compiler decide)
 - [ ] SIMD instructions (Intel)
 - [ ] GPU (CUDA)
 
@@ -48,3 +48,11 @@ a comparision/benchmark on the algorithms implemented here.
 ## C/C++ compiler optimization
 
 - [ ] `__vectorcall`, `__fastcall`
+
+#### Note on compilers
+
+It looks like that some intrinsics might not be required as the compiler is already addressing where it can some SIMD optimization.
+
+- [ ] add specific compiler options on CMAKE configuration, to enhanche performances.
+
+
