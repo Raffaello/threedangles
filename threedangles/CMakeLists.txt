@@ -14,6 +14,7 @@ endif()
 
 add_executable(threedangles "threedangles.cpp")
 target_sources(threedangles PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CPUID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Triangle.cpp
