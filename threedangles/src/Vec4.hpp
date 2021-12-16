@@ -11,10 +11,10 @@ public:
         SSE = 1
     };
 
-    const static eImpl implementation = eImpl::CPU;
+    static Vec4::eImpl impl;
 
-    Vec4(const float x, const float y, const float z);
     Vec4(const float x, const float y, const float z, const float w);
+    Vec4(const float x, const float y, const float z);
     Vec4();
 
     // TODO: review the const to allow mutability
@@ -47,4 +47,22 @@ public:
     float w = 1.0f;
 
     color_t col;
+
+private:
+    Vec4(__vectorcall *add)(const Vec4& v1, const Vec4& v2) = nullptr;
+    Vec4(__vectorcall *sub)(const Vec4& v1, const Vec4& v2) = nullptr;
+    Vec4(__vectorcall *mul)(const Vec4& v1, const float k) = nullptr;
+    Vec4(__vectorcall *div)(const Vec4& v1, const float k) = nullptr;
+
+    float(__vectorcall *dot)(const Vec4& v1, const Vec4& v2) = nullptr;
+    float(__vectorcall *mag)(const Vec4& v1, const Vec4& v2) = nullptr;
+    
+    Vec4(__vectorcall *nor)(const Vec4& v) = nullptr;
+
+    Vec4(__vectorcall *crp)(const Vec4& v1, const Vec4& v2) = nullptr;
+    Vec4(__vectorcall *nrw)(const Vec4& v) = nullptr;
+    Vec4(__vectorcall *inp)(const Vec4& v, const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) = nullptr;
+
 };
+
+

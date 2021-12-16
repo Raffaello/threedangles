@@ -42,6 +42,7 @@ void cpu_features()
 int main(int argc, char* argv[])
 {
     cpu_features();
+    //Vec4impl = Vec4::eImpl::SSE;
 
     int width = 640;
     int height = 480;
@@ -194,7 +195,7 @@ int main(int argc, char* argv[])
         screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks) + " AVG: " + std::to_string(tot_frames * 1000.0f / frameTicks));
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
-        if (frameTicks >= 1000) {
+        if (frameTicks >= 3000) {
             tot_frames = 0;
             frame_start_ticks = SDL_GetTicks();
         }
