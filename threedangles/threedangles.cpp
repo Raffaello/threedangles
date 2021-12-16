@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 
-#include <Vec4.hpp>
 #include <Engine.hpp>
 #include <Cam.hpp>
 #include <Light.hpp>
@@ -13,11 +12,21 @@
 
 #include <SDL2/SDL.h>
 
-#ifdef _WIN32
-#include <intrin.h>
-#endif
-#ifdef linux
+#if defined(__clang__) || defined(__GNUC__)
 #include <cpuid.h>
+// Add the method if not present in GCC
+#if __GNUC__ < 11
+static __inline void
+__cpuidex(int __cpuid_info[4], int __leaf, int __subleaf)
+{
+    __cpuid_count(__leaf, __subleaf, __cpuid_info[0], __cpuid_info[1],
+        __cpuid_info[2], __cpuid_info[3]);
+}
+
+
+#endif
+#else
+#include <intrin.h>
 #endif
 
 #include <bitset>
@@ -41,12 +50,12 @@ void cpu_features()
 
     // Calling __cpuid with 0x0 as the function_id argument
     // gets the number of the highest valid function ID.
-#ifdef _WIN32
+#if defined(__clang__) || defined(__GNUC__)
+    __cpuid(0, cpui[0], cpui[1], cpui[2], cpui[3]);
+#else
     __cpuid(cpui.data(), 0);
 #endif
-#ifdef linux
-    __cpuid(0, cpui[0], cpui[1], cpui[2], cpui[3]);
-#endif
+
     int nIds_ = cpui[0];
 
     for (int i = 0; i < nIds_; i++) {
@@ -78,12 +87,11 @@ void cpu_features()
     // --------------------------------------
 
     // Calling __cpuid with 0x80000000 as the function_id argument
-    // gets the number of the highest valid extended ID.
-#ifdef _WIN32
-    __cpuid(cpui.data(), 0x80000000);
-#endif
-#ifdef linux
+    // gets the number of the highest valid extended ID.cpui
+#if defined(__clang__) || defined(__GNUC__)
     __cpuid(0x80000000, cpui[0], cpui[1], cpui[2], cpui[3]);
+#else
+    __cpuid(cpui.data(), 0x80000000);
 #endif
     int nExIds_ = cpui[0];
 
