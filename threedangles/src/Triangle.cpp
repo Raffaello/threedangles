@@ -17,6 +17,29 @@ Triangle Triangle::operator+(const Vec4& v) const noexcept
     return t;
 }
 
+Triangle Triangle::operator*(const Mat4& m) const noexcept
+{
+    Triangle t(*this);
+
+    t.a = m * a;
+    t.b = m * b;
+    t.c = m * c;
+
+    return t;
+}
+
+Triangle& Triangle::operator*=(const Mat4& m) noexcept
+{
+    //a *= m;
+    //b *= m;
+    //c *= m;
+    a = m * a;
+    b = m * b;
+    c = m * c;
+    
+    return *this;
+}
+
 Triangle Triangle::normByW() const noexcept
 {
     Triangle t(*this);
@@ -61,4 +84,14 @@ Vec4 Triangle::faceNormal() const noexcept
     line2 = line2 -a; //c-a
 
     return line1.crossProd(line2).normalize();
+}
+
+Triangle& Triangle::operator=(const Triangle& t) noexcept
+{
+    a = t.a;
+    b = t.b;
+    c = t.c;
+    col = t.col;
+
+    return *this;
 }

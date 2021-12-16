@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Vec4.hpp>
-#include <Triangle.hpp>
 #include <array>
 
 /**
@@ -13,12 +12,12 @@ class Mat4
 public:
     Mat4 operator*(const Mat4& m_) const noexcept;
     Vec4 operator*(const Vec4& i) const noexcept;
-    Triangle operator*(const Triangle& i) const noexcept;
 
     bool operator==(const Mat4& m) const noexcept;
     
     static float deg2rad(const float deg);
     
+    // These method could be moved outside of this class
     static Mat4 createIdentity();
     static Mat4 createTranslation(const Vec4& v);
     static Mat4 createTranslation(const float k);

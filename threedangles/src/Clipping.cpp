@@ -123,7 +123,6 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // All points lie on the inside of plane, so do nothing
         // and allow the triangle to simply pass through
         out_tri1 = in;
-        out_tri1.setColor(in);
 
         return 1;
     }

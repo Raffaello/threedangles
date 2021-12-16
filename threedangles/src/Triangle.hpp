@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Vec4.hpp>
+#include <Mat4.hpp>
 #include <cstdint>
 #include <types.hpp>
 
@@ -13,6 +14,8 @@ public:
     Vec4 a, b, c;
 
     Triangle operator+(const Vec4& v) const noexcept;
+    Triangle operator*(const Mat4& m) const noexcept;
+    Triangle& operator*=(const Mat4& m) noexcept;
 
     Triangle normByW() const noexcept;
 
@@ -27,6 +30,8 @@ public:
     color_t getColor() const noexcept;
 
     Vec4 faceNormal() const noexcept;
+
+    Triangle& operator=(const Triangle& t) noexcept;
 
 private:
     // TODO move the colors to vertex

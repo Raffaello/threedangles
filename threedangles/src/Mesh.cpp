@@ -6,7 +6,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
 {
     for (const auto& tri : tris)
     {
-        Triangle triTransformed = matWorld * tri;
+        Triangle triTransformed = tri * matWorld;
         // Normals (back-face culling)
         Vec4 normal = triTransformed.faceNormal();
         float norm_dp = normal.dotProd(triTransformed.a - cam.position);
@@ -15,7 +15,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
             continue;
 
         // World Space -> View Space
-        triTransformed = matView * triTransformed;
+        triTransformed *= matView;
         // Clipping section 
         std::vector<Triangle> clips;
         clipping->clipZ(triTransformed, clips);
@@ -24,7 +24,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         {
             // Projection 3D -> 2D & Scale into view (viewport)
             raster_t r;
-            r.t = (matProj * c).normByW();
+            r.t = (c * matProj).normByW();
             r.faceNormal = normal;
             out.push_back(r);
         }

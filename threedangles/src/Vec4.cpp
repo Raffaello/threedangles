@@ -1,5 +1,6 @@
 #include <Vec4.hpp>
 #include <cmath>
+#include <cassert>
 
 Vec4::Vec4(const float x, const float y, const float z) : Vec4(x, y, z, 1.0f)
 {
@@ -59,14 +60,45 @@ bool Vec4::operator==(const Vec4& v) const
     return x == v.x && y == v.y && z == v.z && w == v.w;
 }
 
+Vec4& Vec4::operator=(const Vec4& v) noexcept
+{
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    w = v.w;
+    col = v.col;
+    
+    return *this;
+}
+
+Vec4& Vec4::operator+=(const Vec4& v) noexcept
+{
+    x = x + v.x;
+    y = y + v.y;
+    z = z + v.z;
+    
+    return *this;
+}
+
+//Vec4& Vec4::operator*=(const Mat4& m) noexcept
+//{
+//    x = x * m.m[0][0] + y * m.m[0][1] + z * m.m[0][2] + w * m.m[0][3];
+//    y = x * m.m[1][0] + y * m.m[1][1] + z * m.m[1][2] + w * m.m[1][3];
+//    z = x * m.m[2][0] + y * m.m[2][1] + z * m.m[2][2] + w * m.m[2][3];
+//    w = x * m.m[3][0] + y * m.m[3][1] + z * m.m[3][2] + w * m.m[3][3];
+//
+//    return *this;
+//}
+
 Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept
 {
-    //plane_n = plane_n.normalize();
-    float plane_d = -plane_n.dotProd(*this);
-    float ad = lineStart.dotProd(plane_n);
-    float bd = lineEnd.dotProd(plane_n);
-    float t = (-plane_d - ad) / (bd - ad);
-    Vec4 lineStartToEnd = lineEnd - lineStart;
-    Vec4 lineToIntersect = lineStartToEnd * t;
+    assert(plane_n == plane_n.normalize());
+
+    const float plane_d = -plane_n.dotProd(*this);
+    const float ad = lineStart.dotProd(plane_n);
+    const float bd = lineEnd.dotProd(plane_n);
+    const float t = (-plane_d - ad) / (bd - ad);
+    const Vec4 lineStartToEnd = lineEnd - lineStart;
+    const Vec4 lineToIntersect = lineStartToEnd * t;
     return lineStart + lineToIntersect;
 }

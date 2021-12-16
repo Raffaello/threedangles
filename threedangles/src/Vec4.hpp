@@ -25,6 +25,11 @@ public:
 
     bool operator==(const Vec4& v) const;
 
+    Vec4& operator=(const Vec4& v) noexcept;
+    Vec4& operator+=(const Vec4& v) noexcept;
+    //Vec4& operator*=(const Vec4& m) noexcept;
+    //Vec4& operator*=(const Mat4& m) noexcept;
+
     Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept;
 
 //private:
