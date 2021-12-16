@@ -16,7 +16,7 @@
 #ifdef _WIN32
 #include <intrin.h>
 #endif
-#ifdef __linux__
+#ifdef linux
 #include <cpuid.h>
 #endif
 
@@ -44,7 +44,7 @@ void cpu_features()
 #ifdef _WIN32
     __cpuid(cpui.data(), 0);
 #endif
-#ifdef __linux__
+#ifdef linux
     __cpuid(0, cpui[0], cpui[1], cpui[2], cpui[3]);
 #endif
     int nIds_ = cpui[0];
@@ -82,7 +82,7 @@ void cpu_features()
 #ifdef _WIN32
     __cpuid(cpui.data(), 0x80000000);
 #endif
-#ifdef __linux__
+#ifdef linux
     __cpuid(0x80000000, cpui[0], cpui[1], cpui[2], cpui[3]);
 #endif
     int nExIds_ = cpui[0];
