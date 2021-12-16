@@ -2,6 +2,7 @@
 #include <bitset>
 #include <vector>
 #include <array>
+#include <cstring>
 
 CPUID::CPUID()
 {
