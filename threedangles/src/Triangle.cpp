@@ -85,13 +85,3 @@ Vec4 Triangle::faceNormal() const noexcept
 
     return line1.crossProd(line2).normalize();
 }
-
-Triangle& Triangle::operator=(const Triangle& t) noexcept
-{
-    a = t.a;
-    b = t.b;
-    c = t.c;
-    col = t.col;
-
-    return *this;
-}

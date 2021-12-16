@@ -10,6 +10,7 @@ class Triangle
 public:
     Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_);
     Triangle() = default;
+    ~Triangle() = default;
 
     Vec4 a, b, c;
 
@@ -30,9 +31,6 @@ public:
     color_t getColor() const noexcept;
 
     Vec4 faceNormal() const noexcept;
-
-    Triangle& operator=(const Triangle& t) noexcept;
-
 private:
     // TODO move the colors to vertex
     color_t col;

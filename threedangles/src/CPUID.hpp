@@ -21,19 +21,19 @@ class CPUID
 public:
     CPUID();
 
-    const bool MMX()      const noexcept;
-    const bool SSE()      const noexcept;
-    const bool SSE2()     const noexcept;
-    const bool SSE3()     const noexcept;
-    const bool SSSE3()    const noexcept;
-    const bool SSE41()    const noexcept;
-    const bool SSE42()    const noexcept;
-    const bool AVX()      const noexcept;
-    const bool AVX2()     const noexcept;
-    const bool AVX512F()  const noexcept;
-    const bool AVX512PF() const noexcept;
-    const bool AVX512ER() const noexcept;
-    const bool AVX512CD() const noexcept;
+    bool MMX()      const noexcept;
+    bool SSE()      const noexcept;
+    bool SSE2()     const noexcept;
+    bool SSE3()     const noexcept;
+    bool SSSE3()    const noexcept;
+    bool SSE41()    const noexcept;
+    bool SSE42()    const noexcept;
+    bool AVX()      const noexcept;
+    bool AVX2()     const noexcept;
+    bool AVX512F()  const noexcept;
+    bool AVX512PF() const noexcept;
+    bool AVX512ER() const noexcept;
+    bool AVX512CD() const noexcept;
 
     const std::string& brand()  const noexcept;
     const std::string& vendor() const noexcept;

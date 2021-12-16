@@ -119,17 +119,6 @@ bool Vec4::operator==(const Vec4& v) const
     return x == v.x && y == v.y && z == v.z && w == v.w;
 }
 
-Vec4& Vec4::operator=(const Vec4& v) noexcept
-{
-    x = v.x;
-    y = v.y;
-    z = v.z;
-    w = v.w;
-    col = v.col;
-    
-    return *this;
-}
-
 Vec4& Vec4::operator+=(const Vec4& v) noexcept
 {
     x += v.x;

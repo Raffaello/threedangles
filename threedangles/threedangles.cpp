@@ -42,7 +42,6 @@ void cpu_features()
 int main(int argc, char* argv[])
 {
     cpu_features();
-    //Vec4impl = Vec4::eImpl::SSE;
 
     int width = 640;
     int height = 480;

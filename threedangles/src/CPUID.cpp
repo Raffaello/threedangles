@@ -39,7 +39,7 @@ CPUID::CPUID()
     *reinterpret_cast<int*>(vendor + 4) = data_[0][3];
     *reinterpret_cast<int*>(vendor + 8) = data_[0][2];
     vendor_ = vendor;
-    //cout << "CPU vendor: " << vendor << endl;
+
     // load bitset with flags for function 0x00000001
     if (nIds_ >= 1)
     {
@@ -90,7 +90,6 @@ CPUID::CPUID()
         brand_ = brand;
     }
 
-    //cout << "CPU Brand: " << brand << endl;
     // ----------------------------------------------------------
 
     _MMX = f_1_EDX_[23];
@@ -108,67 +107,67 @@ CPUID::CPUID()
     _AVX512CD = f_7_EBX_[28];
 }
 
-const bool CPUID::MMX() const noexcept
+bool CPUID::MMX() const noexcept
 {
     return _MMX;
 }
 
-const bool CPUID::SSE() const noexcept
+bool CPUID::SSE() const noexcept
 {
     return _SSE;
 }
 
-const bool CPUID::SSE2() const noexcept
+bool CPUID::SSE2() const noexcept
 {
     return _SSE2;
 }
 
-const bool CPUID::SSE3() const noexcept
+bool CPUID::SSE3() const noexcept
 {
     return _SSE3;
 }
 
-const bool CPUID::SSSE3() const noexcept
+bool CPUID::SSSE3() const noexcept
 {
     return _SSSE3;
 }
 
-const bool CPUID::SSE41() const noexcept
+bool CPUID::SSE41() const noexcept
 {
     return _SSE41;
 }
 
-const bool CPUID::SSE42() const noexcept
+bool CPUID::SSE42() const noexcept
 {
     return _SSE42;
 }
 
-const bool CPUID::AVX() const noexcept
+bool CPUID::AVX() const noexcept
 {
     return _AVX;
 }
 
-const bool CPUID::AVX2() const noexcept
+bool CPUID::AVX2() const noexcept
 {
     return _AVX2;
 }
 
-const bool CPUID::AVX512F() const noexcept
+bool CPUID::AVX512F() const noexcept
 {
     return _AVX512F;
 }
 
-const bool CPUID::AVX512PF() const noexcept
+bool CPUID::AVX512PF() const noexcept
 {
     return _AVX512PF;
 }
 
-const bool CPUID::AVX512ER() const noexcept
+bool CPUID::AVX512ER() const noexcept
 {
     return _AVX512ER;
 }
 
-const bool CPUID::AVX512CD() const noexcept
+bool CPUID::AVX512CD() const noexcept
 {
     return _AVX512CD;
 }

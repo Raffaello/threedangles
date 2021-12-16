@@ -16,6 +16,7 @@ public:
     Vec4(const float x, const float y, const float z, const float w);
     Vec4(const float x, const float y, const float z);
     Vec4();
+    ~Vec4() = default;
 
     // TODO: review the const to allow mutability
     //       in the this ptr, so can be more
@@ -33,7 +34,6 @@ public:
 
     bool operator==(const Vec4& v) const;
 
-    Vec4& operator=(const Vec4& v) noexcept;
     Vec4& operator+=(const Vec4& v) noexcept;
     //Vec4& operator*=(const Vec4& m) noexcept;
     //Vec4& operator*=(const Mat4& m) noexcept;
