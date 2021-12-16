@@ -45,7 +45,7 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
     std::array<Triangle,2> clipped;
     // Add initial triangle
     out.push_back(tri);
-    size_t nNewTriangles = 1;
+    std::size_t nNewTriangles = 1;
     for (int p = 0; p < 4; p++)
     {
         while (nNewTriangles > 0)

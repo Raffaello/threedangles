@@ -13,7 +13,13 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef _WIN32
 #include <intrin.h>
+#endif
+#ifdef __linux__
+#include <cpuid.h>
+#endif
+
 #include <bitset>
 
 using std::cerr;
@@ -24,7 +30,7 @@ void cpu_features()
 {
     std::vector<std::array<int, 4>> data_;
     std::vector<std::array<int, 4>> exData_;
-    std::array<int, 4> cpuinfo;
+    std::array<int, 4> cpui;
 
     std::bitset<32> f_1_ECX_;
     std::bitset<32> f_1_EDX_;
@@ -35,12 +41,17 @@ void cpu_features()
 
     // Calling __cpuid with 0x0 as the function_id argument
     // gets the number of the highest valid function ID.
-    __cpuid(cpuinfo.data(), 0);
-    int nIds_ = cpuinfo[0];
+#ifdef _WIN32
+    __cpuid(cpui.data(), 0);
+#endif
+#ifdef __linux__
+    __cpuid(0, cpui[0], cpui[1], cpui[2], cpui[3]);
+#endif
+    int nIds_ = cpui[0];
 
     for (int i = 0; i < nIds_; i++) {
-        __cpuidex(cpuinfo.data(), i, 0);
-        data_.push_back(cpuinfo);
+        __cpuidex(cpui.data(), i, 0);
+        data_.push_back(cpui);
     }
 
     // Capture vendor string
@@ -68,16 +79,21 @@ void cpu_features()
 
     // Calling __cpuid with 0x80000000 as the function_id argument
     // gets the number of the highest valid extended ID.
-    __cpuid(cpuinfo.data(), 0x80000000);
-    int nExIds_ = cpuinfo[0];
+#ifdef _WIN32
+    __cpuid(cpui.data(), 0x80000000);
+#endif
+#ifdef __linux__
+    __cpuid(0x80000000, cpui[0], cpui[1], cpui[2], cpui[3]);
+#endif
+    int nExIds_ = cpui[0];
 
     char brand[0x40];
     memset(brand, 0, sizeof(brand));
 
     for (int i = 0x80000000; i <= nExIds_; ++i)
     {
-        __cpuidex(cpuinfo.data(), i, 0);
-        exData_.push_back(cpuinfo);
+        __cpuidex(cpui.data(), i, 0);
+        exData_.push_back(cpui);
     }
 
     // load bitset with flags for function 0x80000001
@@ -90,9 +106,9 @@ void cpu_features()
     // Interpret CPU brand string if reported
     if (nExIds_ >= 0x80000004)
     {
-        memcpy(brand, exData_[2].data(), sizeof(cpuinfo));
-        memcpy(brand + 16, exData_[3].data(), sizeof(cpuinfo));
-        memcpy(brand + 32, exData_[4].data(), sizeof(cpuinfo));
+        memcpy(brand, exData_[2].data(), sizeof(cpui));
+        memcpy(brand + 16, exData_[3].data(), sizeof(cpui));
+        memcpy(brand + 32, exData_[4].data(), sizeof(cpui));
         //brand_ = brand;
     }
 
