@@ -14,7 +14,11 @@
 
 #include <CPUID.hpp>
 
-#include <cuda/gpu_info.cuh>
+#include <cassert>
+
+#ifdef WITH_CUDA
+#include <cuda/GPUInfo.cuh>
+#endif
 
 using std::cerr;
 using std::endl;
@@ -41,11 +45,34 @@ void cpu_features()
     if (cpuid.AVX512CD()) cout << "AVX512CD" << endl;
 }
 
-
 void gpu_features()
 {
 #ifdef WITH_CUDA
-    display_gpu_info();
+    cuda::GPUInfo gpuInfo;
+
+    cout << "CUDART VERSION : " << gpuInfo.cudart_version << endl;
+    cout << "THRUST VERSION : " << gpuInfo.thrust_version << endl;
+    int err = gpuInfo.getErrorsCount();
+    if (err > 0) {
+        for (int i = 0; i < err; i++)
+            cerr << "ERROR " << i << ": " << gpuInfo.getErrors()[i] << endl;
+    }
+
+    int devCount = gpuInfo.getDeviceCount();
+    assert(gpuInfo.getDeviceProperties().size() == devCount);
+    cout << "Total devices  : " << devCount << endl;
+    for (int i = 0; i < devCount; i++)
+    {
+        cudaDeviceProp devProp = gpuInfo.getDeviceProperties()[i];
+        cout
+            << "Device:     " << i << endl
+            << "Name:       " << devProp.name << " - " << devProp.major << "." << devProp.minor << endl
+            << "Global Mem: " << devProp.totalGlobalMem << endl
+            << "Shared Mem: " << devProp.sharedMemPerBlock << endl
+        ;
+    }
+#else
+    cout << "No CUDA 11 available" << endl;
 #endif
 }
 

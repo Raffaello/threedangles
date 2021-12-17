@@ -35,7 +35,7 @@ if (CMAKE_CUDA_COMPILER)
     set_target_properties(threedangles PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     target_include_directories(threedangles PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
     target_sources(threedangles PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/gpu_info.cu
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/GPUInfo.cu
     )
 endif()
 
