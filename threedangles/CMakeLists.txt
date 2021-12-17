@@ -25,9 +25,6 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/gpu_info.cu
-
-
 )
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -35,10 +32,11 @@ target_include_directories(threedangles PRIVATE
 )
 
 if (CMAKE_CUDA_COMPILER)
-set_target_properties(threedangles PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-message(status ${CUDAToolkit_INCLUDE_DIRS})
-target_include_directories(threedangles PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
-
+    set_target_properties(threedangles PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_include_directories(threedangles PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
+    target_sources(threedangles PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/gpu_info.cu
+    )
 endif()
 
 target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA})

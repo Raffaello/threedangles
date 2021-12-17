@@ -41,10 +41,14 @@ void cpu_features()
     if (cpuid.AVX512CD()) cout << "AVX512CD" << endl;
 }
 
+
 void gpu_features()
 {
+#ifdef WITH_CUDA
     display_gpu_info();
+#endif
 }
+
 
 int main(int argc, char* argv[])
 {

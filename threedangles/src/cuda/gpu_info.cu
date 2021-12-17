@@ -16,7 +16,7 @@ void display_gpu_info()
         cerr << cudaGetLastError() << endl;
         return;
     }
-    cout << "CUDA :" << CUDART_VERSION << " - " << THRUST_VERSION << endl;
+    cout << "CUDA :" << CUDART_VERSION << " - THRUST: " << THRUST_VERSION << endl;
     cout << "CUDA device count:" << devCount << endl;
     for (int i = 0; i < devCount; i++)
     {
