@@ -44,6 +44,13 @@ a comparision/benchmark on the algorithms implemented here.
 ## SIMD
 - [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations
 
+## CUDA
+This might require to redo all the `engine` into `cudaEngine`:
+
+- sorting
+- vectors, matrix and triangle storing and operations 
+- screen and surface, textures
+- operations in the pipeline and how organize data might be required to reorder it and increment parallelism.
 
 ## C/C++ compiler optimization
 - [ ] `__vectorcall`, `__fastcall`

@@ -14,6 +14,8 @@
 
 #include <CPUID.hpp>
 
+#include <cuda/gpu_info.cuh>
+
 using std::cerr;
 using std::endl;
 using std::cout;
@@ -39,9 +41,15 @@ void cpu_features()
     if (cpuid.AVX512CD()) cout << "AVX512CD" << endl;
 }
 
+void gpu_features()
+{
+    display_gpu_info();
+}
+
 int main(int argc, char* argv[])
 {
     cpu_features();
+    gpu_features();
 
     int width = 640;
     int height = 480;

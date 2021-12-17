@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for threedangles, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.17)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_DEBUG_POSTFIX d)
@@ -25,12 +25,24 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/gpu_info.cu
+
+
 )
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CUDAToolkit_INCLUDE_DIRS}
 )
 
-target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main})
+if (CMAKE_CUDA_COMPILER)
+set_target_properties(threedangles PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+message(status ${CUDAToolkit_INCLUDE_DIRS})
+target_include_directories(threedangles PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
+
+endif()
+
+target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA})
+
 
 ############################### tests ########################################
 if(BUILD_TESTING)
