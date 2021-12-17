@@ -33,18 +33,6 @@ Vec4 Mat4::operator*(const Vec4& i) const noexcept
     return v;
 }
 
-Triangle Mat4::operator*(const Triangle& i) const noexcept
-{
-    //return { *this * i.a, *this * i.b, *this * i.c };
-    Triangle t(i);
-
-    t.a = *this * i.a;
-    t.b = *this * i.b;
-    t.c = *this * i.c;
-
-    return t;
-}
-
 bool Mat4::operator==(const Mat4& m) const noexcept
 {
     for (int i = 0; i < 4; i++) {

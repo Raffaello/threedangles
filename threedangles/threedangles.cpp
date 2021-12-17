@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 
-#include <Vec4.hpp>
 #include <Engine.hpp>
 #include <Cam.hpp>
 #include <Light.hpp>
@@ -13,12 +12,76 @@
 
 #include <SDL2/SDL.h>
 
+#include <CPUID.hpp>
+
+#include <cassert>
+
+#ifdef WITH_CUDA
+#include <cuda/GPUInfo.cuh>
+#endif
+
 using std::cerr;
 using std::endl;
 using std::cout;
 
+void cpu_features()
+{
+    CPUID cpuid;
+    cout << cpuid.vendor() << endl;
+    cout << cpuid.brand() << endl;
+    cout << "Instrcuctions Sets:" << endl;
+    if (cpuid.MMX()) cout << "MMX" << endl;
+    if (cpuid.SSE()) cout << "SSE" << endl;
+    if (cpuid.SSE2()) cout << "SSE2" << endl;
+    if (cpuid.SSE3()) cout << "SSE3" << endl;
+    if (cpuid.SSSE3()) cout << "SSSE3" << endl;
+    if (cpuid.SSE41()) cout << "SSE41" << endl;
+    if (cpuid.SSE42()) cout << "SSE42" << endl;
+    if (cpuid.AVX()) cout << "AVX" << endl;
+    if (cpuid.AVX2()) cout << "AVX2" << endl;
+    if (cpuid.AVX512F()) cout << "AVX512F" << endl;
+    if (cpuid.AVX512PF()) cout << "AVX512PF" << endl;
+    if (cpuid.AVX512ER()) cout << "AVX512ER" << endl;
+    if (cpuid.AVX512CD()) cout << "AVX512CD" << endl;
+}
+
+void gpu_features()
+{
+#ifdef WITH_CUDA
+    cuda::GPUInfo gpuInfo;
+
+    cout << "CUDART VERSION : " << gpuInfo.cudart_version << endl;
+    cout << "THRUST VERSION : " << gpuInfo.thrust_version << endl;
+    int err = gpuInfo.getErrorsCount();
+    if (err > 0) {
+        for (int i = 0; i < err; i++)
+            cerr << "ERROR " << i << ": " << gpuInfo.getErrors()[i] << endl;
+    }
+
+    int devCount = gpuInfo.getDeviceCount();
+    assert(gpuInfo.getDeviceProperties().size() == devCount);
+    cout << "Total devices  : " << devCount << endl;
+    for (int i = 0; i < devCount; i++)
+    {
+        cudaDeviceProp devProp = gpuInfo.getDeviceProperties()[i];
+        cout
+            << "Device:     " << i << endl
+            << "Name:       " << devProp.name << " - " << devProp.major << "." << devProp.minor << endl
+            << "Global Mem: " << devProp.totalGlobalMem << endl
+            << "Shared Mem: " << devProp.sharedMemPerBlock << endl
+        ;
+    }
+#else
+    cout << "No CUDA 11 available" << endl;
+#endif
+}
+
+
 int main(int argc, char* argv[])
 {
+    cpu_features();
+    gpu_features();
+
     int width = 640;
     int height = 480;
     const float w2 = 0.5f * static_cast<float>(width);
@@ -152,7 +215,7 @@ int main(int argc, char* argv[])
         engine->setMatrixWorld(matTrans * matRotZ * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-        // TODO there is a bug on the normal and light when "mounted on the cam"
+        // TODO there is a bug on the normal and light when "mounted on the cam"?
         //light.direction_normalized = cam.position.normalize();
         // Process the triangles.
         engine->processFrame(cam, light, black);
@@ -170,7 +233,7 @@ int main(int argc, char* argv[])
         screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks) + " AVG: " + std::to_string(tot_frames * 1000.0f / frameTicks));
         //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
-        if (frameTicks >= 1000) {
+        if (frameTicks >= 5000) {
             tot_frames = 0;
             frame_start_ticks = SDL_GetTicks();
         }

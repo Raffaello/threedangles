@@ -45,7 +45,7 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
     std::array<Triangle,2> clipped;
     // Add initial triangle
     out.push_back(tri);
-    size_t nNewTriangles = 1;
+    std::size_t nNewTriangles = 1;
     for (int p = 0; p < 4; p++)
     {
         while (nNewTriangles > 0)
@@ -123,7 +123,6 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // All points lie on the inside of plane, so do nothing
         // and allow the triangle to simply pass through
         out_tri1 = in;
-        out_tri1.setColor(in);
 
         return 1;
     }

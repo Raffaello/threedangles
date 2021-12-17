@@ -17,6 +17,29 @@ Triangle Triangle::operator+(const Vec4& v) const noexcept
     return t;
 }
 
+Triangle Triangle::operator*(const Mat4& m) const noexcept
+{
+    Triangle t(*this);
+
+    t.a = m * a;
+    t.b = m * b;
+    t.c = m * c;
+
+    return t;
+}
+
+Triangle& Triangle::operator*=(const Mat4& m) noexcept
+{
+    //a *= m;
+    //b *= m;
+    //c *= m;
+    a = m * a;
+    b = m * b;
+    c = m * c;
+    
+    return *this;
+}
+
 Triangle Triangle::normByW() const noexcept
 {
     Triangle t(*this);

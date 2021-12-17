@@ -1,12 +1,13 @@
 #pragma once
 
 #include <vector>
-#include <Triangle.hpp>
 #include <string>
+#include <memory>
+
 #include <Vec4.hpp>
 #include <Mat4.hpp>
+#include <Triangle.hpp>
 #include <Cam.hpp>
-#include <memory>
 #include <Clipping.hpp>
 
 class Mesh

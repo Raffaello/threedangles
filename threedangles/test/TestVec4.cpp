@@ -2,7 +2,27 @@
 #include <gmock/gmock.h>
 #include <Vec4.hpp>
 
+TEST(Vec4, assigment)
+{
+    Vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+    Vec4 b;
+    a.col.r = 5;
+    a.col.g = 6;
+    a.col.b = 7;
+    a.col.a = 8;
+    
+    b = a;
 
+    EXPECT_TRUE(b == a);
+    EXPECT_EQ(b.x, a.x);
+    EXPECT_EQ(b.y, a.y);
+    EXPECT_EQ(b.z, a.z);
+    EXPECT_EQ(b.w, a.w);
+    EXPECT_EQ(b.col.r, a.col.r);
+    EXPECT_EQ(b.col.g, a.col.g);
+    EXPECT_EQ(b.col.b, a.col.b);
+    EXPECT_EQ(b.col.a, a.col.a);
+}
 TEST(Vec4, equality)
 {
     Vec4 a;

@@ -64,10 +64,10 @@ namespace sdl
         col = SDL_MapRGBA(fmt, c.r, c.g, c.b, c.a);
     }
 
-    void Screen_SDL::drawPixel(const int x, const int y) noexcept
+    inline void Screen_SDL::drawPixel(const int x, const int y) noexcept
     {
         //if (x >= 0 && x < width && y >= 0 && y < height)
-            *reinterpret_cast<uint32_t*>(pxl + y * pitch + (x << 2)) = col;
+            *reinterpret_cast<uint32_t*>(pxl + y * pitch + (x * 4)) = col;
     }
 
     void Screen_SDL::setTitle(const std::string& title) noexcept
