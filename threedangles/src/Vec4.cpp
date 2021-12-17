@@ -1,10 +1,12 @@
 #include <Vec4.hpp>
 #include <cmath>
 #include <cassert>
+#if 0
 #include <cpu/Vec4CPU.hpp>
 #include <simd/Vec4SSE.hpp>
 
 Vec4::eImpl Vec4::impl = Vec4::eImpl::CPU;
+#endif
 
 Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(y), z(z), w(w)
 {
@@ -16,6 +18,7 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
     // but anyway it is compiled already with SSE even the CPU implementation due
     // to compiler optimization
     // probably can just be removed then.
+#if 0
     switch (impl)
     {
     case eImpl::CPU:
@@ -45,6 +48,7 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
     default:
         break;
     }
+#endif
 }
 
 Vec4::Vec4(const float x, const float y, const float z) : Vec4(x, y, z, 1.0f)
@@ -56,65 +60,83 @@ Vec4::Vec4() : Vec4(0.0f, 0.0f, 0.0f, 1.0f)
 
 Vec4 Vec4::operator+(const Vec4& v) const
 {
-    //return Vec4(x + v.x, y + v.y, z + v.z);
+    return Vec4(x + v.x, y + v.y, z + v.z);
+#if 0
     //return cpu::vector_add(*this, v);
     return add(*this, v);
+#endif
 }
 
 Vec4 Vec4::operator-(const Vec4& v) const
 {
-    //return Vec4(x - v.x, y - v.y, z - v.z);
+    return Vec4(x - v.x, y - v.y, z - v.z);
+#if 0
     //return cpu::vector_sub(*this, v);
     return sub(*this, v);
+#endif
 }
 
 Vec4 Vec4::operator*(const float k) const
 {
-    //return Vec4(x * k, y * k, z * k);
+    return Vec4(x * k, y * k, z * k);
+#if 0
     //return cpu::vector_mul(*this, k);
     return mul(*this, k);
+#endif
 }
 
 Vec4 Vec4::operator/(const float k) const
 {
-    //return Vec4(x / k, y / k, z / k);
+    return Vec4(x / k, y / k, z / k);
+#if 0
     //return cpu::vector_div(*this, k);
     return div(*this, k);
+#endif
 }
 
 float Vec4::dotProd(const Vec4& v) const
 {
-    //return x * v.x + y * v.y + z * v.z;
+    return x * v.x + y * v.y + z * v.z;
+#if 0
     //return cpu::vector_dotProd(*this, v);
     return dot(*this, v);
+#endif
 }
 
 float Vec4::magnitude(const Vec4& v) const
 {
-    //return std::sqrt(dotProd(v));
+    return std::sqrt(dotProd(v));
+#if 0
     //return cpu::vector_magnitude(*this, v);
     return mag(*this, v);
+#endif
 }
 
 Vec4 Vec4::normalize() const
 {
-    //return *this / magnitude(*this);
+    return *this / magnitude(*this);
+#if 0
     //return cpu::vector_normalize(*this);
     return nor(*this);
+#endif
 }
 
 Vec4 Vec4::crossProd(const Vec4& v) const
 {
-    //return Vec4(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x );
+    return Vec4(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x );
+#if 0
     //return cpu::vector_crossProd(*this, v);
     return crp(*this, v);
+#endif
 }
 
 Vec4 Vec4::normByW() const
 {
-    //return Vec4(x / w, y / w, z / w, 1.0f / w );
+    return Vec4(x / w, y / w, z / w, 1.0f / w );
+#if 0
     //return cpu::vector_normByW(*this);
     return nrw(*this);
+#endif
 }
 
 bool Vec4::operator==(const Vec4& v) const
@@ -143,7 +165,7 @@ Vec4& Vec4::operator+=(const Vec4& v) noexcept
 
 Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept
 {
-    /*assert(plane_n == plane_n.normalize());
+    assert(plane_n == plane_n.normalize());
 
     const float plane_d = -plane_n.dotProd(*this);
     const float ad = lineStart.dotProd(plane_n);
@@ -151,8 +173,9 @@ Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4
     const float t = (-plane_d - ad) / (bd - ad);
     const Vec4 lineStartToEnd = lineEnd - lineStart;
     const Vec4 lineToIntersect = lineStartToEnd * t;
-    return lineStart + lineToIntersect;*/
-
+    return lineStart + lineToIntersect;
+#if 0
     //return cpu::vector_intersect_plane(*this, plane_n, lineStart, lineEnd);
     return inp(*this, plane_n, lineStart, lineEnd);
+#endif
 }
