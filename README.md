@@ -1,6 +1,6 @@
 ﻿# threedangles
 
-Three-D-angles is a 3D triangles engines built from scratch.
+Three-D-angles is a 3D triangles engine built from scratch.
 
 It will feature the following algorithms:
 
@@ -18,9 +18,7 @@ It will feature the following algorithms:
 - Left-hand rules
 - Quaternions
 
-The algorithms are all implemented from scratch without using any modern library or Engine.
-
-Their implementation will be based on :
+The implementation will be based on :
 
 - [x] compiler based (can be using whatever instruction the compiler decide)
 - [ ] SIMD instructions (Intel)
@@ -33,9 +31,9 @@ a comparision/benchmark on the algorithms implemented here.
 
 # Note on the implementation
 
-- Using SDL2 for window creation (and pixel drawing, soon to be removed) so it can be cross-OS in a simpler way,
+- Using SDL2 for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
-  SDL2 might be removed completely after few iterations of the engine.
+  SDL2 might be removed completely after few iterations.
 
 ## windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
@@ -54,6 +52,7 @@ This might require to redo all the `engine` into `cudaEngine`:
 
 ## C/C++ compiler optimization
 - [ ] `__vectorcall`, `__fastcall`
+- [ ] various compiler switches
 
 #### Note on compilers
 It looks like compilers are already using some SIMD from default C/C++ code.
