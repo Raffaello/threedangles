@@ -45,6 +45,7 @@ public:
 private:
     std::shared_ptr<Screen> _screen;
     std::shared_ptr<Clipping> _clipping;
+
     float fov = 0.0f;
     float far = 0.0f;
     float near = 0.0f;

@@ -191,6 +191,14 @@ int main(int argc, char* argv[])
                     cam.moveBackward();
                     SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
+                /*case SDLK_q:
+                    cam.rollCCW();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
+                    break;
+                case SDLK_e:
+                    cam.rollCW();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
+                    break;*/
                 default:
                     break;
                 }
