@@ -68,7 +68,7 @@ private:
     
     void draw_hline(int x1, int x2, const int y) const noexcept;
     void draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept;
-    void draw_hline(int x1, int x2, const int y, const color_t& c1, const color_t c2) const noexcept;
+    void draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) const noexcept;
     /**
      * @brief Triangle is already normalized by w. Only x,y coord will be used
      * @param triangle

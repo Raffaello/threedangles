@@ -19,7 +19,8 @@ INSTANTIATE_TEST_CASE_P(Engine, EngineLerpTest, ::testing::Values(
     std::make_tuple<>(10, 40, 0, 10),
     std::make_tuple<>(10, 40, 1, 40),
     std::make_tuple<>(10, 40, 0.5, 25),
-    std::make_tuple<>(10, 40, 0.9, 37)
+    std::make_tuple<>(10, 40, 0.9, 37),
+    std::make_tuple<>(40, 10, 1.0-0.9, 37)
 ));
 
 int main(int argc, char** argv)

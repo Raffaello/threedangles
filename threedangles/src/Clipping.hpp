@@ -12,7 +12,7 @@ class Clipping
     // TODO clipping is breaking "lerp"
     //      as it "cut" off the end point for the color
     //      on the clipped triangle with new vertex
-    //      need to interpolate the new color 
+    //      need to interpolate the new color
 public:
     Clipping() = delete;
     Clipping(const float near, const float far, const int width, const int height);

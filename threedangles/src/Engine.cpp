@@ -629,18 +629,29 @@ inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) co
     draw_hline(x1, x2, y);
 }
 
-void Engine::draw_hline(int x1, int x2, const int y, const color_t& c1, const color_t c2) const noexcept
+void Engine::draw_hline(int x1, int x2, const int y,  color_t c1, color_t c2) const noexcept
 {
-    if (x1 >= x2) std::swap(x1, x2);
-    for (int x = x1; x <= x2; x++) {
-        const float t = (x - x1) / (x2 - x1);
-        color_t c;
-        c.r = std::round(Engine::lerp(c1.r, c2.r, t));
-        c.g = std::round(Engine::lerp(c1.g, c2.g, t));
-        c.b = std::round(Engine::lerp(c1.b, c2.b, t));
-        c.a = 255;
+    if (x1 >= x2)
+    {
+        std::swap(x1, x2);
+        std::swap(c1, c2);
+    }
+    
+    const int dx = x2 - x1;
+    const float tstep = 1.0f / sqrt(dx * dx);
+    float t = 0.0f;
+    color_t c = c1;
+    _screen->drawPixel(x1, y, c);
+    for (int x = x1+1; x < x2; x++)
+    {
+        t += tstep;
+        c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
+        c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
+        c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
+        //c.a = 255;
         _screen->drawPixel(x, y, c);
     }
+    _screen->drawPixel(x2, y, c2);
 }
 
 inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) const noexcept
@@ -689,7 +700,7 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
     int sy = y1 < y2 ? 1 : -1;
     int err = dx + dy;  // error value e_xy
     
-    float t = 0.0;
+    float t = 0.0f;
     int x = x1;
     int y = y1;
     color_t c = c1;
