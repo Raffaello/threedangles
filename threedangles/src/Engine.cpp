@@ -7,6 +7,7 @@
 #include <exception>
 #include <algorithm>
 #include <list>
+#include <cassert>
 
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {
@@ -497,6 +498,7 @@ next:
 
 void Engine::fillTriangle2(const Triangle& triangle) const noexcept
 {
+    // Parallel implementation and color interpolation
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
     float z1 = triangle.a.z;
@@ -567,16 +569,18 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     // Top-half triangle
 
 
+
     // Bottom-half triangle
 }
 
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
-        [](const Triangle& t1, const Triangle& t2) {
+        [](const Triangle& t1, const Triangle& t2)
+        {
             // divsion by 3.0f can be skipped
-            float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
-            float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
+            const float z1 = t1.a.z + t1.b.z + t1.c.z;
+            const float z2 = t2.a.z + t2.b.z + t2.c.z;
             return z1 < z2;
         }
     );
@@ -593,7 +597,7 @@ void Engine::raster() noexcept
         for (auto& t : listTriangles)
         {
             if (filled >= 1) {
-                fillTriangle(t);
+                fillTriangle2(t);
                 if (filled == 2) {
                     t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
                     drawTriangle(t);
@@ -614,7 +618,7 @@ inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept
     // it needs a linear interpolation, i think
     // std::lerp(z1,z2, p) p =(x-x1)/(x2-x1) x = [x1,x2[?
     // TODO: do first color interpolation
-    if (x1 >= x2) std::swap(x1, x2);
+    if (x1 > x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
         // this could be done more efficientily
         // addressing the hline directly on the buffer.
@@ -629,9 +633,16 @@ inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) co
     draw_hline(x1, x2, y);
 }
 
-void Engine::draw_hline(int x1, int x2, const int y,  color_t c1, color_t c2) const noexcept
+void Engine::draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) const noexcept
 {
-    if (x1 >= x2)
+    if (x1 == x2)
+    {
+        // should be c1 50% and c2 50% ? 
+        _screen->drawPixel(x1, y, c1);
+        return;
+    }
+
+    if (x1 > x2)
     {
         std::swap(x1, x2);
         std::swap(c1, c2);
@@ -642,12 +653,13 @@ void Engine::draw_hline(int x1, int x2, const int y,  color_t c1, color_t c2) co
     float t = 0.0f;
     color_t c = c1;
     _screen->drawPixel(x1, y, c);
-    for (int x = x1+1; x < x2; x++)
+    for (int x = x1 + 1; x < x2; x++)
     {
         t += tstep;
-        c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
-        c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
-        c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
+        c = color_lerpRGB(c1, c2, t);
+        //c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
+        //c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
+        //c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
         //c.a = 255;
         _screen->drawPixel(x, y, c);
     }
@@ -729,9 +741,6 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
         }
         
         t += tstep;
-        c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
-        c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
-        c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
-        //c.a = 255;
+        c = color_lerpRGB(c1, c2, t);
     }
 }
