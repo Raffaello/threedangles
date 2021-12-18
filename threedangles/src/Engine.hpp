@@ -76,10 +76,10 @@ private:
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
     void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) const noexcept;
 
-    Mat4 matProjection;
-    Mat4 matWorld;
-    Mat4 matView;
+    Mat4 _matProjection;
+    Mat4 _matWorld;
+    Mat4 _matView;
 
-    std::vector<Mesh> meshes;
-    std::vector<raster_t> trianglesToRaster;
+    std::vector<Mesh> _meshes;
+    std::vector<raster_t> _trianglesToRaster;
 };

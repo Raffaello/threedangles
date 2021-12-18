@@ -28,17 +28,17 @@ std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const 
 
 void Engine::setMatrixProjection(const Mat4& matProj) noexcept
 {
-    matProjection = matProj;
+    _matProjection = matProj;
 }
 
 void Engine::setMatrixWorld(const Mat4& matWorld) noexcept
 {
-    this->matWorld = matWorld;
+    this->_matWorld = matWorld;
 }
 
 void Engine::setMatrixView(const Mat4& matView) noexcept
 {
-    this->matView = matView;
+    this->_matView = matView;
 }
 
 void Engine::initPerspectiveProjection(const float fov, const float far, const float near) noexcept
@@ -46,7 +46,7 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
     this->fov = fov;
     this->far = far;
     this->near = near;
-    matProjection = Mat4::createScale(_screen->width / 2.0f, _screen->height / 2.0f, 1.0f)
+    _matProjection = Mat4::createScale(_screen->width / 2.0f, _screen->height / 2.0f, 1.0f)
         * Mat4::createTranslation({ 1.0f, 1.0f, 0.0f })
         * Mat4::createProjection(_screen->width, _screen->height, fov, far, near);
     _clipping = std::make_shared<Clipping>(near, far, _screen->width, _screen->height); 
@@ -54,16 +54,16 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
 
 void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_col) noexcept
 {
-    trianglesToRaster.clear();
+    _trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
 
-    for (const auto& mesh : meshes)
+    for (const auto& mesh : _meshes)
     {
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?
-        mesh.render(matProjection, matWorld, matView, showHiddenVertexes, cam, _clipping, trianglesToRaster);
+        mesh.render(_matProjection, _matWorld, _matView, showHiddenVertexes, cam, _clipping, _trianglesToRaster);
     }
 
     // Z-depth sorting (Painter's Algorithm)
@@ -181,7 +181,7 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
 
     file.close();
     vertexes.clear();
-    meshes.push_back(m);
+    _meshes.push_back(m);
 
     return true;
 }
@@ -482,7 +482,7 @@ next:
 
 inline void Engine::sortZ() noexcept
 {
-    std::sort(trianglesToRaster.begin(), trianglesToRaster.end(),
+    std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
         [](const raster_t& r1, const raster_t& r2) {
             // divsion by 3.0f can be skipped
             float z1 = (r1.t.a.z + r1.t.b.z + r1.t.c.z); // / 3.0f;
@@ -494,7 +494,7 @@ inline void Engine::sortZ() noexcept
 
 void Engine::raster(const Light& light) noexcept
 {
-    for (const auto& t : trianglesToRaster)
+    for (const auto& t : _trianglesToRaster)
     {
         std::list<raster_t> listTriangles;
         _clipping->clipScreen(t, listTriangles);

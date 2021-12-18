@@ -56,17 +56,17 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
             out.pop_front();
             nNewTriangles--;
 
-            // Clip it against a plane. We only need to test each 
+            // Clip it against a plane. We only need to test each
             // subsequent plane, against subsequent new triangles
             // as all triangles after a plane clip are guaranteed
-            // to lie on the inside of the plane. I like how this
-            // comment is almost completely and utterly justified
+            // to lie on the inside of the plane.
             nTrisToAdd = againstPlane(r.t, planes_p[p], planes_n[p], clipped[0], clipped[1]);
 
             // Clipping may yield a variable number of triangles, so
             // add these new ones to the back of the queue for subsequent
             // clipping against next planes
-            for (int w = 0; w < nTrisToAdd; w++) {
+            for (int w = 0; w < nTrisToAdd; w++)
+            {
                 raster_t rr;
                 rr.t = clipped[w];
                 rr.faceNormal = r.faceNormal;

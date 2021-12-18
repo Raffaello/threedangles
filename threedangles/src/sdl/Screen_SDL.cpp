@@ -1,4 +1,5 @@
 #include <sdl/Screen_SDL.hpp>
+#include <cassert>
 
 namespace sdl
 {
@@ -66,8 +67,18 @@ namespace sdl
 
     inline void Screen_SDL::drawPixel(const int x, const int y) noexcept
     {
-        //if (x >= 0 && x < width && y >= 0 && y < height)
-            *reinterpret_cast<uint32_t*>(pxl + y * pitch + (x * 4)) = col;
+        assert(x >= 0 && x < width&& y >= 0 && y < height);
+        // writing multiple horizontal pixels at time could
+        // be more performant, like using a memcpy
+        //uint32_t* buf = reinterpret_cast<uint32_t*>(pxl + y * pitch);
+        //buf[x] = col; x=[x1,x2[
+        // ---
+        // writing multiple vertical pixels at time could be
+        // more performant, like increasing the y by pitch (width)
+        //uint32_t* buf = reinterpret_cast<uint32_t*>(pxl + x);
+        //buf[y * pitch] = col; y =[y1,y2[
+
+        reinterpret_cast<uint32_t*>(pxl + y * pitch)[x] = col;
     }
 
     void Screen_SDL::setTitle(const std::string& title) noexcept
