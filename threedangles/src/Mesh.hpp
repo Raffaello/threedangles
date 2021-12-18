@@ -17,7 +17,7 @@ public:
 
     void render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
         const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
-        std::vector<raster_t>& out) const noexcept;
+        std::vector<Triangle>& out) const noexcept;
     // TODO add mesh position in the world. ?
 
     // TODO replace with vertex buffer?...

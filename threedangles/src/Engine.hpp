@@ -82,5 +82,5 @@ private:
     Mat4 _matView;
 
     std::vector<Mesh> _meshes;
-    std::vector<raster_t> _trianglesToRaster;
+    std::vector<Triangle> _trianglesToRaster;
 };

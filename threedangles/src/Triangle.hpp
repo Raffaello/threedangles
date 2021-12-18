@@ -31,13 +31,8 @@ public:
     color_t getColor() const noexcept;
 
     Vec4 faceNormal() const noexcept;
+    Vec4 faceNormal_;
 private:
     // TODO move the colors to vertex
     color_t col;
 };
-
-typedef struct raster_t
-{
-    Triangle t;
-    Vec4 faceNormal;
-} raster_t;

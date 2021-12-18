@@ -483,10 +483,10 @@ next:
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
-        [](const raster_t& r1, const raster_t& r2) {
+        [](const Triangle& t1, const Triangle& t2) {
             // divsion by 3.0f can be skipped
-            float z1 = (r1.t.a.z + r1.t.b.z + r1.t.c.z); // / 3.0f;
-            float z2 = (r2.t.a.z + r2.t.b.z + r2.t.c.z); // / 3.0f;
+            float z1 = (t1.a.z + t1.b.z + t1.c.z); // / 3.0f;
+            float z2 = (t2.a.z + t2.b.z + t2.c.z); // / 3.0f;
             return z1 < z2;
         }
     );
@@ -496,7 +496,7 @@ void Engine::raster(const Light& light) noexcept
 {
     for (const auto& t : _trianglesToRaster)
     {
-        std::list<raster_t> listTriangles;
+        std::list<Triangle> listTriangles;
         _clipping->clipScreen(t, listTriangles);
 
         // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
@@ -506,18 +506,18 @@ void Engine::raster(const Light& light) noexcept
             // todo: it should be computed during the rasterization?
             // body create also a Light interface / class
             // If more lights? this need to be moved to the rasterization phase
-            if (illuminationOn) t.t.setColor(light.flatShading(t.faceNormal));
-            else t.t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+            if (illuminationOn) t.setColor(light.flatShading(t.faceNormal_));
+            else t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
 
             if (filled >= 1) {
-                fillTriangle(t.t);
+                fillTriangle(t);
                 if (filled == 2) {
-                    t.t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    drawTriangle(t.t);
+                    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+                    drawTriangle(t);
                 }
             }
             else {
-                drawTriangle(t.t);
+                drawTriangle(t);
             }
         }
     }

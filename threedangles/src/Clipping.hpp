@@ -14,7 +14,7 @@ public:
     Clipping(const float near, const float far, const int width, const int height);
 
     void clipZ(const Triangle& t, std::vector<Triangle>& out) const noexcept;
-    void clipScreen(const raster_t& tri, std::list<raster_t>& out) const noexcept;
+    void clipScreen(const Triangle& tri, std::list<Triangle>& out) const noexcept;
 
     int againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept;
 private:

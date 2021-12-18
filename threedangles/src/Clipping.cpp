@@ -39,7 +39,7 @@ void Clipping::clipZ(const Triangle& t, std::vector<Triangle>& out) const noexce
     }
 }
 
-void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const noexcept
+void Clipping::clipScreen(const Triangle& tri, std::list<Triangle>& out) const noexcept
 {
     // CLIPPING on Screen size
     std::array<Triangle,2> clipped;
@@ -52,7 +52,7 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
         {
             int nTrisToAdd = 0;
             // Take triangle from front of queue
-            raster_t r = out.front();
+            Triangle r = out.front();
             out.pop_front();
             nNewTriangles--;
 
@@ -60,17 +60,14 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
             // subsequent plane, against subsequent new triangles
             // as all triangles after a plane clip are guaranteed
             // to lie on the inside of the plane.
-            nTrisToAdd = againstPlane(r.t, planes_p[p], planes_n[p], clipped[0], clipped[1]);
+            nTrisToAdd = againstPlane(r, planes_p[p], planes_n[p], clipped[0], clipped[1]);
 
             // Clipping may yield a variable number of triangles, so
             // add these new ones to the back of the queue for subsequent
             // clipping against next planes
             for (int w = 0; w < nTrisToAdd; w++)
             {
-                raster_t rr;
-                rr.t = clipped[w];
-                rr.faceNormal = r.faceNormal;
-                out.push_back(rr);
+                out.push_back(clipped[w]);
             }
         }
 
@@ -134,6 +131,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
         // Copy appearance info to new triangle
         out_tri1.setColor(in);
+        out_tri1.faceNormal_ = in.faceNormal_;
         //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
@@ -157,6 +155,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri1.setColor(in);
         //out_tri1.setColor(0, 64, 0, 255);
         out_tri2.setColor(in);
+        out_tri1.faceNormal_ = out_tri2.faceNormal_ = in.faceNormal_;
         //out_tri2.setColor(0, 0, 64, 255);
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
