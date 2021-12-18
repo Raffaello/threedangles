@@ -173,7 +173,7 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
         }
         else if (type == "o")
         {
-            // object name
+            ss >> m.name;
         }
         else if (type == "g")
         {
@@ -694,6 +694,7 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
     int y = y1;
     color_t c = c1;
     const float tstep = 1.0f / sqrt(dx * dx + dy * dy);
+
     while (true)
     {
         _screen->drawPixel(x, y, c);
@@ -717,11 +718,9 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
         }
         
         t += tstep;
-        c.r = std::round(Engine::lerp(c1.r, c2.r, t));
-        c.g = std::round(Engine::lerp(c1.g, c2.g, t));
-        c.b = std::round(Engine::lerp(c1.b, c2.b, t));
-        c.a = 255;
+        c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
+        c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
+        c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
+        //c.a = 255;
     }
-
-    int aaa = 0;
 }

@@ -95,6 +95,6 @@ private:
     std::vector<Triangle> _trianglesToRaster;
     std::vector<Light> _lights;
     uint8_t _lightCounts = 1;
-public:
+public: // remove later, OBJ file doesn't support vertex coloring
     std::vector<Mesh> _meshes;
 };

@@ -101,20 +101,11 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!engine->addMeshFromOBJFile("plain_cube.obj")) {
+    if (!engine->addMeshFromOBJFile("plain_triangle.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
     }
-    // override mesh to be just a triangle
-    engine->_meshes.clear();
-    Mesh mmm;
-    Triangle ttt;
-    ttt.a = Vec4(0.0f, 1.0f, 0.0f);
-    ttt.b = Vec4(0.0f, 0.0f, 0.0f);
-    ttt.c = Vec4(-1.0f, 0.0f, 0.0f);
-    mmm.tris.push_back(ttt);
-    engine->_meshes.push_back(mmm);
-    // set vertex color
+    
     for (auto& t : engine->_meshes[0].tris) {
         t.a.col = { 255,0,0,255 };
         t.b.col = { 0,255,0,255 };
