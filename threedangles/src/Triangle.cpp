@@ -80,8 +80,8 @@ Vec4 Triangle::faceNormal() const noexcept
 {
     Vec4 line1(b), line2(c);
 
-    line1 = line1-a; //b-a
-    line2 = line2 -a; //c-a
+    line1 = line1 - a; //b-a
+    line2 = line2 - a; //c-a
 
     return line1.crossProd(line2).normalize();
 }

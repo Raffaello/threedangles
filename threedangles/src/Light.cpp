@@ -3,6 +3,7 @@
 #include <algorithm>
 
 Light::Light(const Vec4& direction, const color_t& color) :
+    direction(direction),
     direction_normalized(direction.normalize()), col(color)
 {
 }
@@ -18,4 +19,9 @@ color_t Light::flatShading(const Vec4& triangleFaceNormal) const noexcept
     //c.a = 255;
 
     return c;
+}
+
+color_t Light::gouraudShading(const Triangle& triangle) const noexcept
+{
+    return {};
 }

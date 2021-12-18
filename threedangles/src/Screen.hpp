@@ -8,8 +8,10 @@ class Screen
 public:
     const int width;
     const int height;
+    const int screenSize;
 
-    Screen(const std::string& title, const int width, const int height) : width(width), height(height), _title(title) {}
+    Screen(const std::string& title, const int width, const int height) :
+        width(width), height(height), screenSize(width* height), _title(title) {}
     virtual ~Screen() = default;
 
     virtual bool init() = 0;

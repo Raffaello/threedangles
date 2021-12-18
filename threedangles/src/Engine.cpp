@@ -10,6 +10,7 @@
 
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {
+    //_depthBuffer = std::make_shared<float[]>(_screen->screenSize);
 }
 
 std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const int width, const int height) noexcept
@@ -52,11 +53,12 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
     _clipping = std::make_shared<Clipping>(near, far, _screen->width, _screen->height); 
 }
 
-void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_col) noexcept
+void Engine::processFrame(const Cam& cam, const color_t& bg_col) noexcept
 {
     _trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
+    //for (int i = 0; i < _screen->screenSize; ++i) _depthBuffer[i] = far;
 
     for (const auto& mesh : _meshes)
     {
@@ -70,7 +72,7 @@ void Engine::processFrame(const Cam& cam, const Light& light, const color_t& bg_
     sortZ();
 
     // Triangle Rasterization
-    raster(light);
+    raster();
 
     // Swap buffers
     _screen->flip();
@@ -186,6 +188,17 @@ bool Engine::addMeshFromOBJFile(const std::string& filename)
     return true;
 }
 
+void Engine::addLight(const Light& light)
+{
+    _lights.push_back(light);
+    _lightCounts = _lights.size();
+}
+
+float Engine::lerp(const float a, const float b, const float t) noexcept
+{
+    return a + t * (b - a);
+}
+
 inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
 {
     // triangle.normByW();
@@ -197,7 +210,7 @@ inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
-    auto c = triangle.getColor();
+    color_t c = triangle.getColor();
     // rasterization clipping,
     // not working when the triangle is out of the screen
     // as it could still draw something
@@ -221,7 +234,6 @@ inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
     drawLine(x1, y1, x2, y2);
     drawLine(x2, y2, x3, y3);
     drawLine(x3, y3, x1, y1);
-
 }
 
 inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
@@ -233,7 +245,30 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
     
-    _screen->setDrawColor(triangle.getColor());
+    // Illumination (flat shading)
+    color_t c;
+    if (illuminationOn == 0) {
+        c.r = 255; c.g = 255; c.b = 255; c.a = 255;
+        _screen->setDrawColor(c);
+    }
+    else if (illuminationOn == 1) {
+        // blending lights (average)
+        int r = 0; int g = 0; int b = 0; int a = 0;
+        for (const auto& light : _lights)
+        {
+            color_t col = light.flatShading(triangle.faceNormal_);
+            r += col.r; g += col.g; b += col.b; a += col.a;
+        }
+        
+        c.g = g / _lightCounts;
+        c.b = b / _lightCounts;
+        c.r = r / _lightCounts;
+        c.a = a / _lightCounts;
+        
+    }
+    //else if (illuminationOn == 2) {
+    //}
+    _screen->setDrawColor(c);
 
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
     if (y1 > y2) {
@@ -480,6 +515,81 @@ next:
     }
 }
 
+void Engine::fillTriangle2(const Triangle& triangle) const noexcept
+{
+    int x1 = static_cast<int>(std::round(triangle.a.x));
+    int y1 = static_cast<int>(std::round(triangle.a.y));
+    float z1 = triangle.a.z;
+    color_t c1 = triangle.a.col;
+    int x2 = static_cast<int>(std::round(triangle.b.x));
+    int y2 = static_cast<int>(std::round(triangle.b.y));
+    float z2 = triangle.b.z;
+    color_t c2 = triangle.b.col;
+    int x3 = static_cast<int>(std::round(triangle.c.x));
+    int y3 = static_cast<int>(std::round(triangle.c.y));
+    float z3 = triangle.c.z;
+    color_t c3 = triangle.c.col;
+
+    // Illumination (flat shading)
+    // todo: it should be computed during the rasterization?
+    // body create also a Light interface / class
+    // If more lights? this need to be moved to the rasterization phase
+    color_t c = triangle.getColor();
+    if (illuminationOn == 0) {
+        c.r = 255; c.g = 255; c.b = 255; c.a = 255;
+        _screen->setDrawColor(c);
+    }
+    else if (illuminationOn == 1) {
+        // blending lights (average)
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int a = 0;
+        for (const auto& light : _lights)
+        {
+            color_t col = light.flatShading(triangle.faceNormal_);
+            r += col.r;
+            g += col.g;
+            b += col.b;
+            a += col.a;
+        }
+
+        c.g = g / _lightCounts;
+        c.b = b / _lightCounts;
+        c.r = r / _lightCounts;
+        c.a = a / _lightCounts;
+        _screen->setDrawColor(c);
+    }
+    //else if (illuminationOn == 2) {
+    //    // TODO
+    //}
+
+    // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
+    if (y1 > y2) {
+        std::swap(y1, y2);
+        std::swap(x1, x2);
+        std::swap(z1, z2);
+        std::swap(c1, c2);
+    }
+    if (y1 > y3) {
+        std::swap(y1, y3);
+        std::swap(x1, x3);
+        std::swap(z1, z3);
+        std::swap(c1, c3);
+    }
+    if (y2 > y3) {
+        std::swap(y2, y3);
+        std::swap(x2, x3);
+        std::swap(z2, z3);
+        std::swap(c2, c3);
+    }
+
+    // Top-half triangle
+
+
+    // Bottom-half triangle
+}
+
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
@@ -492,7 +602,7 @@ inline void Engine::sortZ() noexcept
     );
 }
 
-void Engine::raster(const Light& light) noexcept
+void Engine::raster() noexcept
 {
     for (const auto& t : _trianglesToRaster)
     {
@@ -502,13 +612,6 @@ void Engine::raster(const Light& light) noexcept
         // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
         for (auto& t : listTriangles)
         {
-            // Illumination (flat shading)
-            // todo: it should be computed during the rasterization?
-            // body create also a Light interface / class
-            // If more lights? this need to be moved to the rasterization phase
-            if (illuminationOn) t.setColor(light.flatShading(t.faceNormal_));
-            else t.setColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-
             if (filled >= 1) {
                 fillTriangle(t);
                 if (filled == 2) {
@@ -525,6 +628,12 @@ void Engine::raster(const Light& light) noexcept
 
 inline void Engine::draw_hline(int x1, int x2, const int y) const noexcept
 {
+    // TODO: for the depth buffer the z value need to be interpolated?
+    //       or would be enough the z at the line?
+    // if (x1,y,z1), (x2,y,z2) z1 can be different z2
+    // it needs a linear interpolation, i think
+    // std::lerp(z1,z2, p) p =(x-x1)/(x2-x1) x = [x1,x2[?
+    // TODO: do first color interpolation
     if (x1 >= x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
         // this could be done more efficientily
@@ -538,6 +647,20 @@ inline void Engine::draw_hline(int x1, int x2, const int y, const color_t& c) co
 {
     _screen->setDrawColor(c);
     draw_hline(x1, x2, y);
+}
+
+void Engine::draw_hline(int x1, int x2, const int y, const color_t& c1, const color_t c2) const noexcept
+{
+    if (x1 >= x2) std::swap(x1, x2);
+    for (int x = x1; x <= x2; x++) {
+        const float t = (x - x1) / (x2 - x1);
+        color_t c;
+        c.r = std::round(Engine::lerp(c1.r, c2.r, t));
+        c.g = std::round(Engine::lerp(c1.g, c2.g, t));
+        c.b = std::round(Engine::lerp(c1.b, c2.b, t));
+        c.a = 255;
+        _screen->drawPixel(x, y, c);
+    }
 }
 
 inline void Engine::drawLine(int x1, int y1, const int x2, const int y2) const noexcept

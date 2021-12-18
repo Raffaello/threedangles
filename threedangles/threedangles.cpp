@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!engine->addMeshFromOBJFile("plain_mountains.obj")) {
+    if (!engine->addMeshFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
     }
@@ -115,8 +115,10 @@ int main(int argc, char* argv[])
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light
-    Light light(Vec4(1.0f, 3.0f, -1.0f), { 80, 32, 64, 255 });
-    
+    Light light(Vec4(0.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
+    engine->addLight(light);
+    Light light2(Vec4(1.0f, 3.0f, -1.0f), { 0, 255, 255, 255 });
+    //engine->addLight(light2);
     // offset params
     Vec4 translation(0.0f, 0.0f, 0.0f);
     bool quit = false;
@@ -146,7 +148,8 @@ int main(int argc, char* argv[])
                     SDL_Log("Show Hidden Vertexes = %d", engine->showHiddenVertexes);
                     break;
                 case SDLK_l:
-                    engine->illuminationOn = !engine->illuminationOn;
+                    engine->illuminationOn++;
+                    engine->illuminationOn %= 3;
                     SDL_Log("Illumination ON = %d", engine->illuminationOn);
                     break;
                 case SDLK_f:
@@ -213,7 +216,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        alpha = 0.0f;
+        //alpha = 0.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 
@@ -226,7 +229,7 @@ int main(int argc, char* argv[])
         // TODO there is a bug on the normal and light when "mounted on the cam"?
         //light.direction_normalized = cam.position.normalize();
         // Process the triangles.
-        engine->processFrame(cam, light, black);
+        engine->processFrame(cam, black);
         tot_frames++;
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();
