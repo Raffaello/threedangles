@@ -693,6 +693,7 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
     int x = x1;
     int y = y1;
     color_t c = c1;
+    const float tstep = 1.0f / sqrt(dx * dx + dy * dy);
     while (true)
     {
         _screen->drawPixel(x, y, c);
@@ -714,8 +715,8 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
             err += dx;
             y += sy;
         }
-        t = (float)(y - y1) / (float)(x - x1);
         
+        t += tstep;
         c.r = std::round(Engine::lerp(c1.r, c2.r, t));
         c.g = std::round(Engine::lerp(c1.g, c2.g, t));
         c.b = std::round(Engine::lerp(c1.b, c2.b, t));

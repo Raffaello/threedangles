@@ -105,8 +105,16 @@ int main(int argc, char* argv[])
         cerr << "Can't load OBJ file";
         return -2;
     }
-
-    // set cube vertex color
+    // override mesh to be just a triangle
+    engine->_meshes.clear();
+    Mesh mmm;
+    Triangle ttt;
+    ttt.a = Vec4(0.0f, 1.0f, 0.0f);
+    ttt.b = Vec4(0.0f, 0.0f, 0.0f);
+    ttt.c = Vec4(-1.0f, 0.0f, 0.0f);
+    mmm.tris.push_back(ttt);
+    engine->_meshes.push_back(mmm);
+    // set vertex color
     for (auto& t : engine->_meshes[0].tris) {
         t.a.col = { 255,0,0,255 };
         t.b.col = { 0,255,0,255 };
@@ -223,7 +231,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 1.0f;
+        //alpha = 0.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 
