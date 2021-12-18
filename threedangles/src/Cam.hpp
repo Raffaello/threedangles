@@ -41,6 +41,6 @@ private:
     Mat4 matrixLookAt() const;
     Mat4 matrixLookAtInverse(const Mat4& m) const;
     const Vec4 up;
-    const Vec4 znorm;
+    const Vec4 znorm = Vec4(0.0f, 0.0f, 1.0f);
     Vec4 target;
 };

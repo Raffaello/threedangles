@@ -1,6 +1,6 @@
 #include <Cam.hpp>
 
-Cam::Cam(const Vec4& pos, const Vec4& up): position(pos), up(up), znorm(0.0f, 0.0f, 1.0f)
+Cam::Cam(const Vec4& pos, const Vec4& up): position(pos), up(up)
 {
 }
 
