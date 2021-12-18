@@ -106,6 +106,13 @@ int main(int argc, char* argv[])
         return -2;
     }
 
+    // set cube vertex color
+    for (auto& t : engine->_meshes[0].tris) {
+        t.a.col = { 255,0,0,255 };
+        t.b.col = { 0,255,0,255 };
+        t.c.col = { 0,0,255,255 };
+    }
+     
     // Projection Matrix
     const float fov = 50.0f;
     const float zfar = 100.0f;
@@ -216,7 +223,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 0.0f;
+        //alpha = 1.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 

@@ -86,13 +86,15 @@ private:
     // TODO color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
     void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) const noexcept;
+    void drawLine(const int x1, const int y1, const int x2, const int y2, const color_t& c1, const color_t c2) const noexcept;
 
     Mat4 _matProjection;
     Mat4 _matWorld;
     Mat4 _matView;
 
-    std::vector<Mesh> _meshes;
     std::vector<Triangle> _trianglesToRaster;
     std::vector<Light> _lights;
     uint8_t _lightCounts = 1;
+public:
+    std::vector<Mesh> _meshes;
 };

@@ -60,6 +60,9 @@ Vec4::Vec4() : Vec4(0.0f, 0.0f, 0.0f, 1.0f)
 
 Vec4 Vec4::operator+(const Vec4& v) const
 {
+    //Vec4 u(*this);
+    //u.x += v.x; u.y += v.y; u.z += v.z;
+    //return u;
     return Vec4(x + v.x, y + v.y, z + v.z);
 #if 0
     //return cpu::vector_add(*this, v);
@@ -69,6 +72,9 @@ Vec4 Vec4::operator+(const Vec4& v) const
 
 Vec4 Vec4::operator-(const Vec4& v) const
 {
+    //Vec4 u(*this);
+    //u.x -= v.x; u.y -= v.y;  u.z -= v.z;
+    //return u;
     return Vec4(x - v.x, y - v.y, z - v.z);
 #if 0
     //return cpu::vector_sub(*this, v);
@@ -78,7 +84,9 @@ Vec4 Vec4::operator-(const Vec4& v) const
 
 Vec4 Vec4::operator*(const float k) const
 {
-    return Vec4(x * k, y * k, z * k);
+    Vec4 u(*this);
+    u.x *= k; u.y *= k; u.z *= k;
+    return u;
 #if 0
     //return cpu::vector_mul(*this, k);
     return mul(*this, k);
@@ -87,7 +95,9 @@ Vec4 Vec4::operator*(const float k) const
 
 Vec4 Vec4::operator/(const float k) const
 {
-    return Vec4(x / k, y / k, z / k);
+    Vec4 u(*this);
+    u.x /= k; u.y /= k; u.z /= k;
+    return u;
 #if 0
     //return cpu::vector_div(*this, k);
     return div(*this, k);
@@ -132,7 +142,9 @@ Vec4 Vec4::crossProd(const Vec4& v) const
 
 Vec4 Vec4::normByW() const
 {
-    return Vec4(x / w, y / w, z / w, 1.0f / w );
+    Vec4 u(*this);
+    u.x /= w; u.y /= w; u.z /= w; u.w = 1.0f / w;
+    return u;
 #if 0
     //return cpu::vector_normByW(*this);
     return nrw(*this);

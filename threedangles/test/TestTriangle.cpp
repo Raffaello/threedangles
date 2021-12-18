@@ -13,6 +13,10 @@ TEST(Triangle, assignment)
     A.setColor(1, 2, 3, 4);
     A.faceNormal_ = Vec4(4, 3, 2, 1);
 
+    A.a.col = { 2,0,0,0 };
+    A.b.col = { 0,2,0,0 };
+    A.c.col = { 0,0,2,0 };
+
     Triangle B = A;
 
     EXPECT_TRUE(B.a == A.a);
@@ -29,6 +33,10 @@ TEST(Triangle, assignment)
     EXPECT_EQ(B.faceNormal_.y, A.faceNormal_.y);
     EXPECT_EQ(B.faceNormal_.z, A.faceNormal_.z);
     EXPECT_EQ(B.faceNormal_.w, A.faceNormal_.w);
+    
+    EXPECT_EQ(B.a.col, A.a.col);
+    EXPECT_EQ(B.b.col, A.b.col);
+    EXPECT_EQ(B.c.col, A.c.col);
 }
 
 int main(int argc, char** argv)

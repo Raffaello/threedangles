@@ -21,7 +21,7 @@ public:
     Triangle normByW() const noexcept;
 
     // TODO: the triangle color should be the average of the vertexes' color
-    // BODY: can't really set it up, unless replale the vertexes color.
+    // BODY: can't really set it up, unless replace the vertexes color.
     // BODY: it would have conflicts when using a vertex buffer?
     // BODY: need to resolve shared vertexes with different color
     void setColor(const color_t& c) noexcept;

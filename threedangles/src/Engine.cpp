@@ -201,8 +201,6 @@ float Engine::lerp(const float a, const float b, const float t) noexcept
 
 inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
 {
-    // triangle.normByW();
-    //compute_int_coord();
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
     int x2 = static_cast<int>(std::round(triangle.b.x));
@@ -211,29 +209,11 @@ inline void Engine::drawTriangle(const Triangle& triangle) const noexcept
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
     color_t c = triangle.getColor();
-    // rasterization clipping,
-    // not working when the triangle is out of the screen
-    // as it could still draw something
-    // as the coords are just capped in the max and min values
-    // instead should just not be drawn
-    /*if (x1 < 0) x1 = 0;
-    if (y1 < 0) y1 = 0;
-    if (x2 < 0) x2 = 0;
-    if (y2 < 0) y2 = 0;
-    if (x3 < 0) x3 = 0;
-    if (y3 < 0) y3 = 0;
-
-    if (x1 > _screen->width)  x1 = _screen->width;
-    if (y1 > _screen->height) y1 = _screen->height;
-    if (x2 > _screen->width)  x2 = _screen->width;
-    if (y2 > _screen->height) y2 = _screen->height;
-    if (x3 > _screen->width)  x3 = _screen->width;
-    if (y3 > _screen->height) y3 = _screen->height;*/
 
     _screen->setDrawColor(c);
-    drawLine(x1, y1, x2, y2);
-    drawLine(x2, y2, x3, y3);
-    drawLine(x3, y3, x1, y1);
+    drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
+    drawLine(x2, y2, x3, y3, triangle.b.col, triangle.c.col);
+    drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
 inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
@@ -699,4 +679,48 @@ inline void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const 
 {
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);
+}
+
+void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, const color_t& c1, const color_t c2) const noexcept
+{
+    int dx = abs(x2 - x1);
+    int sx = x1 < x2 ? 1 : -1;
+    int dy = -abs(y2 - y1);
+    int sy = y1 < y2 ? 1 : -1;
+    int err = dx + dy;  // error value e_xy
+    
+    float t = 0.0;
+    int x = x1;
+    int y = y1;
+    color_t c = c1;
+    while (true)
+    {
+        _screen->drawPixel(x, y, c);
+        if (x == x2 && y == y2)
+            break;
+
+        int e2 = err << 1;
+
+        if (e2 >= dy)
+        {
+            // e_xy+e_x > 0
+            err += dy;
+            x += sx;
+        }
+
+        if (e2 <= dx)
+        {
+            // e_xy+e_y < 0
+            err += dx;
+            y += sy;
+        }
+        t = (float)(y - y1) / (float)(x - x1);
+        
+        c.r = std::round(Engine::lerp(c1.r, c2.r, t));
+        c.g = std::round(Engine::lerp(c1.g, c2.g, t));
+        c.b = std::round(Engine::lerp(c1.b, c2.b, t));
+        c.a = 255;
+    }
+
+    int aaa = 0;
 }

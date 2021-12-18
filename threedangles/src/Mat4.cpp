@@ -23,7 +23,7 @@ Mat4 Mat4::operator*(const Mat4& m_) const noexcept
 
 Vec4 Mat4::operator*(const Vec4& i) const noexcept
 {
-    Vec4 v;
+    Vec4 v(i);
 
     v.x = i.x * this->m[0][0] + i.y * this->m[0][1] + i.z * this->m[0][2] + i.w * this->m[0][3];
     v.y = i.x * this->m[1][0] + i.y * this->m[1][1] + i.z * this->m[1][2] + i.w * this->m[1][3];
