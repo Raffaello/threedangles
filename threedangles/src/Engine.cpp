@@ -265,24 +265,41 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
         std::swap(x2, x3);
     }
 
-    int t1x = 0, t2x = 0, y = 0, minx = 0, maxx = 0, t1xp = 0, t2xp = 0;
+    // -----
+    int t1x = x1;
+    int t2x = x1;
+    int y = y1;
     bool changed1 = false;
     bool changed2 = false;
-
-    int8_t signx1 = 0, signx2 = 0;
-
-    int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-    int e1 = 0, e2 = 0;
-
-    // -----
-
-    t1x = t2x = x1;
-    y = y1;
-    changed1 = changed2 = false;
-
-    //fill_top_flat(renderer);
-    dy1 = y2 - y1;
-    dx1 = x2 - x1;
+    int dy1 = y2 - y1;
+    int dx1 = x2 - x1;
+    int dy2 = y3 - y1;
+    int dx2 = x3 - x1;
+    int8_t signx1;
+    int8_t signx2;
+    int e1;
+    int e2;
+    int minx;
+    int maxx;
+    int t1xp;
+    int t2xp = 0;
+    /*color_t c1 = triangle.a.col;
+    color_t c2 = triangle.b.col;
+    color_t c3 = triangle.c.col;
+    color_t tc1;
+    color_t tc2;
+    const float t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
+    float t1 = 0.0f;
+    const float t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
+    float t2 = 0.0f;*/
+    // interpolate the color of the line1 and line2 (tc1, tc2)
+   /* t1 += t1step;
+    t2 += t2step;
+    color_t tc1 = color_lerpRGB(c1, c2, t1);
+    color_t tc2 = color_lerpRGB(c1, c3, t2);
+    assert(ty1 == ty2);
+    draw_hline(tx1, tx2, ty1, tc1, tc2);*/
+    
     if (dx1 < 0) {
         dx1 = -dx1;
         signx1 = -1;
@@ -291,8 +308,6 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
         signx1 = 1;
     }
 
-    dy2 = y3 - y1;
-    dx2 = x3 - x1;
     if (dx2 < 0) {
         dx2 = -dx2;
         signx2 = -1;
@@ -310,13 +325,13 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
         changed2 = true;
     }
 
-    /* here we know that v1.y <= v2.y <= v3.y */
-    /* check for trivial case of bottom-flat triangle */
-
+    // here we know that v1.y <= v2.y <= v3.y
+    // check for trivial case of bottom-flat triangle
+    
     e2 = dx2 >> 1;
     // Flat top, just process the second half
     if (y1 == y2)
-        goto next;
+        goto NEXT;
 
     e1 = dx1 >> 1;
     for (int i = 0; i < dx1;)
@@ -344,7 +359,7 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
                 if (changed1)
                     t1xp = signx1;
                 else
-                    goto next1;
+                    goto NEXT1;
             }
 
             if (changed1)
@@ -353,7 +368,7 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
                 t1x += signx1;
         }
         // Move line
-    next1:
+    NEXT1:
         // process second line until y value is about to change
         while (true)
         {
@@ -364,14 +379,14 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
                 if (changed2)
                     t2xp = signx2;
                 else
-                    goto next2;
+                    goto NEXT2;
             }
             if (changed2)
                 break;
             else
                 t2x += signx2;
         }
-    next2:
+    NEXT2:
         //fill_update_minmax();
         if (minx > t1x)
             minx = t1x;
@@ -394,7 +409,7 @@ inline void Engine::fillTriangle(const Triangle& triangle) const noexcept
         if (y == y2)
             break;
     }
-next:
+NEXT:
     // Second half
     //fill_bottom_flat(renderer);
     dy1 = y3 - y2;
@@ -443,7 +458,7 @@ next:
                     //break;
                 }//t1x += signx1;
                 else
-                    goto next3;
+                    goto NEXT3;
             }
             if (changed1)
                 break;
@@ -452,7 +467,7 @@ next:
             if (i < dx1)
                 i++;
         }
-    next3:
+    NEXT3:
         // process second line until y value is about to change
         while (t2x != x3)
         {
@@ -463,7 +478,7 @@ next:
                 if (changed2)
                     t2xp = signx2;
                 else
-                    goto next4;
+                    goto NEXT4;
             }
 
             if (changed2)
@@ -471,7 +486,7 @@ next:
             else
                 t2x += signx2;
         }
-    next4:
+    NEXT4:
         //fill_update_minmax();
         if (minx > t1x)
             minx = t1x;
@@ -498,7 +513,7 @@ next:
 
 void Engine::fillTriangle2(const Triangle& triangle) const noexcept
 {
-    // Parallel implementation and color interpolation
+    // TODO: Parallel implementation and color interpolation
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
     float z1 = triangle.a.z;
@@ -513,9 +528,9 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     color_t c3 = triangle.c.col;
 
     // Illumination (flat shading)
-    // todo: it should be computed during the rasterization?
-    // body create also a Light interface / class
-    // If more lights? this need to be moved to the rasterization phase
+    // TODO if illumination off should just interpolate vertex color
+    //      if flat shading interpolate with the flat shading light value
+    //      if gouraud interpolate vertex colors with light values
     color_t c = triangle.getColor();
     if (illuminationOn == 0) {
         c.r = 255; c.g = 255; c.b = 255; c.a = 255;
@@ -523,10 +538,10 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     }
     else if (illuminationOn == 1) {
         // blending lights (average)
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int a = 0;
+        unsigned int r = 0;
+        unsigned int g = 0;
+        unsigned int b = 0;
+        unsigned int a = 0;
         for (const auto& light : _lights)
         {
             color_t col = light.flatShading(triangle.faceNormal_);
@@ -566,11 +581,130 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
         std::swap(c2, c3);
     }
 
+
+    int dx1 = abs(x2 - x1);
+    int dy1 = y2 - y1;
+    int sx1 = x1 <= x2 ? 1 : -1;
+    int sy1 = y1 <= y2 ? 1 : -1; // always 1 as it has been swapped.
+    assert(sy1 == 1);
+    int err1 = dx1 + dy1;
+    //const int e21 = err << 1;
+
+    const int dx2 = abs(x3 - x1);
+    const int dy2 = y3 - y1;
+    int sx2 = x1 <= x3 ? 1 : -1;
+    const int sy2 = y1 <= y3 ? 1 : -1; // always 1 as it has been swapped;
+    assert(sy2 == 1);
+    int err2 = dx2 + dy2;
+    //const int e22 = err << 1;
+    bool l1yChanged = false;
+    bool l2yChanged = false;
+    // top half
+    int tx1 = x1;
+    int tx2 = x1;
+    int ty = y1;
+
+    float t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
+    float t1 = 0.0f;
+    float t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
+    float t2 = 0.0f;
+    // todo, remove these and do in integer instead.
+    float l1_step = dx1 / static_cast<float>(dy1);
+    float l2_step = dx2 / static_cast<float>(dy2);
+    
     // Top-half triangle
+    for (int i = 0; ty < y2; ty++, i++) {
+        tx1 = x1 + sx1*static_cast<int>(std::round(l1_step * i));
+        tx2 = x2 + sx2*static_cast<int>(std::round(l2_step * i));
+
+        t1 = t1step * i;
+        t2 = t2step * i;
+        color_t tc1 = color_lerpRGB(c1, c2, t1);
+        color_t tc2 = color_lerpRGB(c1, c3, t2);
+
+        draw_hline(tx1, tx2, ty, tc1, tc2);
+    }
+
+    //// 2nd half
+    dy1 = y3 - y2;
+    dx1 = abs(x3 - x2);
+    sx1 = x2 <= x3 ? 1 : -1;
+    t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
+    t1 = 0.0f;
+    t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
+    t2 = 0.0f;
+    l1_step = dx1 / static_cast<float>(dy1);
+    l2_step = dx2 / static_cast<float>(dy2);
+    if (dy1 > 0.0f) {
+        /*for (int i = 0, ty = y2; ty <= y3; ty++)
+        {
+            tx1 = x1 + sx1*static_cast<int>(std::round(l1_step * i));
+            tx2 = x2 + sx2*static_cast<int>(std::round(l2_step * i));
+
+            t1 = t1step * i;
+            t2 = t2step * i;
+            color_t tc1 = color_lerpRGB(c1, c2, t1);
+            color_t tc2 = color_lerpRGB(c1, c3, t2);
+
+            draw_hline(tx1, tx2, ty, tc1, tc2);
+        }*/
+    }
+    else {
+        // horizontal line
+        draw_hline(x2, x3, y3, c2, c3);
+    }
+
+    
 
 
+
+
+    //_screen->drawPixel(x1, y1, c1); // is it ok?
+    //while (ty1 < y2 && tx1 != x2 && tx2 != x3)
+    //{
+    //    l1yChanged = false;
+    //    while (!l1yChanged && tx1 != x2)
+    //    {
+    //        const int e21 = err1 << 1;
+    //        if (e21 >= dy1) {
+    //            err1 += dy1;
+    //            tx1 += sx1;
+    //        }
+
+    //        if (e21 <= dx1) {
+    //            err1 += dx1;
+    //            ty1++;
+    //            l1yChanged = true;
+    //        }
+    //    }
+
+    //    l2yChanged = false;
+    //    while (!l2yChanged && tx2 != x3)
+    //    {
+    //        const int e22 = err2 << 1;
+    //        if (e22 >= dy2) {
+    //            err2 += dy2;
+    //            tx2 += sx2;
+    //        }
+
+    //        if (e22 <= dx2) {
+    //            err2 += dx2;
+    //            ty2++;
+    //            l2yChanged = true;
+    //        }
+    //    }
+
+    //    // interpolate the color of the line1 and line2 (tc1, tc2)
+    //    t1 += t1step;
+    //    t2 += t2step;
+    //    color_t tc1 = color_lerpRGB(c1, c2, t1);
+    //    color_t tc2 = color_lerpRGB(c1, c3, t2);
+    //    assert(ty1 == ty2);
+    //    draw_hline(tx1, tx2, ty1, tc1, tc2);
+    //}
 
     // Bottom-half triangle
+
 }
 
 inline void Engine::sortZ() noexcept
@@ -637,8 +771,8 @@ void Engine::draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) con
 {
     if (x1 == x2)
     {
-        // should be c1 50% and c2 50% ? 
-        _screen->drawPixel(x1, y, c1);
+        // should be c1 50% and c2 50% ?
+        _screen->drawPixel(x1, y, color_lerpRGB(c1, c2, 0.5));
         return;
     }
 
@@ -706,17 +840,17 @@ inline void Engine::drawLine(int x1,  int y1, const int x2, const int y2, const 
 
 void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, const color_t& c1, const color_t c2) const noexcept
 {
-    int dx = abs(x2 - x1);
-    int sx = x1 < x2 ? 1 : -1;
-    int dy = -abs(y2 - y1);
-    int sy = y1 < y2 ? 1 : -1;
+    const int dx = abs(x2 - x1);
+    const int sx = x1 < x2 ? 1 : -1;
+    const int dy = -abs(y2 - y1);
+    const int sy = y1 < y2 ? 1 : -1;
     int err = dx + dy;  // error value e_xy
     
+    const float tstep = 1.0f / sqrt(dx * dx + dy * dy);
     float t = 0.0f;
     int x = x1;
     int y = y1;
     color_t c = c1;
-    const float tstep = 1.0f / sqrt(dx * dx + dy * dy);
 
     while (true)
     {
@@ -724,7 +858,7 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
         if (x == x2 && y == y2)
             break;
 
-        int e2 = err << 1;
+        const int e2 = err << 1;
 
         if (e2 >= dy)
         {

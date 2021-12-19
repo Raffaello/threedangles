@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO this file coudl be restructured as a class Color.
 #include <cstdint>
 #include <cmath>
 
@@ -14,6 +15,7 @@ typedef struct color_t
     }
 } color_t;
 
+// TODO: the color should be possible to compute incrementally and efficiently in hline
 inline color_t color_lerpRGB(const color_t& c1, const color_t& c2, const float t)
 {
     color_t c;
