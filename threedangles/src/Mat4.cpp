@@ -188,7 +188,7 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[2][2] = (znear + zfar) / (znear - zfar);
     m.m[2][3] = (2.0f * zfar * znear) / (znear - zfar);
     m.m[3][2] = -1.0f;
-    
+
 
 
     return m;

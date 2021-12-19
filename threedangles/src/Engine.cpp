@@ -1,10 +1,8 @@
 #include <Engine.hpp>
 #include <cmath>
 #include <sdl/Screen_SDL.hpp>
-#include <fstream>
-#include <strstream> // todo remove as it has been deprecated
+
 #include <vector>
-#include <exception>
 #include <algorithm>
 #include <list>
 #include <cassert>
@@ -66,7 +64,7 @@ void Engine::processFrame(const Cam& cam, const color_t& bg_col) noexcept
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?
-        mesh.render(_matProjection, _matWorld, _matView, showHiddenVertexes, cam, _clipping, _trianglesToRaster);
+        mesh->render(_matProjection, _matWorld, _matView, showHiddenVertexes, cam, _clipping, _trianglesToRaster);
     }
 
     // Z-depth sorting (Painter's Algorithm)
@@ -79,114 +77,12 @@ void Engine::processFrame(const Cam& cam, const color_t& bg_col) noexcept
     _screen->flip();
 }
 
-bool Engine::addMeshFromOBJFile(const std::string& filename)
+void Engine::addMesh(const std::shared_ptr<Mesh>& mesh)
 {
-    std::ifstream file(filename, std::ifstream::in);
-    std::string line;
-    std::vector<Vec4> vertexes;
+    if (nullptr == mesh)
+        return;
 
-    Mesh m;
-    if (!file.is_open())
-        return false;
-
-    m.name = filename;
-    while (std::getline(file, line))
-    {
-        std::strstream ss;
-        std::string type;
-
-        ss << line;
-        ss >> type;
-        if (type == "#")
-        {
-            // comment
-            continue;
-        }
-        else if (type == "v")
-        {
-            // vertex
-            Vec4 v;
-            ss >> v.x >> v.y >> v.z;
-            vertexes.push_back(v);
-        }
-        else if (type == "f")
-        {
-            // TODO: store vt and vn values
-
-            // face
-            // can be:
-            // - int
-            // - int/int
-            // - int/int/int
-            //  int//int
-            std::string fs;
-            int v_[3];
-            //int vt_[3];
-            //int vn_[3];
-            for (int i = 0; i < 3; ++i)
-            {
-                ss >> fs;
-                std::strstream ssf;
-                ssf << fs;
-                std::string sv, svt, svn;
-                std::getline(ssf, sv, '/');
-                std::getline(ssf, svt, '/');
-                std::getline(ssf, svn, '/');
-                // they could be negative..
-                int v = std::stoi(sv);
-                v = v >= 0 ? v : vertexes.size() + v;
-                v_[i] = v;
-                try
-                {
-                    int vt = std::stoi(svt);
-                    //vt_[i] = vt;
-                }
-                catch (const std::invalid_argument&) {}
-                try
-                {
-                    int vn = std::stoi(svn);
-                    //vn_[i] = vn;
-                }
-                catch (const std::invalid_argument& e) {}
-            }
-
-            m.tris.emplace_back(vertexes.at(v_[0] - 1), vertexes.at(v_[1] - 1), vertexes.at(v_[2] - 1));
-        }
-        else if (type == "vt")
-        {
-            // vertex texture
-        }
-        else if (type == "vn")
-        {
-            // vertex normal
-        }
-        else if (type == "vp")
-        {
-            // vertex parameter
-        }
-        else if (type == "l")
-        {
-            // line element
-        }
-        else if (type == "s")
-        {
-            // smooth shading
-        }
-        else if (type == "o")
-        {
-            ss >> m.name;
-        }
-        else if (type == "g")
-        {
-            // group name
-        }
-    }
-
-    file.close();
-    vertexes.clear();
-    _meshes.push_back(m);
-
-    return true;
+    _meshes.push_back(mesh);
 }
 
 void Engine::addLight(const Light& light)
@@ -511,200 +407,9 @@ NEXT:
     }
 }
 
-void Engine::fillTriangle2(const Triangle& triangle) const noexcept
-{
-    // TODO: Parallel implementation and color interpolation
-    int x1 = static_cast<int>(std::round(triangle.a.x));
-    int y1 = static_cast<int>(std::round(triangle.a.y));
-    float z1 = triangle.a.z;
-    color_t c1 = triangle.a.col;
-    int x2 = static_cast<int>(std::round(triangle.b.x));
-    int y2 = static_cast<int>(std::round(triangle.b.y));
-    float z2 = triangle.b.z;
-    color_t c2 = triangle.b.col;
-    int x3 = static_cast<int>(std::round(triangle.c.x));
-    int y3 = static_cast<int>(std::round(triangle.c.y));
-    float z3 = triangle.c.z;
-    color_t c3 = triangle.c.col;
-
-    // Illumination (flat shading)
-    // TODO if illumination off should just interpolate vertex color
-    //      if flat shading interpolate with the flat shading light value
-    //      if gouraud interpolate vertex colors with light values
-    color_t c = triangle.getColor();
-    if (illuminationOn == 0) {
-        c.r = 255; c.g = 255; c.b = 255; c.a = 255;
-        _screen->setDrawColor(c);
-    }
-    else if (illuminationOn == 1) {
-        // blending lights (average)
-        unsigned int r = 0;
-        unsigned int g = 0;
-        unsigned int b = 0;
-        unsigned int a = 0;
-        for (const auto& light : _lights)
-        {
-            color_t col = light.flatShading(triangle.faceNormal_);
-            r += col.r;
-            g += col.g;
-            b += col.b;
-            a += col.a;
-        }
-
-        c.g = g / _lightCounts;
-        c.b = b / _lightCounts;
-        c.r = r / _lightCounts;
-        c.a = a / _lightCounts;
-        _screen->setDrawColor(c);
-    }
-    //else if (illuminationOn == 2) {
-    //    // TODO
-    //}
-
-    // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
-    if (y1 > y2) {
-        std::swap(y1, y2);
-        std::swap(x1, x2);
-        std::swap(z1, z2);
-        std::swap(c1, c2);
-    }
-    if (y1 > y3) {
-        std::swap(y1, y3);
-        std::swap(x1, x3);
-        std::swap(z1, z3);
-        std::swap(c1, c3);
-    }
-    if (y2 > y3) {
-        std::swap(y2, y3);
-        std::swap(x2, x3);
-        std::swap(z2, z3);
-        std::swap(c2, c3);
-    }
-
-
-    int dx1 = x2 - x1;
-    int dy1 = y2 - y1;
-    int sx1 = x1 <= x2 ? 1 : -1;
-    int sy1 = y1 <= y2 ? 1 : -1; // always 1 as it has been swapped.
-    assert(sy1 == 1);
-    int err1 = dx1 + dy1;
-    //const int e21 = err << 1;
-
-    const int dx2 = x3 - x1;
-    const int dy2 = y3 - y1;
-    const int sx2 = x1 <= x3 ? 1 : -1;
-    const int sy2 = y1 <= y3 ? 1 : -1; // always 1 as it has been swapped;
-    assert(sy2 == 1);
-    int err2 = dx2 + dy2;
-    //const int e22 = err << 1;
-    bool l1yChanged = false;
-    bool l2yChanged = false;
-    // top half
-    int tx1 = x1;
-    int tx2 = x1;
-    int ty = y1;
-
-    float t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
-    float t1 = 0.0f;
-    float t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
-    float t2 = 0.0f;
-    // todo, remove these and do in integer instead.
-    float l1_step = dx1 / static_cast<float>(dy1);
-    float l2_step = dx2 / static_cast<float>(dy2);
-
-    // Top-half triangle
-    for (; ty < y2; ty++) {
-        tx1 = x1 + static_cast<int>(std::round(l1_step * (ty-y1)));
-        tx2 = x1 + static_cast<int>(std::round(l2_step * (ty-y1)));
-
-        t1 = t1step * (ty-y1);
-        t2 = t2step * (ty-y1);
-        color_t tc1 = color_lerpRGB(c1, c2, t1);
-        color_t tc2 = color_lerpRGB(c1, c3, t2);
-
-        draw_hline(tx1, tx2, ty, tc1, tc2);
-    }
-
-    //// 2nd half
-    dy1 = y3 - y2;
-    dx1 = x3 - x2;
-    sx1 = x2 <= x3 ? 1 : -1;
-    t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
-    t1 = 0.0f;
-    t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
-    t2 = 0.0f;
-    
-    if (dy1 > 0.0f) {
-        l1_step = dx1 / static_cast<float>(dy1);
-        for (ty = y2; ty <= y3; ty++)
-        {
-            tx1 = x2 + static_cast<int>(std::round(l1_step * (ty-y2)));
-            tx2 = x1 + static_cast<int>(std::round(l2_step * (ty-y1)));
-
-            t1 = t1step * (ty-y2);
-            t2 = t2step * (ty-y1);
-            color_t tc1 = color_lerpRGB(c2, c3, t1);
-            color_t tc2 = color_lerpRGB(c1, c3, t2);
-
-            draw_hline(tx1, tx2, ty, tc1, tc2);
-        }
-    }
-    else {
-        // horizontal line
-        draw_hline(x2, x3, y3, c2, c3);
-    }
-
-    //_screen->drawPixel(x1, y1, c1); // is it ok?
-    //while (ty1 < y2 && tx1 != x2 && tx2 != x3)
-    //{
-    //    l1yChanged = false;
-    //    while (!l1yChanged && tx1 != x2)
-    //    {
-    //        const int e21 = err1 << 1;
-    //        if (e21 >= dy1) {
-    //            err1 += dy1;
-    //            tx1 += sx1;
-    //        }
-
-    //        if (e21 <= dx1) {
-    //            err1 += dx1;
-    //            ty1++;
-    //            l1yChanged = true;
-    //        }
-    //    }
-
-    //    l2yChanged = false;
-    //    while (!l2yChanged && tx2 != x3)
-    //    {
-    //        const int e22 = err2 << 1;
-    //        if (e22 >= dy2) {
-    //            err2 += dy2;
-    //            tx2 += sx2;
-    //        }
-
-    //        if (e22 <= dx2) {
-    //            err2 += dx2;
-    //            ty2++;
-    //            l2yChanged = true;
-    //        }
-    //    }
-
-    //    // interpolate the color of the line1 and line2 (tc1, tc2)
-    //    t1 += t1step;
-    //    t2 += t2step;
-    //    color_t tc1 = color_lerpRGB(c1, c2, t1);
-    //    color_t tc2 = color_lerpRGB(c1, c3, t2);
-    //    assert(ty1 == ty2);
-    //    draw_hline(tx1, tx2, ty1, tc1, tc2);
-    //}
-
-    // Bottom-half triangle
-
-}
-
 void Engine::fillTriangle3(const Triangle& triangle) const noexcept
 {
-    // Pineda alogorithm, traversal bounding box, not incremental edge function
+    // Pineda algorithm, traversal bounding box, not incremental edge function
     // Not efficient implementation.
 
     // It is doing already the back-face culling if drawing only when area is positive
@@ -715,6 +420,7 @@ void Engine::fillTriangle3(const Triangle& triangle) const noexcept
     // Edge function
     // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
     //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
+    // TODO: make it inline
     const auto edge = [](const int x1, const int y1, const int x2, const int y2, const int x, const int y) noexcept {
         return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
     };
@@ -735,35 +441,40 @@ void Engine::fillTriangle3(const Triangle& triangle) const noexcept
     float z3 = triangle.c.z;
     color_t c3 = triangle.c.col;
 
+    int area = edge(x1, y1, x2, y2, x3, y3);
+    if (area == 0)
+        return;
+    
     // bounding box (no clipping)
     int ymin = std::min(y1, std::min(y2, y3));
     int ymax = std::max(y1, std::max(y2, y3));
     int xmin = std::min(x1, std::min(x2, x3));
     int xmax = std::max(x1, std::max(x2, x3));
-    int area = edge(x1, y1, x2, y2, x3, y3);
     int sa = area > 0 ? +1 : -1;
 
     // when area is negative is a back face, "hidden face" removed already
     // by the back-face culling. Using != 0 so i can see the back of the triangle if wanted.
     // the area == 0 is just a flat triangle, a line, no area and it is like a line color interpolation
-    if (area != 0) {
-        for (int y = ymin; y <= ymax; y++) {
-            for (int x = xmin; x <= xmax; x++) {
-                int e1 = edge(x1, y1, x2, y2, x, y); // c3
-                int e2 = edge(x2, y2, x3, y3, x, y); // c1
-                int e3 = edge(x3, y3, x1, y1, x, y); // c2
+    for (int y = ymin; y <= ymax; y++)
+    {
+        for (int x = xmin; x <= xmax; x++) 
+        {
+            const int e1 = edge(x1, y1, x2, y2, x, y); // c3
+            const int e2 = edge(x2, y2, x3, y3, x, y); // c1
+            const int e3 = edge(x3, y3, x1, y1, x, y); // c2
 
-                if (e1 * sa >= 0 && e2 * sa >= 0 && e3 * sa >= 0) {
-                    // inside the triangle
-                    color_t c;
-                    c.r = (e1 * c3.r + e2 * c1.r + e3 * c2.r) / area;
-                    c.g = (e1 * c3.g + e2 * c1.g + e3 * c2.g) / area;
-                    c.b = (e1 * c3.b + e2 * c1.b + e3 * c2.b) / area;
-                    _screen->drawPixel(x, y, c);
-                }
+            if (e1 * sa >= 0 && e2 * sa >= 0 && e3 * sa >= 0)
+            {
+                // inside the triangle
+                color_t c;
+                c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
+                c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
+                c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);
+                _screen->drawPixel(x, y, c);
             }
         }
     }
+   
 }
 
 inline void Engine::sortZ() noexcept
@@ -784,19 +495,25 @@ void Engine::raster() noexcept
     for (const auto& t : _trianglesToRaster)
     {
         std::list<Triangle> listTriangles;
+        // TODO: this can be done with pineda algorithm instead,
+        //       producing less shape morphing and improving performances
         _clipping->clipScreen(t, listTriangles);
 
-        // Draw the transformed, viewed, clipped, projected, sorted, clipped triangles
         for (auto& t : listTriangles)
         {
-            if (filled >= 1) {
+            if (filled >= 1)
+            {
+                // fill triangle
                 fillTriangle3(t);
-                if (filled == 2) {
+                if (filled == 2)
+                {
+                    // wireframe debug
                     t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
                     drawTriangle(t);
                 }
             }
             else {
+                // wireframe
                 drawTriangle(t);
             }
         }
@@ -848,12 +565,9 @@ void Engine::draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) con
     _screen->drawPixel(x1, y, c);
     for (int x = x1 + 1; x < x2; x++)
     {
+        // TODO: color lerp can be linearized
         t += tstep;
         c = color_lerpRGB(c1, c2, t);
-        //c.r = static_cast<uint8_t>(std::round(Engine::lerp(c1.r, c2.r, t)));
-        //c.g = static_cast<uint8_t>(std::round(Engine::lerp(c1.g, c2.g, t)));
-        //c.b = static_cast<uint8_t>(std::round(Engine::lerp(c1.b, c2.b, t)));
-        //c.a = 255;
         _screen->drawPixel(x, y, c);
     }
     _screen->drawPixel(x2, y, c2);
@@ -933,6 +647,7 @@ void Engine::drawLine(const int x1, const int y1, const int x2, const int y2, co
             y += sy;
         }
         
+        // TODO: the color step could be linearized
         t += tstep;
         c = color_lerpRGB(c1, c2, t);
     }

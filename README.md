@@ -5,7 +5,7 @@ Three-D-angles is a 3D triangles engine built from scratch.
 It will feature the following algorithms:
 
 - [x] Line drawing (bresenham)
-- [/] Triangle filling (bresenham)
+- [/] Triangle filling (bresenham, pineda)
 - [/] Triangle clipping
 - [x] Transformations
 - [/] Camera positioning
@@ -15,19 +15,16 @@ It will feature the following algorithms:
 - [ ] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
-- Left-hand rules
+- [ ] Left-hand rules
 - Quaternions
 
 The implementation will be based on :
 
-- [x] compiler based (can be using whatever instruction the compiler decide)
-- [ ] SIMD instructions (Intel)
-- [ ] GPU (CUDA)
+- [x] compiler based
+- [ ] SIMD instructions
+- [ ] GPU
 
 So it would be possible to benchmark those too.
-
-It might be later on implemented an analougue 3D engine feature using DirectX/OpenGL/Vulkan for
-a comparision/benchmark on the algorithms implemented here.
 
 # Note on the implementation
 
@@ -40,13 +37,13 @@ a comparision/benchmark on the algorithms implemented here.
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
 ## SIMD
-- [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations
+- [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations (vectorization)
 
 ## CUDA
 This might require to redo all the `engine` into `cudaEngine`:
 
 - sorting
-- vectors, matrix and triangle storing and operations 
+- vectors, matrix and triangle storing and operations
 - screen and surface, textures
 - operations in the pipeline and how organize data might be required to reorder it and increment parallelism.
 
