@@ -223,6 +223,7 @@ int main(int argc, char* argv[])
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.5f;
+        //alpha = alpha = 3.13700008;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 

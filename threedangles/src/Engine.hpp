@@ -82,6 +82,7 @@ private:
      */
     void fillTriangle(const Triangle& triangle) const noexcept;
     void fillTriangle2(const Triangle& triangle) const noexcept;
+    void fillTriangle3(const Triangle& triangle) const noexcept;
 
     // TODO color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;

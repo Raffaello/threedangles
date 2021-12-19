@@ -611,14 +611,14 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     // todo, remove these and do in integer instead.
     float l1_step = dx1 / static_cast<float>(dy1);
     float l2_step = dx2 / static_cast<float>(dy2);
-    
-    // Top-half triangle
-    for (int i = 0; ty < y2; ty++, i++) {
-        tx1 = x1 + static_cast<int>(std::round(l1_step * i));
-        tx2 = x1 + static_cast<int>(std::round(l2_step * i));
 
-        t1 = t1step * i;
-        t2 = t2step * i;
+    // Top-half triangle
+    for (; ty < y2; ty++) {
+        tx1 = x1 + static_cast<int>(std::round(l1_step * (ty-y1)));
+        tx2 = x1 + static_cast<int>(std::round(l2_step * (ty-y1)));
+
+        t1 = t1step * (ty-y1);
+        t2 = t2step * (ty-y1);
         color_t tc1 = color_lerpRGB(c1, c2, t1);
         color_t tc2 = color_lerpRGB(c1, c3, t2);
 
@@ -653,11 +653,6 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
         // horizontal line
         draw_hline(x2, x3, y3, c2, c3);
     }
-
-    
-
-
-
 
     //_screen->drawPixel(x1, y1, c1); // is it ok?
     //while (ty1 < y2 && tx1 != x2 && tx2 != x3)
@@ -707,6 +702,83 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
 
 }
 
+void Engine::fillTriangle3(const Triangle& triangle) const noexcept
+{
+    // Pined alogorithm, traversal bounding box, not incremental edge function
+    // Not efficient implementation.
+
+    // It is doing already the back-face culling if drawing only when area is positive
+    // this can be useful to avoid some computation.. but at the same time
+    // the faceback culling is useful to reduce the number of triangle to
+    // process
+
+    // Edge function
+    // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
+    //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
+    const auto edge = [](const int x1, const int y1, const int x2, const int y2, const int x, const int y) noexcept {
+        return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
+    };
+
+    // V1
+    int x1 = static_cast<int>(std::round(triangle.a.x));
+    int y1 = static_cast<int>(std::round(triangle.a.y));
+    float z1 = triangle.a.z;
+    color_t c1 = triangle.a.col;
+    // V2
+    int x2 = static_cast<int>(std::round(triangle.b.x));
+    int y2 = static_cast<int>(std::round(triangle.b.y));
+    float z2 = triangle.b.z;
+    color_t c2 = triangle.b.col;
+    // V3
+    int x3 = static_cast<int>(std::round(triangle.c.x));
+    int y3 = static_cast<int>(std::round(triangle.c.y));
+    float z3 = triangle.c.z;
+    color_t c3 = triangle.c.col;
+
+    // bounding box (no clipping)
+    int ymin = std::min(y1, std::min(y2, y3));
+    int ymax = std::max(y1, std::max(y2, y3));
+    int xmin = std::min(x1, std::min(x2, x3));
+    int xmax = std::max(x1, std::max(x2, x3));
+    int area = edge(x1, y1, x2, y2, x3, y3);
+    int sa = area > 0 ? +1 : -1;
+
+    // when area is negative is a back face, "hidden face" removed already
+    // by the back-face culling. Using != 0 so i can see the back of the triangle if wanted.
+    // the area == 0 is just a flat triangle, a line, no area and it is like a line color interpolation
+    if (area != 0) {
+        for (int y = ymin; y <= ymax; y++) {
+            for (int x = xmin; x <= xmax; x++) {
+                int e1 = edge(x1, y1, x2, y2, x, y); // c3
+                int e2 = edge(x2, y2, x3, y3, x, y); // c1
+                int e3 = edge(x3, y3, x1, y1, x, y); // c2
+
+                if (e1 * sa >= 0 && e2 * sa >= 0 && e3 * sa >= 0) {
+                    // inside the triangle
+                    color_t c;
+                    c.r = (e1 * c3.r + e2 * c1.r + e3 * c2.r) / area;
+                    c.g = (e1 * c3.g + e2 * c1.g + e3 * c2.g) / area;
+                    c.b = (e1 * c3.b + e2 * c1.b + e3 * c2.b) / area;
+                    _screen->drawPixel(x, y, c);
+                }
+            }
+        }
+    }
+    else /*if (area == 0)*/ {
+        // horizontal line
+        color_t c1_;
+        color_t c2_;
+        if (x1 == xmin) c1_ = c1;
+        else if (x2 == xmin) c1_ = c2;
+        else if (x3 == xmin) c1_ = c3;
+        if (x1 == xmax) c2_ = c1;
+        else if (x2 == xmax) c2_ = c2;
+        else if (x3 == xmax) c2_ = c3;
+
+        draw_hline(xmin, xmax, ymax,c1,c2);
+    }
+}
+
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
@@ -731,7 +803,7 @@ void Engine::raster() noexcept
         for (auto& t : listTriangles)
         {
             if (filled >= 1) {
-                fillTriangle2(t);
+                fillTriangle3(t);
                 if (filled == 2) {
                     t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
                     drawTriangle(t);
