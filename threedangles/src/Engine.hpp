@@ -11,6 +11,7 @@
 #include <Cam.hpp>
 #include <Light.hpp>
 #include <Clipping.hpp>
+#include <Rasterizer.hpp>
 
 class Engine
 {
@@ -46,6 +47,7 @@ public:
 private:
     std::shared_ptr<Screen> _screen;
     std::shared_ptr<Clipping> _clipping;
+    std::shared_ptr<Rasterizer> _rasterizer;
     // move depthBuffer to screen?
     //std::shared_ptr<float[]> _depthBuffer;
 
@@ -58,33 +60,6 @@ private:
     */
     void sortZ() noexcept;
     void raster() noexcept;
-
-    void draw_hline(int x1, int x2, const int y) const noexcept;
-    void draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept;
-    void draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) const noexcept;
-    /**
-     * @brief Triangle is already normalized by w. Only x,y coord will be used
-     * @param triangle
-    */
-    void drawTriangle(const Triangle& triangle) const noexcept;
-
-    /** @brief Fill a triangle - Bresenham method
-     *         Triangle is already normalized by w. Only x,y coord will be usd
-     * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
-     * @see https://www.avrfreaks.net/sites/default/files/triangles.c
-     */
-    void fillTriangle(const Triangle& triangle) const noexcept;
-    /**
-     * @brief Fill a triangle - Pineda method
-     *        Triangle is already normalized by w.
-     * @link  "doc/A Parallel Algorithm for Polygon Rasterization.pdf"
-    */
-    void fillTriangle3(const Triangle& triangle) const noexcept;
-
-    // TODO color vertex interpolation? let see later...
-    void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
-    void drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) const noexcept;
-    void drawLine(const int x1, const int y1, const int x2, const int y2, const color_t& c1, const color_t c2) const noexcept;
 
     Mat4 _matProjection;
     Mat4 _matWorld;

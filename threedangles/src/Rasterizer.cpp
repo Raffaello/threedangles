@@ -139,7 +139,7 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
     }
 }
 
-inline void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
+void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 {
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
@@ -156,7 +156,7 @@ inline void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
     drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
-inline void Rasterizer::fillTriangle(const Triangle& triangle) const noexcept
+inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
 {
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
@@ -165,25 +165,26 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle) const noexcept
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
+    const uint8_t lightCounts = static_cast<uint8_t>(lights.size());
     // Illumination (flat shading)
     color_t c;
-    if (illuminationOn == 0) {
+    if (illuminationType == 0) {
         c.r = 255; c.g = 255; c.b = 255; c.a = 255;
         _screen->setDrawColor(c);
     }
-    else if (illuminationOn == 1) {
+    else if (illuminationType == 1) {
         // blending lights (average)
         int r = 0; int g = 0; int b = 0; int a = 0;
-        for (const auto& light : _lights)
+        for (const auto& light : lights)
         {
             color_t col = light.flatShading(triangle.faceNormal_);
             r += col.r; g += col.g; b += col.b; a += col.a;
         }
 
-        c.g = g / _lightCounts;
-        c.b = b / _lightCounts;
-        c.r = r / _lightCounts;
-        c.a = a / _lightCounts;
+        c.g = g / lightCounts;
+        c.b = b / lightCounts;
+        c.r = r / lightCounts;
+        c.a = a / lightCounts;
 
     }
     //else if (illuminationOn == 2) {
