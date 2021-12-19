@@ -582,7 +582,7 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     }
 
 
-    int dx1 = abs(x2 - x1);
+    int dx1 = x2 - x1;
     int dy1 = y2 - y1;
     int sx1 = x1 <= x2 ? 1 : -1;
     int sy1 = y1 <= y2 ? 1 : -1; // always 1 as it has been swapped.
@@ -590,9 +590,9 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     int err1 = dx1 + dy1;
     //const int e21 = err << 1;
 
-    const int dx2 = abs(x3 - x1);
+    const int dx2 = x3 - x1;
     const int dy2 = y3 - y1;
-    int sx2 = x1 <= x3 ? 1 : -1;
+    const int sx2 = x1 <= x3 ? 1 : -1;
     const int sy2 = y1 <= y3 ? 1 : -1; // always 1 as it has been swapped;
     assert(sy2 == 1);
     int err2 = dx2 + dy2;
@@ -614,8 +614,8 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
     
     // Top-half triangle
     for (int i = 0; ty < y2; ty++, i++) {
-        tx1 = x1 + sx1*static_cast<int>(std::round(l1_step * i));
-        tx2 = x2 + sx2*static_cast<int>(std::round(l2_step * i));
+        tx1 = x1 + static_cast<int>(std::round(l1_step * i));
+        tx2 = x1 + static_cast<int>(std::round(l2_step * i));
 
         t1 = t1step * i;
         t2 = t2step * i;
@@ -627,27 +627,27 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
 
     //// 2nd half
     dy1 = y3 - y2;
-    dx1 = abs(x3 - x2);
+    dx1 = x3 - x2;
     sx1 = x2 <= x3 ? 1 : -1;
     t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
     t1 = 0.0f;
     t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
     t2 = 0.0f;
-    l1_step = dx1 / static_cast<float>(dy1);
-    l2_step = dx2 / static_cast<float>(dy2);
+    
     if (dy1 > 0.0f) {
-        /*for (int i = 0, ty = y2; ty <= y3; ty++)
+        l1_step = dx1 / static_cast<float>(dy1);
+        for (ty = y2; ty <= y3; ty++)
         {
-            tx1 = x1 + sx1*static_cast<int>(std::round(l1_step * i));
-            tx2 = x2 + sx2*static_cast<int>(std::round(l2_step * i));
+            tx1 = x2 + static_cast<int>(std::round(l1_step * (ty-y2)));
+            tx2 = x1 + static_cast<int>(std::round(l2_step * (ty-y1)));
 
-            t1 = t1step * i;
-            t2 = t2step * i;
-            color_t tc1 = color_lerpRGB(c1, c2, t1);
+            t1 = t1step * (ty-y2);
+            t2 = t2step * (ty-y1);
+            color_t tc1 = color_lerpRGB(c2, c3, t1);
             color_t tc2 = color_lerpRGB(c1, c3, t2);
 
             draw_hline(tx1, tx2, ty, tc1, tc2);
-        }*/
+        }
     }
     else {
         // horizontal line
