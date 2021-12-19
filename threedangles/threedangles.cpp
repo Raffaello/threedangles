@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!engine->addMeshFromOBJFile("plain_triangle.obj")) {
+    if (!engine->addMeshFromOBJFile("plain_cube.obj")) {
         cerr << "Can't load OBJ file";
         return -2;
     }

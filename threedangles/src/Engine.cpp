@@ -704,7 +704,7 @@ void Engine::fillTriangle2(const Triangle& triangle) const noexcept
 
 void Engine::fillTriangle3(const Triangle& triangle) const noexcept
 {
-    // Pined alogorithm, traversal bounding box, not incremental edge function
+    // Pineda alogorithm, traversal bounding box, not incremental edge function
     // Not efficient implementation.
 
     // It is doing already the back-face culling if drawing only when area is positive
@@ -763,19 +763,6 @@ void Engine::fillTriangle3(const Triangle& triangle) const noexcept
                 }
             }
         }
-    }
-    else /*if (area == 0)*/ {
-        // horizontal line
-        color_t c1_;
-        color_t c2_;
-        if (x1 == xmin) c1_ = c1;
-        else if (x2 == xmin) c1_ = c2;
-        else if (x3 == xmin) c1_ = c3;
-        if (x1 == xmax) c2_ = c1;
-        else if (x2 == xmax) c2_ = c2;
-        else if (x3 == xmax) c2_ = c3;
-
-        draw_hline(xmin, xmax, ymax,c1,c2);
     }
 }
 
