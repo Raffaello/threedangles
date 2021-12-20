@@ -28,7 +28,7 @@ public:
      * @param triangle
     */
     void drawTriangle(const Triangle& triangle) const noexcept;
-    void drawTriangle(const Triangle& triangle, Color& c) const noexcept;
+    void drawTriangle(const Triangle& triangle, const Color& c) const noexcept;
 
 
     /** @brief Fill a triangle - Bresenham method

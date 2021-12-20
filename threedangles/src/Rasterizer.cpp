@@ -145,7 +145,7 @@ void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
     drawTriangle(triangle, c);
 }
 
-void Rasterizer::drawTriangle(const Triangle& triangle, Color& c) const noexcept
+void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const noexcept
 {
     int x1 = static_cast<int>(std::round(triangle.a.v.x));
     int y1 = static_cast<int>(std::round(triangle.a.v.y));
