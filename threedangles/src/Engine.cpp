@@ -1,11 +1,7 @@
 #include <Engine.hpp>
-#include <cmath>
 #include <sdl/Screen_SDL.hpp>
-
-#include <vector>
 #include <algorithm>
 #include <list>
-#include <cassert>
 
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {

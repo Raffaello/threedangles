@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("plain_triangle.obj");
+    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
