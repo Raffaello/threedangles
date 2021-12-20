@@ -10,18 +10,16 @@ Light::Light(const Vec4& direction, const Color& color) :
 
 Color Light::flatShading(const Vec4& triangleFaceNormal) const noexcept
 {
-    float dp = triangleFaceNormal.dotProd(direction_normalized);
-    Color c;
-    
-    c.r = static_cast<uint8_t>(std::clamp(std::round(dp * col.r), 0.0f, 255.0f));
-    c.g = static_cast<uint8_t>(std::clamp(std::round(dp * col.g), 0.0f, 255.0f));
-    c.b = static_cast<uint8_t>(std::clamp(std::round(dp * col.b), 0.0f, 255.0f));
-    //c.a = 255;
+    const float dp = triangleFaceNormal.dotProd(direction_normalized);
 
-    return c;
+    return Color(
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.r), 0.0f, 255.0f)),
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.g), 0.0f, 255.0f)),
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.b), 0.0f, 255.0f))
+    );
 }
 
-Color Light::gouraudShading(const Triangle& triangle) const noexcept
+Color Light::gouraudShading(const Triangle& triangle, const int w1, const int w2, const int w3, const int wn) const noexcept
 {
-    return {};
+    return Color();
 }

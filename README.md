@@ -13,6 +13,7 @@ It will feature the following algorithms:
 - [ ] Textures
 - [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
+- [ ] Vertex Normals
 - [ ] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
@@ -24,8 +25,6 @@ The implementation will be based on :
 - [x] compiler based
 - [ ] SIMD instructions
 - [ ] GPU
-
-So it would be possible to benchmark those too.
 
 # Note on the implementation
 
@@ -56,5 +55,3 @@ This might require to redo all the `engine` into `cudaEngine`:
 It looks like compilers are already using some SIMD from default C/C++ code.
 
 - [ ] add specific compiler options on CMAKE configuration, to enhanche performances.
-
-

@@ -36,7 +36,7 @@ public:
      * @see http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
      * @see https://www.avrfreaks.net/sites/default/files/triangles.c
      */
-    void fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept;
+    void fillTriangleNoInterpolation(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept;
     
     /**
      * @brief Fill a triangle - Pineda method

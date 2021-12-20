@@ -29,7 +29,14 @@ public:
     
     // TODO add mesh position in the world. ?
 
+    // Store the list of vertexes and the faces like the OBJ file model.
+    // from this point can derive the adiajency list for each vertex related to faces.
 
+    
+    
+    
+    
+    // A mesh instead of being composed of triangle should be composed by vertexes to be processed?
 
     // TODO replace with vertex buffer?...
     std::vector<Triangle> tris; // ?

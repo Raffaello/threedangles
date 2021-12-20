@@ -23,6 +23,9 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         if (!showHiddenVertexes && norm_dp >= 0.0f)
             continue;
 
+        // TODO: Vertex normals
+
+
         // World Space -> View Space
         triTransformed *= matView;
         // Clipping section 

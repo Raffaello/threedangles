@@ -160,7 +160,7 @@ void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const no
     drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
-void Rasterizer::fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
+void Rasterizer::fillTriangleNoInterpolation(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
 {
     int x1 = static_cast<int>(std::round(triangle.a.v.x));
     int y1 = static_cast<int>(std::round(triangle.a.v.y));
@@ -472,6 +472,8 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     float z3 = triangle.c.v.z;
     Color c3 = triangle.c.col;
 
+    // TODO: move to Triangle and skip to reach here? 
+    //       what about clipping before rasterization process?
     int area = edge(x1, y1, x2, y2, x3, y3);
     if (area == 0)
         return;
@@ -527,7 +529,6 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             {
                 // inside the triangle
                 if (illuminationType == 0) {
-                    //Color c;
                     c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
                     c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
                     c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);
@@ -535,9 +536,20 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 else if (illuminationType == 1) {
                     // using the precomputed Color C, doing nothing
                 }
-                else if (illuminationType == 2) {
-                    // TODO Gouraud
+                else if (illuminationType == 2)
+                {
+                    // TODO Gouraud 
+                    // (emulating at the moment flat-shading, but computed per pixel, very slow)
+                    // the performances will be similar when having the right colors.
+                    Color c1 = lights[0].flatShading(triangle.faceNormal_);
+                    Color c2 = lights[0].flatShading(triangle.faceNormal_);
+                    Color c3 = lights[0].flatShading(triangle.faceNormal_);
+
+                    c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
+                    c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
+                    c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);
                 }
+
                 _screen->drawPixel(x, y, c);
             }
         }

@@ -13,5 +13,5 @@ public:
     Color col;
 
     Color flatShading(const Vec4& triangleFaceNormal) const noexcept;
-    Color gouraudShading(const Triangle& triangle) const noexcept;
+    Color gouraudShading(const Triangle& triangle, const int w1, const int w2, const int w3, const int wn) const noexcept;
 };

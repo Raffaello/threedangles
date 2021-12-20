@@ -24,6 +24,7 @@ public:
     void setColor(const Triangle& that) noexcept;
     Color getColor() const noexcept;
 
+    // Used for back-face culling and flat-shading
     Vec4 faceNormal() const noexcept;
     Vec4 faceNormal_;
 };
