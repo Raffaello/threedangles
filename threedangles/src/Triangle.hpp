@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Vec4.hpp>
 #include <Vertex.hpp>
 #include <Mat4.hpp>
 #include <cstdint>
@@ -10,7 +9,6 @@ class Triangle
 {
 public:
     Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_);
-    Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_);
     Triangle() = default;
     ~Triangle() = default;
 

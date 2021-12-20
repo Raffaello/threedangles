@@ -6,13 +6,6 @@ Triangle::Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_) : a(a_)
 {
 }
 
-Triangle::Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_)
-{
-    a.v = a_;
-    b.v = b_;
-    c.v = c_;
-}
-
 Triangle Triangle::operator*(const Mat4& m) const noexcept
 {
     Triangle t(*this);

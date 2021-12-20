@@ -41,7 +41,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 {
     std::ifstream file(filename, std::ifstream::in);
     std::string line;
-    std::vector<Vec4> vertexes;
+    std::vector<Vertex> vertexes;
 
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
@@ -64,8 +64,8 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         else if (type == "v")
         {
             // vertex
-            Vec4 v;
-            ss >> v.x >> v.y >> v.z;
+            Vertex v;
+            ss >> v.v.x >> v.v.y >> v.v.z;
             vertexes.push_back(v);
         }
         else if (type == "f")
