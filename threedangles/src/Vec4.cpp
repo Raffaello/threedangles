@@ -18,6 +18,13 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
     // but anyway it is compiled already with SSE even the CPU implementation due
     // to compiler optimization
     // probably can just be removed then.
+    // ----------------------------------------------------------------------------
+    // To do it properly:
+    // these routines should be done as separated shared objects:
+    // load them dynamically based on CPUID instruction set detection.
+    // Using a plug-in interface architecture for them, sharing same interface.
+    // So there will be a vec4cpu.dll (so), vec4sse.dll (so), etc..
+    // the engine will load the required dll (so) based on cpuid info.
 #if 0
     switch (impl)
     {
