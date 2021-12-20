@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Vec4.hpp>
 #include <Vertex.hpp>
 #include <Mat4.hpp>
 #include <cstdint>
