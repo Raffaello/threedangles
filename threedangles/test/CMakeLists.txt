@@ -51,11 +51,27 @@ macro_test(
 )
 
 macro_test(
+        EXE TestColor
+        FILE "TestColor.cpp"
+        FILES
+    )
+
+macro_test(
+        EXE TestVertex
+        FILE "TestVertex.cpp"
+        FILES
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
+)
+
+
+macro_test(
         EXE TestTriangle
         FILE "TestTriangle.cpp"
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
 )
 

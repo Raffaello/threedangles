@@ -95,18 +95,18 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
     int nOutsidePointCount = 0;
 
     // Get signed distance of each point in triangle to plane
-    if (dist(in.a) >= 0)
-        inside_points[nInsidePointCount++] = &in.a;
+    if (dist(in.a.v) >= 0)
+        inside_points[nInsidePointCount++] = &in.a.v;
     else
-        outside_points[nOutsidePointCount++] = &in.a;
-    if (dist(in.b) >= 0)
-        inside_points[nInsidePointCount++] = &in.b;
+        outside_points[nOutsidePointCount++] = &in.a.v;
+    if (dist(in.b.v) >= 0)
+        inside_points[nInsidePointCount++] = &in.b.v;
     else
-        outside_points[nOutsidePointCount++] = &in.b;
-    if (dist(in.c) >= 0)
-        inside_points[nInsidePointCount++] = &in.c;
+        outside_points[nOutsidePointCount++] = &in.b.v;
+    if (dist(in.c.v) >= 0)
+        inside_points[nInsidePointCount++] = &in.c.v;
     else
-        outside_points[nOutsidePointCount++] = &in.c;
+        outside_points[nOutsidePointCount++] = &in.c.v;
 
     if (nInsidePointCount == 0)
     {
@@ -135,12 +135,12 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
-        out_tri1.a = *inside_points[0];
+        out_tri1.a.v = *inside_points[0];
 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
-        out_tri1.b = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
-        out_tri1.c = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[1]);
+        out_tri1.b.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[1]);
 
         return 1;
     }
@@ -160,16 +160,16 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
-        out_tri1.a = *inside_points[0];
-        out_tri1.b = *inside_points[1];
-        out_tri1.c = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
+        out_tri1.a.v = *inside_points[0];
+        out_tri1.b.v = *inside_points[1];
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
         // triangle and the plane, and the newly created point above
-        out_tri2.a = *inside_points[1];
-        out_tri2.b = out_tri1.c;
-        out_tri2.c = plane_p.intersectPlane(plane_n, *inside_points[1], *outside_points[0]);
+        out_tri2.a.v = *inside_points[1];
+        out_tri2.b.v = out_tri1.c.v;
+        out_tri2.c.v = plane_p.intersectPlane(plane_n, *inside_points[1], *outside_points[0]);
 
         return 2;
     }

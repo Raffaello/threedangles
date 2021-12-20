@@ -99,8 +99,8 @@ inline void Engine::sortZ() noexcept
         [](const Triangle& t1, const Triangle& t2)
         {
             // divsion by 3.0f can be skipped
-            const float z1 = t1.a.z + t1.b.z + t1.c.z;
-            const float z2 = t2.a.z + t2.b.z + t2.c.z;
+            const float z1 = t1.a.v.z + t1.b.v.z + t1.c.v.z;
+            const float z2 = t2.a.v.z + t2.b.v.z + t2.c.v.z;
             return z1 < z2;
         }
     );
@@ -124,8 +124,7 @@ void Engine::raster() noexcept
                 if (filled == 2)
                 {
                     // wireframe debug
-                    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    _rasterizer->drawTriangle(t);
+                    _rasterizer->drawTriangle(t, Color(255, 255, 255));
                 }
             }
             else {
