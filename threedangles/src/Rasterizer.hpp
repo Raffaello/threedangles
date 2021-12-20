@@ -42,8 +42,9 @@ public:
      * @brief Fill a triangle - Pineda method
      *        Triangle is already normalized by w.
      * @link  "doc/A Parallel Algorithm for Polygon Rasterization.pdf"
+     * THIS IS a lot slower than 'fillTriangle', need improvements
     */
-    void fillTriangle3(const Triangle& triangle) const noexcept;
+    void fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept;
 
     // TODO color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;

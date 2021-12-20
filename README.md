@@ -11,6 +11,7 @@ It will feature the following algorithms:
 - [/] Camera positioning
 - [/] Loading 3D file for objects
 - [ ] Textures
+- [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
 - [ ] Gouraud Shading
 - [ ] Phong Shading

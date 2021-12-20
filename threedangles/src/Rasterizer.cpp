@@ -160,7 +160,7 @@ void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const no
     drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
-inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
+void Rasterizer::fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
 {
     int x1 = static_cast<int>(std::round(triangle.a.v.x));
     int y1 = static_cast<int>(std::round(triangle.a.v.y));
@@ -189,11 +189,10 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
         c.b = b / lightCounts;
         c.r = r / lightCounts;
         c.a = a / lightCounts;
-
+        _screen->setDrawColor(c);
     }
     //else if (illuminationOn == 2) {
     //}
-    _screen->setDrawColor(c);
 
     // at first sort the three vertices by y-coordinate ascending so v1 is the topmost vertice
     if (y1 > y2) {
@@ -227,22 +226,6 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
     int maxx;
     int t1xp;
     int t2xp = 0;
-    /*Color c1 = triangle.a.col;
-    Color c2 = triangle.b.col;
-    Color c3 = triangle.c.col;
-    Color tc1;
-    Color tc2;
-    const float t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
-    float t1 = 0.0f;
-    const float t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
-    float t2 = 0.0f;*/
-    // interpolate the color of the line1 and line2 (tc1, tc2)
-   /* t1 += t1step;
-    t2 += t2step;
-    Color tc1 = Color::lerpRGB(c1, c2, t1);
-    Color tc2 = Color::lerpRGB(c1, c3, t2);
-    assert(ty1 == ty2);
-    draw_hline(tx1, tx2, ty1, tc1, tc2);*/
 
     if (dx1 < 0) {
         dx1 = -dx1;
@@ -455,7 +438,7 @@ NEXT:
     }
 }
 
-void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
+void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
 {
     // Pineda algorithm, traversal bounding box, not incremental edge function
     // Not efficient implementation.
@@ -493,6 +476,35 @@ void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
     if (area == 0)
         return;
 
+
+    // lights
+    const uint8_t lightCounts = static_cast<uint8_t>(lights.size());
+    // Illumination (flat shading)
+    Color c;
+    if (illuminationType == 0) {
+        //c.r = 255; c.g = 255; c.b = 255; c.a = 255;
+        //_screen->setDrawColor(c);
+    }
+    else if (illuminationType == 1) {
+        // blending lights (average)
+        int r = 0; int g = 0; int b = 0; int a = 0;
+        for (const auto& light : lights)
+        {
+            Color col = light.flatShading(triangle.faceNormal_);
+            r += col.r; g += col.g; b += col.b; a += col.a;
+        }
+
+        c.g = g / lightCounts;
+        c.b = b / lightCounts;
+        c.r = r / lightCounts;
+        c.a = a / lightCounts;
+        //_screen->setDrawColor(c);
+    }
+    //else if (illuminationOn == 2) {
+        // Gouraud
+    //}
+
+
     // bounding box (no clipping)
     int ymin = std::min(y1, std::min(y2, y3));
     int ymax = std::max(y1, std::max(y2, y3));
@@ -514,13 +526,20 @@ void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
             if (e1 * sa >= 0 && e2 * sa >= 0 && e3 * sa >= 0)
             {
                 // inside the triangle
-                Color c;
-                c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
-                c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
-                c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);
+                if (illuminationType == 0) {
+                    //Color c;
+                    c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
+                    c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
+                    c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);
+                }
+                else if (illuminationType == 1) {
+                    // using the precomputed Color C, doing nothing
+                }
+                else if (illuminationType == 2) {
+                    // TODO Gouraud
+                }
                 _screen->drawPixel(x, y, c);
             }
         }
     }
-
 }
