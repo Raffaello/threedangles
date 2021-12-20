@@ -1,6 +1,6 @@
 #pragma once
 
-#include <types.hpp>
+#include <Color.hpp>
 #include <Vec4.hpp>
 #include <Triangle.hpp>
 #include <vector>

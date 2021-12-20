@@ -49,7 +49,7 @@ void Engine::initPerspectiveProjection(const float fov, const float far, const f
     _clipping = std::make_shared<Clipping>(near, far, _screen->width, _screen->height); 
 }
 
-void Engine::processFrame(const Cam& cam, const color_t& bg_col) noexcept
+void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
 {
     _trianglesToRaster.clear();
     // Clear the screen/buffer

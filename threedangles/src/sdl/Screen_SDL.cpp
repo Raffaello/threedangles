@@ -60,7 +60,7 @@ namespace sdl
         return true;
     }
 
-    void Screen_SDL::setDrawColor(const color_t& c) noexcept
+    void Screen_SDL::setDrawColor(const Color& c) noexcept
     {
         col = SDL_MapRGBA(fmt, c.r, c.g, c.b, c.a);
     }
@@ -87,7 +87,7 @@ namespace sdl
         SDL_SetWindowTitle(window, title.c_str());
     }
 
-    void Screen_SDL::clear(const color_t& c) noexcept
+    void Screen_SDL::clear(const Color& c) noexcept
     {
         setDrawColor(c);
         SDL_FillRect(surface, nullptr, col);

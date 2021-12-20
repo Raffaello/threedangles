@@ -3,7 +3,7 @@
 #include <Vec4.hpp>
 #include <Mat4.hpp>
 #include <cstdint>
-#include <types.hpp>
+#include <Color.hpp>
 
 class Triangle
 {
@@ -24,15 +24,15 @@ public:
     // BODY: can't really set it up, unless replace the vertexes color.
     // BODY: it would have conflicts when using a vertex buffer?
     // BODY: need to resolve shared vertexes with different color
-    void setColor(const color_t& c) noexcept;
+    void setColor(const Color& c) noexcept;
     void setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha) noexcept;
     void setColor(const Triangle& that) noexcept;
     void getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
-    color_t getColor() const noexcept;
+    Color getColor() const noexcept;
 
     Vec4 faceNormal() const noexcept;
     Vec4 faceNormal_;
 private:
     // TODO move the colors to vertex
-    color_t col;
+    Color col;
 };

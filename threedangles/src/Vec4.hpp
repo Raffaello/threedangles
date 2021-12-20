@@ -1,6 +1,6 @@
 #pragma once
 
-#include <types.hpp>
+#include <Color.hpp>
 
 class Vec4
 {
@@ -48,7 +48,7 @@ public:
     float z = 0.0f;
     float w = 1.0f;
 
-    color_t col; // this should go on a "Vertex class"
+    Color col; // this should go on a "Vertex class"
 
 private:
 #if 0

@@ -51,7 +51,7 @@ Triangle Triangle::normByW() const noexcept
     return t;
 }
 
-void Triangle::setColor(const color_t& c) noexcept
+void Triangle::setColor(const Color& c) noexcept
 {
     col = c;
 }
@@ -71,7 +71,7 @@ void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const no
     r = col.r; g = col.g; b = col.b; a = col.a;
 }
 
-color_t Triangle::getColor() const noexcept
+Color Triangle::getColor() const noexcept
 {
     return col;
 }

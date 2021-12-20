@@ -23,18 +23,18 @@ inline void Rasterizer::draw_hline(int x1, int x2, const int y) const noexcept
     }
 }
 
-inline void Rasterizer::draw_hline(int x1, int x2, const int y, const color_t& c) const noexcept
+inline void Rasterizer::draw_hline(int x1, int x2, const int y, const Color& c) const noexcept
 {
     _screen->setDrawColor(c);
     draw_hline(x1, x2, y);
 }
 
-void Rasterizer::draw_hline(int x1, int x2, const int y, color_t c1, color_t c2) const noexcept
+void Rasterizer::draw_hline(int x1, int x2, const int y, Color c1, Color c2) const noexcept
 {
     if (x1 == x2)
     {
         // should be c1 50% and c2 50% ?
-        _screen->drawPixel(x1, y, color_lerpRGB(c1, c2, 0.5));
+        _screen->drawPixel(x1, y, Color::lerpRGB(c1, c2, 0.5));
         return;
     }
 
@@ -47,13 +47,13 @@ void Rasterizer::draw_hline(int x1, int x2, const int y, color_t c1, color_t c2)
     const int dx = x2 - x1;
     const float tstep = 1.0f / sqrt(dx * dx);
     float t = 0.0f;
-    color_t c = c1;
+    Color c = c1;
     _screen->drawPixel(x1, y, c);
     for (int x = x1 + 1; x < x2; x++)
     {
         // TODO: color lerp can be linearized
         t += tstep;
-        c = color_lerpRGB(c1, c2, t);
+        c = Color::lerpRGB(c1, c2, t);
         _screen->drawPixel(x, y, c);
     }
     _screen->drawPixel(x2, y, c2);
@@ -91,13 +91,13 @@ inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2) con
     }
 }
 
-inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2, const color_t& c) const noexcept
+inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2, const Color& c) const noexcept
 {
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);
 }
 
-void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2, const color_t& c1, const color_t c2) const noexcept
+void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2, const Color& c1, const Color c2) const noexcept
 {
     const int dx = abs(x2 - x1);
     const int sx = x1 < x2 ? 1 : -1;
@@ -109,7 +109,7 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
     float t = 0.0f;
     int x = x1;
     int y = y1;
-    color_t c = c1;
+    Color c = c1;
 
     while (true)
     {
@@ -135,7 +135,7 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
 
         // TODO: the color step could be linearized
         t += tstep;
-        c = color_lerpRGB(c1, c2, t);
+        c = Color::lerpRGB(c1, c2, t);
     }
 }
 
@@ -148,7 +148,7 @@ void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
 
-    color_t c = triangle.getColor();
+    Color c = triangle.getColor();
 
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
@@ -167,7 +167,7 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
 
     const uint8_t lightCounts = static_cast<uint8_t>(lights.size());
     // Illumination (flat shading)
-    color_t c;
+    Color c;
     if (illuminationType == 0) {
         c.r = 255; c.g = 255; c.b = 255; c.a = 255;
         _screen->setDrawColor(c);
@@ -177,7 +177,7 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
         int r = 0; int g = 0; int b = 0; int a = 0;
         for (const auto& light : lights)
         {
-            color_t col = light.flatShading(triangle.faceNormal_);
+            Color col = light.flatShading(triangle.faceNormal_);
             r += col.r; g += col.g; b += col.b; a += col.a;
         }
 
@@ -223,11 +223,11 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
     int maxx;
     int t1xp;
     int t2xp = 0;
-    /*color_t c1 = triangle.a.col;
-    color_t c2 = triangle.b.col;
-    color_t c3 = triangle.c.col;
-    color_t tc1;
-    color_t tc2;
+    /*Color c1 = triangle.a.col;
+    Color c2 = triangle.b.col;
+    Color c3 = triangle.c.col;
+    Color tc1;
+    Color tc2;
     const float t1step = 1.0f / sqrt(dx1 * dx1 + dy1 * dy1);
     float t1 = 0.0f;
     const float t2step = 1.0f / sqrt(dx2 * dx2 + dy2 * dy2);
@@ -235,8 +235,8 @@ inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illumin
     // interpolate the color of the line1 and line2 (tc1, tc2)
    /* t1 += t1step;
     t2 += t2step;
-    color_t tc1 = color_lerpRGB(c1, c2, t1);
-    color_t tc2 = color_lerpRGB(c1, c3, t2);
+    Color tc1 = Color::lerpRGB(c1, c2, t1);
+    Color tc2 = Color::lerpRGB(c1, c3, t2);
     assert(ty1 == ty2);
     draw_hline(tx1, tx2, ty1, tc1, tc2);*/
 
@@ -473,17 +473,17 @@ void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
     int x1 = static_cast<int>(std::round(triangle.a.x));
     int y1 = static_cast<int>(std::round(triangle.a.y));
     float z1 = triangle.a.z;
-    color_t c1 = triangle.a.col;
+    Color c1 = triangle.a.col;
     // V2
     int x2 = static_cast<int>(std::round(triangle.b.x));
     int y2 = static_cast<int>(std::round(triangle.b.y));
     float z2 = triangle.b.z;
-    color_t c2 = triangle.b.col;
+    Color c2 = triangle.b.col;
     // V3
     int x3 = static_cast<int>(std::round(triangle.c.x));
     int y3 = static_cast<int>(std::round(triangle.c.y));
     float z3 = triangle.c.z;
-    color_t c3 = triangle.c.col;
+    Color c3 = triangle.c.col;
 
     int area = edge(x1, y1, x2, y2, x3, y3);
     if (area == 0)
@@ -510,7 +510,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
             if (e1 * sa >= 0 && e2 * sa >= 0 && e3 * sa >= 0)
             {
                 // inside the triangle
-                color_t c;
+                Color c;
                 c.r = std::clamp((e1 * c3.r + e2 * c1.r + e3 * c2.r) / area, 0, 255);
                 c.g = std::clamp((e1 * c3.g + e2 * c1.g + e3 * c2.g) / area, 0, 255);
                 c.b = std::clamp((e1 * c3.b + e2 * c1.b + e3 * c2.b) / area, 0, 255);

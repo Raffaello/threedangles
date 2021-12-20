@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <types.hpp>
+#include <Color.hpp>
 
 class Screen
 {
@@ -15,15 +15,15 @@ public:
     virtual ~Screen() = default;
 
     virtual bool init() = 0;
-    virtual void setDrawColor(const color_t& c)noexcept = 0;
+    virtual void setDrawColor(const Color& c)noexcept = 0;
     virtual void drawPixel(const int x, const int y) noexcept = 0;
-    inline void drawPixel(const int x, const int y, const color_t& c) {
+    inline void drawPixel(const int x, const int y, const Color& c) {
         setDrawColor(c);
         drawPixel(x, y);
     }
     inline std::string getTitle() const noexcept { return _title; }
     virtual void setTitle(const std::string& title) noexcept = 0;
-    virtual void clear(const color_t& c) noexcept = 0;
+    virtual void clear(const Color& c) noexcept = 0;
     virtual void flip() noexcept = 0;
 
 protected:

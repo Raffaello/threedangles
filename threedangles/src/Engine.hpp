@@ -30,7 +30,7 @@ public:
     void setMatrixView(const Mat4& matView) noexcept;
     void initPerspectiveProjection(const float fov, const float far, const float near) noexcept;
     
-    void processFrame(const Cam& cam, const color_t& bg_col) noexcept;
+    void processFrame(const Cam& cam, const Color& bg_col) noexcept;
 
     bool showHiddenVertexes = false;
     // 0 = off, 1 = flat, 2=gouraud
