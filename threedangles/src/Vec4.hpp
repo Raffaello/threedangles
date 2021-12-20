@@ -38,6 +38,7 @@ public:
     Vec4& operator*=(const Vec4& v) noexcept;
     //Vec4& operator*=(const Mat4& m) noexcept;
 
+    // should make sense to have a "Plane" class instead of Vec4 for plane?
     Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept;
 
 //private:

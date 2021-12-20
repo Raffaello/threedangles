@@ -14,7 +14,6 @@ Mat4 Mat4::operator*(const Mat4& m_) const noexcept
             for (int k = 0; k < 4; k++) {
                 matrix.m[i][j] += m[i][k] * m_.m[k][j];
             }
-            //matrix.m[i][j] = m[i][0] * m_.m[0][j] + m[i][1] * m_.m[1][j] + m[i][2] * m_.m[2][j] + m[i][3] * m_.m[3][j];
         }
     }
 

@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <Vertex.hpp>
 
-TEST(Vecrtex, assigment)
+TEST(Vertex, assigment)
 {
     Vertex v1;
 
@@ -18,6 +18,8 @@ TEST(Vecrtex, assigment)
 }
 TEST(Vertex, equality)
 {
+    Vertex v;
+    EXPECT_EQ(v, v);
 }
 
 int main(int argc, char** argv)
