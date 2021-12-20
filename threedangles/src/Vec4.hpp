@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Color.hpp>
-
 class Vec4
 {
 public:
@@ -37,7 +35,7 @@ public:
     bool operator==(const Vec4& v) const;
 
     Vec4& operator+=(const Vec4& v) noexcept;
-    //Vec4& operator*=(const Vec4& m) noexcept;
+    Vec4& operator*=(const Vec4& v) noexcept;
     //Vec4& operator*=(const Mat4& m) noexcept;
 
     Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept;
@@ -47,8 +45,6 @@ public:
     float y = 0.0f;
     float z = 0.0f;
     float w = 1.0f;
-
-    Color col; // this should go on a "Vertex class"
 
 private:
 #if 0

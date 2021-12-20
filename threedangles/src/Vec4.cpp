@@ -165,6 +165,15 @@ Vec4& Vec4::operator+=(const Vec4& v) noexcept
     return *this;
 }
 
+Vec4& Vec4::operator*=(const Vec4& v) noexcept
+{
+    x *= v.x;
+    y *= v.y;
+    z *= v.z;
+
+    return *this;
+}
+
 //Vec4& Vec4::operator*=(const Mat4& m) noexcept
 //{
 //    x = x * m.m[0][0] + y * m.m[0][1] + z * m.m[0][2] + w * m.m[0][3];
@@ -174,6 +183,8 @@ Vec4& Vec4::operator+=(const Vec4& v) noexcept
 //
 //    return *this;
 //}
+
+
 
 Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept
 {

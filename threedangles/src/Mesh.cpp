@@ -18,8 +18,8 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         Triangle triTransformed = tri * matWorld;
         // Normals (back-face culling)
         triTransformed.faceNormal_ = triTransformed.faceNormal();
-        float norm_dp = triTransformed.faceNormal_.dotProd(triTransformed.a - cam.position);
 
+        const float norm_dp = triTransformed.faceNormal_.dotProd(triTransformed.a.v - cam.position);
         if (!showHiddenVertexes && norm_dp >= 0.0f)
             continue;
 

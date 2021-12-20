@@ -1,14 +1,6 @@
-#pragma once
+#include "Vertex.hpp"
 
-#include <Vec4.hpp>
-#include <Color.hpp>
-
-
-class Vertex
+bool Vertex::operator==(const Vertex& vx) const noexcept
 {
-public:
-    Vec4 vec;
-    colort_t col;
-
-
+	return v == vx.v && col == vx.col;
 }

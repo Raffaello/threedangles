@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Vec4.hpp>
+#include <Vertex.hpp>
 #include <Mat4.hpp>
 #include <cstdint>
 #include <Color.hpp>
@@ -8,13 +8,14 @@
 class Triangle
 {
 public:
+    Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_);
     Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_);
     Triangle() = default;
     ~Triangle() = default;
 
-    Vec4 a, b, c;
+    Vertex a, b, c;
 
-    Triangle operator+(const Vec4& v) const noexcept;
+    //Triangle operator+(const Vec4& v) const noexcept;
     Triangle operator*(const Mat4& m) const noexcept;
     Triangle& operator*=(const Mat4& m) noexcept;
 

@@ -2,28 +2,36 @@
 #include <cassert>
 
 
-Triangle::Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_) : a(a_), b(b_), c(c_)
+Triangle::Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_) : a(a_), b(b_), c(c_)
 {
 }
 
-Triangle Triangle::operator+(const Vec4& v) const noexcept
+Triangle::Triangle(const Vec4& a_, const Vec4& b_, const Vec4& c_)
 {
-    Triangle t(*this);
-
-    t.a = a + v;
-    t.b = b + v;
-    t.c = c + v;
-
-    return t;
+    a.v = a_;
+    b.v = b_;
+    c.v = c_;
 }
+
+
+//Triangle Triangle::operator+(const Vec4& v) const noexcept
+//{
+//    Triangle t(*this);
+//
+//    t.a = a + v;
+//    t.b = b + v;
+//    t.c = c + v;
+//
+//    return t;
+//}
 
 Triangle Triangle::operator*(const Mat4& m) const noexcept
 {
     Triangle t(*this);
 
-    t.a = m * a;
-    t.b = m * b;
-    t.c = m * c;
+    t.a.v = m * a.v;
+    t.b.v = m * b.v;
+    t.c.v = m * c.v;
 
     return t;
 }
@@ -33,9 +41,9 @@ Triangle& Triangle::operator*=(const Mat4& m) noexcept
     //a *= m;
     //b *= m;
     //c *= m;
-    a = m * a;
-    b = m * b;
-    c = m * c;
+    a.v = m * a.v;
+    b.v = m * b.v;
+    c.v = m * c.v;
     
     return *this;
 }
@@ -44,9 +52,9 @@ Triangle Triangle::normByW() const noexcept
 {
     Triangle t(*this);
 
-    t.a = a.normByW();
-    t.b = b.normByW();
-    t.c = c.normByW();
+    t.a.v = a.v.normByW();
+    t.b.v = b.v.normByW();
+    t.c.v = c.v.normByW();
 
     return t;
 }
@@ -78,10 +86,10 @@ Color Triangle::getColor() const noexcept
 
 Vec4 Triangle::faceNormal() const noexcept
 {
-    Vec4 line1(b), line2(c);
+    Vec4 line1(b.v), line2(c.v);
 
-    line1 = line1 - a; //b-a
-    line2 = line2 - a; //c-a
+    line1 = line1 - a.v; //b-a
+    line2 = line2 - a.v; //c-a
 
     return line1.crossProd(line2).normalize();
 }

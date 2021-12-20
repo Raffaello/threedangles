@@ -99,8 +99,8 @@ inline void Engine::sortZ() noexcept
         [](const Triangle& t1, const Triangle& t2)
         {
             // divsion by 3.0f can be skipped
-            const float z1 = t1.a.z + t1.b.z + t1.c.z;
-            const float z2 = t2.a.z + t2.b.z + t2.c.z;
+            const float z1 = t1.a.v.z + t1.b.v.z + t1.c.v.z;
+            const float z2 = t2.a.v.z + t2.b.v.z + t2.c.v.z;
             return z1 < z2;
         }
     );

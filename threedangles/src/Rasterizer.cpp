@@ -141,12 +141,12 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
 
 void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 {
-    int x1 = static_cast<int>(std::round(triangle.a.x));
-    int y1 = static_cast<int>(std::round(triangle.a.y));
-    int x2 = static_cast<int>(std::round(triangle.b.x));
-    int y2 = static_cast<int>(std::round(triangle.b.y));
-    int x3 = static_cast<int>(std::round(triangle.c.x));
-    int y3 = static_cast<int>(std::round(triangle.c.y));
+    int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    int y3 = static_cast<int>(std::round(triangle.c.v.y));
 
     Color c = triangle.getColor();
 
@@ -158,12 +158,12 @@ void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 
 inline void Rasterizer::fillTriangle(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
 {
-    int x1 = static_cast<int>(std::round(triangle.a.x));
-    int y1 = static_cast<int>(std::round(triangle.a.y));
-    int x2 = static_cast<int>(std::round(triangle.b.x));
-    int y2 = static_cast<int>(std::round(triangle.b.y));
-    int x3 = static_cast<int>(std::round(triangle.c.x));
-    int y3 = static_cast<int>(std::round(triangle.c.y));
+    int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    int y3 = static_cast<int>(std::round(triangle.c.v.y));
 
     const uint8_t lightCounts = static_cast<uint8_t>(lights.size());
     // Illumination (flat shading)
@@ -470,19 +470,19 @@ void Rasterizer::fillTriangle3(const Triangle& triangle) const noexcept
     };
 
     // V1
-    int x1 = static_cast<int>(std::round(triangle.a.x));
-    int y1 = static_cast<int>(std::round(triangle.a.y));
-    float z1 = triangle.a.z;
+    int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    float z1 = triangle.a.v.z;
     Color c1 = triangle.a.col;
     // V2
-    int x2 = static_cast<int>(std::round(triangle.b.x));
-    int y2 = static_cast<int>(std::round(triangle.b.y));
-    float z2 = triangle.b.z;
+    int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    float z2 = triangle.b.v.z;
     Color c2 = triangle.b.col;
     // V3
-    int x3 = static_cast<int>(std::round(triangle.c.x));
-    int y3 = static_cast<int>(std::round(triangle.c.y));
-    float z3 = triangle.c.z;
+    int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    int y3 = static_cast<int>(std::round(triangle.c.v.y));
+    float z3 = triangle.c.v.z;
     Color c3 = triangle.c.col;
 
     int area = edge(x1, y1, x2, y2, x3, y3);

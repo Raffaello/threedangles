@@ -6,7 +6,11 @@
 class Vertex
 {
 public:
+    Vertex() = default;
+    ~Vertex() = default;
     Vec4 v;
-    Vec4 normal;
     Color col;
-}
+    //Vec4 normal;
+
+    bool operator==(const Vertex& vx) const noexcept;
+};
