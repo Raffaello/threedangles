@@ -59,29 +59,36 @@ Triangle Triangle::normByW() const noexcept
     return t;
 }
 
-void Triangle::setColor(const Color& c) noexcept
-{
-    col = c;
-}
-
-void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha) noexcept
-{
-    col = { r,g,blue,alpha };
-}
+//void Triangle::setColor(const Color& c) noexcept
+//{
+//    col = c;
+//}
+//
+//void Triangle::setColor(const uint8_t r, const uint8_t g, const uint8_t blue, const uint8_t alpha) noexcept
+//{
+//    col = { r,g,blue,alpha };
+//}
 
 void Triangle::setColor(const Triangle& that) noexcept
 {
-    col = that.col;
+    a.col = that.a.col;
+    b.col = that.b.col;
+    c.col = that.c.col;
 }
 
-void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept
-{
-    r = col.r; g = col.g; b = col.b; a = col.a;
-}
+//void Triangle::getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept
+//{
+//    r = col.r; g = col.g; b = col.b; a = col.a;
+//}
 
 Color Triangle::getColor() const noexcept
 {
-    return col;
+    return Color(
+        (a.col.r + b.col.r + c.col.r) / 3,
+        (a.col.g + b.col.g + c.col.g) / 3,
+        (a.col.b + b.col.b + c.col.b) / 3,
+        (a.col.a + b.col.a + c.col.a) / 3
+    );
 }
 
 Vec4 Triangle::faceNormal() const noexcept

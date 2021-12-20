@@ -141,14 +141,18 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
 
 void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 {
+    Color c = triangle.getColor();
+    drawTriangle(triangle, c);
+}
+
+void Rasterizer::drawTriangle(const Triangle& triangle, Color& c) const noexcept
+{
     int x1 = static_cast<int>(std::round(triangle.a.v.x));
     int y1 = static_cast<int>(std::round(triangle.a.v.y));
     int x2 = static_cast<int>(std::round(triangle.b.v.x));
     int y2 = static_cast<int>(std::round(triangle.b.v.y));
     int x3 = static_cast<int>(std::round(triangle.c.v.x));
     int y3 = static_cast<int>(std::round(triangle.c.v.y));
-
-    Color c = triangle.getColor();
 
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);

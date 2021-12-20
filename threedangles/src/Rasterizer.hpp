@@ -28,6 +28,8 @@ public:
      * @param triangle
     */
     void drawTriangle(const Triangle& triangle) const noexcept;
+    void drawTriangle(const Triangle& triangle, Color& c) const noexcept;
+
 
     /** @brief Fill a triangle - Bresenham method
      *         Triangle is already normalized by w. Only x,y coord will be usd

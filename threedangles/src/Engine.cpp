@@ -124,8 +124,7 @@ void Engine::raster() noexcept
                 if (filled == 2)
                 {
                     // wireframe debug
-                    t.setColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-                    _rasterizer->drawTriangle(t);
+                    _rasterizer->drawTriangle(t, Color(255, 255, 255));
                 }
             }
             else {
