@@ -13,7 +13,9 @@ public:
     Triangle() = default;
     ~Triangle() = default;
 
-    Vertex a, b, c;
+    Vertex a;
+    Vertex b;
+    Vertex c;
 
     Triangle operator*(const Mat4& m) const noexcept;
     Triangle& operator*=(const Mat4& m) noexcept;

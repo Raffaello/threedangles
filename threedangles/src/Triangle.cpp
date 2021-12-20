@@ -63,7 +63,8 @@ Color Triangle::getColor() const noexcept
 
 Vec4 Triangle::faceNormal() const noexcept
 {
-    Vec4 line1(b.v), line2(c.v);
+    Vec4 line1(b.v);
+    Vec4 line2(c.v);
 
     line1 = line1 - a.v; // b - a
     line2 = line2 - a.v; // c - a
