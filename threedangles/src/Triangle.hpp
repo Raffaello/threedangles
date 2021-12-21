@@ -24,7 +24,7 @@ public:
     void setColor(const Triangle& that) noexcept;
     Color getColor() const noexcept;
 
-    // TODO method make it private and const the value, compute it at constructor level.
+    // @todo method make it private and const the value, compute it at constructor level.
     // cant be private as Vertex might change for a triangle and then need to be recompute
     // rename it as surfaceNormal
      

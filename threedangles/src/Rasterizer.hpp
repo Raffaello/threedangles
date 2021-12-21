@@ -10,7 +10,7 @@
 /**
  * @brief Rasterization primitives
  * 
- * TODO: How about lights interpolation at pixel level?
+ * @todo: How about lights interpolation at pixel level?
  *       Does it requires to pass lights into it?
  * 
 */
@@ -46,7 +46,7 @@ public:
     */
     void fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept;
 
-    // TODO color vertex interpolation? let see later...
+    // @todo color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
     void drawLine(int x1, int y1, const int x2, const int y2, const Color& c) const noexcept;
     void drawLine(const int x1, const int y1, const int x2, const int y2, const Color& c1, const Color c2) const noexcept;

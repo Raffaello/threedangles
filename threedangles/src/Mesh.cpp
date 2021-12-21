@@ -1,12 +1,12 @@
 #include <Mesh.hpp>
 #include <fstream>
-#include <strstream> // todo remove as it has been deprecated
+#include <strstream> // @todo remove as it has been deprecated
 
 void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
     const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
     std::vector<Triangle>& out) const noexcept
 {
-    // TODO:
+    // @todo:
     // wouldn't be better process all triangles producing:
     // 1. triTransformed first and their "faceNormal and store in the vertex if not culled
     // 2. clip all of them in Z
@@ -15,7 +15,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
     // and appling to the mesh itself instead of passing them as parameters
     for (const auto& tri : tris)
     {
-        // TODO pre-compute the facenormals and here process in the '*' operator too
+        // @todo pre-compute the facenormals and here process in the '*' operator too
         Triangle triTransformed = tri * matWorld;
         //auto fn = tri.faceNormal();
         //auto fnt = matWorld * fn;
@@ -26,7 +26,7 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         if (!showHiddenVertexes && norm_dp >= 0.0f)
             continue;
 
-        // TODO: Vertex normals
+        // @todo: Vertex normals
 
 
         // World Space -> View Space
@@ -76,7 +76,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         }
         else if (type == "f")
         {
-            // TODO: store vt and vn values
+            // @todo: store vt and vn values
 
             // face
             // can be:

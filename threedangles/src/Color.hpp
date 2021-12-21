@@ -1,6 +1,6 @@
 #pragma once
 
-// TODO this file coudl be restructured as a class Color.
+// @todo this file coudl be restructured as a class Color.
 #include <cstdint>
 #include <cmath>
 
@@ -17,7 +17,7 @@ public:
     inline bool operator==(const Color& c) const noexcept {
         return r == c.r && g == c.g && b == c.b && a == c.a;
     }
-        // TODO: the color should be possible to compute incrementally and efficiently in hline
+        // @todo: the color should be possible to compute incrementally and efficiently in hline
     inline static Color lerpRGB(const Color& c1, const Color& c2, const float t)
     {
         Color c;

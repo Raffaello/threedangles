@@ -18,7 +18,7 @@ public:
     Vec4();
     ~Vec4() = default;
 
-    // TODO: review the const to allow mutability
+    // @todo: review the const to allow mutability
     //       in the this ptr, so can be more
     //       performant as well less mem consuming
     //       and having more cpu cache hits

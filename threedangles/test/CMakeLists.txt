@@ -89,6 +89,6 @@ macro_test(
             ${CMAKE_SOURCE_DIR}/threedangles/src/Clipping.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Engine.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Rasterizer.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/sdl/Screen_SDL.cpp # todo remove
+            ${CMAKE_SOURCE_DIR}/threedangles/src/sdl/Screen_SDL.cpp # @todo remove
         LINKS SDL2::SDL2 ${SDL2Main} # This should be removed and use a Screen Stub
     )

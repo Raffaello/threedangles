@@ -110,7 +110,7 @@ void Engine::raster() noexcept
 {
     for (const auto& t : _trianglesToRaster)
     {
-        // TODO: this can be done with pineda algorithm instead,
+        // @todo: this can be done with pineda algorithm instead,
         //       producing less shape morphing and improving performances
         std::list<Triangle> listTriangles;
         _clipping->clipScreen(t, listTriangles);

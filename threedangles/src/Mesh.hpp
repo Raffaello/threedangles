@@ -28,7 +28,7 @@ public:
     */
     static std::shared_ptr<Mesh> loadFromOBJFile(const std::string& filename);
 
-    // TODO
+    // @todo
     // store vertexes and face as it is in the OBJ file
     // and as well store triangles
     // after use a #define to switch among them at compile time to decide.
@@ -50,7 +50,7 @@ public:
     // ---------------------------------------------------------------------------------
 
     
-    // TODO add mesh position in the world. ?
+    // @todo add mesh position in the world. ?
 
     // Store the list of vertexes and the faces like the OBJ file model.
     // from this point can derive the adiajency list for each vertex related to faces.
@@ -61,7 +61,7 @@ public:
     
     // A mesh instead of being composed of triangle should be composed by vertexes to be processed?
 
-    // TODO replace with vertex buffer?...
+    // @todo replace with vertex buffer?...
     std::vector<Triangle> tris; // ?
     std::string name;
 };

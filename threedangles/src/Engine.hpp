@@ -18,7 +18,7 @@ class Engine
 private:
     explicit Engine(const std::shared_ptr<Screen> screen);
 public:
-    // TODO create a factory class (friend of engine) to decouple from SDL
+    // @todo create a factory class (friend of engine) to decouple from SDL
     static std::shared_ptr<Engine> createEngineSDL(const std::string& title, const int width, const int height) noexcept;
 
     inline std::shared_ptr<Screen> getScreen() const noexcept {
@@ -40,9 +40,9 @@ public:
 
     void addMesh(const std::shared_ptr<Mesh>& mesh);
     void addLight(const Light& light);
-    // TODO add the "remove/update/set method" for mesh and light
+    // @todo add the "remove/update/set method" for mesh and light
 
-    // TODO replace with std::lerp when C++20
+    // @todo replace with std::lerp when C++20
     static float lerp(const float a, const float b, const float t) noexcept;
 private:
     std::shared_ptr<Screen> _screen;

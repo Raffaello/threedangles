@@ -8,12 +8,12 @@ Rasterizer::Rasterizer(const std::shared_ptr<Screen> screen) : _screen(screen)
 
 inline void Rasterizer::draw_hline(int x1, int x2, const int y) const noexcept
 {
-    // TODO: for the depth buffer the z value need to be interpolated?
+    // @todo: for the depth buffer the z value need to be interpolated?
     //       or would be enough the z at the line?
     // if (x1,y,z1), (x2,y,z2) z1 can be different z2
     // it needs a linear interpolation, i think
     // std::lerp(z1,z2, p) p =(x-x1)/(x2-x1) x = [x1,x2[?
-    // TODO: do first color interpolation
+    // @todo: do first color interpolation
     if (x1 > x2) std::swap(x1, x2);
     for (; x1 <= x2; x1++) {
         // this could be done more efficientily
@@ -51,7 +51,7 @@ void Rasterizer::draw_hline(int x1, int x2, const int y, Color c1, Color c2) con
     _screen->drawPixel(x1, y, c);
     for (int x = x1 + 1; x < x2; x++)
     {
-        // TODO: color lerp can be linearized
+        // @todo: color lerp can be linearized
         t += tstep;
         c = Color::lerpRGB(c1, c2, t);
         _screen->drawPixel(x, y, c);
@@ -133,7 +133,7 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
             y += sy;
         }
 
-        // TODO: the color step could be linearized
+        // @todo: the color step could be linearized
         t += tstep;
         c = Color::lerpRGB(c1, c2, t);
     }
@@ -451,7 +451,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     // Edge function
     // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
     //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
-    // TODO: make it inline
+    // @todo: make it inline
     const auto edge = [](const int x1, const int y1, const int x2, const int y2, const int x, const int y) noexcept {
         return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
     };
@@ -472,7 +472,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     float z3 = triangle.c.v.z;
     Color c3 = triangle.c.col;
 
-    // TODO: move to Triangle and skip to reach here? 
+    // @todo: move to Triangle and skip to reach here? 
     //       what about clipping before rasterization process?
     int area = edge(x1, y1, x2, y2, x3, y3);
     if (area == 0)
@@ -538,7 +538,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 }
                 else if (illuminationType == 2)
                 {
-                    // TODO Gouraud 
+                    // @todo Gouraud 
                     // (emulating at the moment flat-shading, but computed per pixel, very slow)
                     // the performances will be similar when having the right colors.
                     Color c1 = lights[0].flatShading(triangle.faceNormal_);

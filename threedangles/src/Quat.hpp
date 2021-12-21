@@ -4,7 +4,7 @@
  * @brief Quaternion
  * @link https://www.3dgep.com/understanding-quaternions/
  * Quite similar to Vec4
- * TODO: see if Quat and Vec4 can be generalized (Vec3 would be enough to use here)
+ * @todo: see if Quat and Vec4 can be generalized (Vec3 would be enough to use here)
 */
 class Quat
 {

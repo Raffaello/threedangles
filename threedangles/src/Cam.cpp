@@ -9,7 +9,7 @@ Mat4 Cam::matrixView() noexcept
     // Camera Matrix
     Mat4 matCamRot = Mat4::createRotationY(yaw);
     lookAt = matCamRot * znorm;
-    // TODO: i am computing twice the F,forward vector here and in matrixLookAt(), just compute once.
+    // @todo: i am computing twice the F,forward vector here and in matrixLookAt(), just compute once.
     Vec4 F = lookAt.normalize();
     Vec4 L = up.crossProd(F).normalize();
     lookAt = Mat4::createRotation(pitch, L) * lookAt;

@@ -11,7 +11,7 @@ class Mat4
 {
 public:
     Mat4 operator*(const Mat4& m_) const noexcept;
-    // TODO remove this operator
+    // @todo remove this operator
     Vec4 operator*(const Vec4& i) const noexcept;
 
     bool operator==(const Mat4& m) const noexcept;
@@ -30,7 +30,7 @@ public:
     static Mat4 createRotation(const float theta, const Vec4& n) noexcept;
 
 
-    // todo move to private
+    // @todo move to private
     std::array<std::array<float, 4>, 4> m = {};
 private:
     
