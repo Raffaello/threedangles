@@ -2,6 +2,11 @@
 
 Three-D-angles is a 3D triangles engine built from scratch.
 
+The project has been inspired by a video series of OLC (OneLoneCoder):
+- [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
+- [GitHub](https://github.com/OneLoneCoder)
+
+
 It will feature the following algorithms:
 
 - [x] Line drawing (bresenham)

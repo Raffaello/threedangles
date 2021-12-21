@@ -25,6 +25,10 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
     // Using a plug-in interface architecture for them, sharing same interface.
     // So there will be a vec4cpu.dll (so), vec4sse.dll (so), etc..
     // the engine will load the required dll (so) based on cpuid info.
+    // ----------------------------------------------------------------------------
+    // alternatively use static function pointers and initialize the class from the engine
+    // to associate the respective function once.
+
 #if 0
     switch (impl)
     {

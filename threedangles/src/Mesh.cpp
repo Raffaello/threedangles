@@ -15,10 +15,13 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
     // and appling to the mesh itself instead of passing them as parameters
     for (const auto& tri : tris)
     {
+        // TODO pre-compute the facenormals and here process in the '*' operator too
         Triangle triTransformed = tri * matWorld;
+        /auto fn = tri.faceNormal();
+        auto fnt = matWorld * fn;
+        
         // Normals (back-face culling)
         triTransformed.faceNormal_ = triTransformed.faceNormal();
-
         const float norm_dp = triTransformed.faceNormal_.dotProd(triTransformed.a.v - cam.position);
         if (!showHiddenVertexes && norm_dp >= 0.0f)
             continue;
