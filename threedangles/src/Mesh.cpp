@@ -17,8 +17,8 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
     {
         // TODO pre-compute the facenormals and here process in the '*' operator too
         Triangle triTransformed = tri * matWorld;
-        /auto fn = tri.faceNormal();
-        auto fnt = matWorld * fn;
+        //auto fn = tri.faceNormal();
+        //auto fnt = matWorld * fn;
         
         // Normals (back-face culling)
         triTransformed.faceNormal_ = triTransformed.faceNormal();
