@@ -459,15 +459,12 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     // V1
     const int x1 = static_cast<int>(std::round(triangle.a.v.x));
     const int y1 = static_cast<int>(std::round(triangle.a.v.y));
-
     // V2
     const int x2 = static_cast<int>(std::round(triangle.b.v.x));
     const int y2 = static_cast<int>(std::round(triangle.b.v.y));
-   
     // V3
     const int x3 = static_cast<int>(std::round(triangle.c.v.x));
     const int y3 = static_cast<int>(std::round(triangle.c.v.y));
-    
 
     // @todo: move to Triangle and skip to reach here? 
     //       what about clipping before rasterization process?
@@ -484,18 +481,23 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     const float w2 = triangle.b.v.w;
     const float w3 = triangle.c.v.w;
 
-    const Color c1 = triangle.a.col;
-    const Color c2 = triangle.b.col;
-    const Color c3 = triangle.c.col;
+    Color c1;
+    Color c2;
+    Color c3;
+    Color c;
 
+    float c1r, c1g, c1b, c2r, c2g, c2b, c3r, c3g, c3b;
+    c1r = c1g = c1b = c2r = c2g = c2b = c3r = c3g = c3b = 1.0f;
     // lights
     const uint8_t lightCounts = static_cast<uint8_t>(lights.size());
-    Color c;
-    /*if (illuminationType == 0) {
-        //c.r = 255; c.g = 255; c.b = 255; c.a = 255;
-        //_screen->setDrawColor(c);
+    if (illuminationType == 0)
+    {
+        c1 = triangle.a.col;
+        c2 = triangle.b.col;
+        c3 = triangle.c.col;
     }
-    else*/ if (illuminationType == 1) {
+    else if (illuminationType == 1)
+    {
         // Illumination (flat shading)
         // blending lights (average)
         int r = 0; int g = 0; int b = 0; int a = 0;
@@ -509,27 +511,30 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
         c.b = b / lightCounts;
         c.r = r / lightCounts;
         c.a = a / lightCounts;
-        //_screen->setDrawColor(c);
     }
-    //else if (illuminationOn == 2) {
+    else if (illuminationType == 2)
+    {
         // Gouraud
-    //}
+        // (emulating at the moment flat-shading, but computed per pixel, very slow)
+        // the performances will be similar when having the right colors.
+        c1 = lights[0].flatShading(triangle.faceNormal_);
+        c2 = lights[0].flatShading(triangle.faceNormal_);
+        c3 = lights[0].flatShading(triangle.faceNormal_);
+    }
 
-
-    // bounding box (no clipping)
-    int ymin = std::min(y1, std::min(y2, y3));
-    int ymax = std::max(y1, std::max(y2, y3));
-    int xmin = std::min(x1, std::min(x2, x3));
-    int xmax = std::max(x1, std::max(x2, x3));
-    int sa = area > 0 ? +1 : -1;
-
-    float c1r, c1g, c1b, c2r, c2g, c2b, c3r, c3g, c3b;
-    if (perspectiveCorrection)
+    if (perspectiveCorrection && illuminationType != 1)
     {
         c1r = w1 * c1.r; c1g = w1 * c1.g; c1b = w1 * c1.b;
         c2r = w2 * c2.r; c2g = w2 * c2.g; c2b = w2 * c2.b;
         c3r = w3 * c3.r; c3g = w3 * c3.g; c3b = w3 * c3.b;
     }
+
+    // bounding box (no clipping)
+    const int ymin = std::min(y1, std::min(y2, y3));
+    const int ymax = std::max(y1, std::max(y2, y3));
+    const int xmin = std::min(x1, std::min(x2, x3));
+    const int xmax = std::max(x1, std::max(x2, x3));
+    const int sa = area > 0 ? +1 : -1;
 
     for (int y = ymin; y <= ymax; y++)
     {
@@ -543,7 +548,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 continue;
 
             // inside the triangle
-            if (illuminationType == 0)
+
+            // Lights off / gouraud
+            if (illuminationType == 0 || illuminationType == 2)
             {
                 if (perspectiveCorrection)
                 {
@@ -559,28 +566,14 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                     c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
                 }
             }
-            else if (illuminationType == 1) {
+            //else if (illuminationType == 1) {
                 // using the precomputed Color C, doing nothing
 
                 // todo: should interpolate the pixel with the flatShading light color?
 
-            }
-            else if (illuminationType == 2)
-            {
-                // @todo Gouraud
-                // (emulating at the moment flat-shading, but computed per pixel, very slow)
-                // the performances will be similar when having the right colors.
-                Color c1 = lights[0].flatShading(triangle.faceNormal_);
-                Color c2 = lights[0].flatShading(triangle.faceNormal_);
-                Color c3 = lights[0].flatShading(triangle.faceNormal_);
-
-                c.r = std::clamp((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area, 0, 255);
-                c.g = std::clamp((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area, 0, 255);
-                c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
-            }
+            //}
 
             _screen->drawPixel(x, y, c);
-
         }
     }
 }

@@ -12,7 +12,13 @@ class Clipping
     // @todo clipping is breaking "lerp"
     //      as it "cut" off the end point for the color
     //      on the clipped triangle with new vertex
-    //      need to interpolate the new color
+    //      need to interpolate the new color?
+    //
+    //      not sure if clipping should be done only at raster phase per pixel instead
+    //      and here discard only the triangle that are completely outside the screen,
+    //      but keep the one that are partially out, not clipping them but they will be
+    //      clipped during rasterization, so they will be rendered as they should be,
+    //      but stopped to be rendered when out the screen......... 
 public:
     Clipping() = delete;
     Clipping(const float near, const float far, const int width, const int height);

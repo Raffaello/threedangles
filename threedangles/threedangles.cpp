@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("plain_triangle.obj");
+    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.0f;
-        alpha = alpha = 4;
+        //alpha = alpha = 4;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotY = Mat4::createRotationY(alpha*0.1f);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
