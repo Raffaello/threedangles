@@ -15,6 +15,7 @@ public:
     Vertex a;
     Vertex b;
     Vertex c;
+    //std::array<Vertex, 3> v;
 
     Triangle operator*(const Mat4& m) const noexcept;
     Triangle& operator*=(const Mat4& m) noexcept;

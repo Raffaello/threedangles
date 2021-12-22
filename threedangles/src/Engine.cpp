@@ -58,6 +58,8 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
 
     for (const auto& mesh : _meshes)
     {
+        if (!mesh->visible)
+            continue;
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?

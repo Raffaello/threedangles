@@ -91,7 +91,7 @@ inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2) con
     }
 }
 
-inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2, const Color& c) const noexcept
+void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2, const Color& c) const noexcept
 {
     _screen->setDrawColor(c);
     drawLine(x1, y1, x2, y2);
@@ -515,11 +515,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     else if (illuminationType == 2)
     {
         // Gouraud
-        // (emulating at the moment flat-shading, but computed per pixel, very slow)
-        // the performances will be similar when having the right colors.
-        c1 = lights[0].flatShading(triangle.faceNormal_);
-        c2 = lights[0].flatShading(triangle.faceNormal_);
-        c3 = lights[0].flatShading(triangle.faceNormal_);
+        c1 = lights[0].flatShading(triangle.a.normal);
+        c2 = lights[0].flatShading(triangle.b.normal);
+        c3 = lights[0].flatShading(triangle.c.normal);
     }
 
     if (perspectiveCorrection && illuminationType != 1)
@@ -550,7 +548,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             // inside the triangle
 
             // Lights off / gouraud
-            if (illuminationType == 0 || illuminationType == 2)
+            if (illuminationType == 0)
             {
                 if (perspectiveCorrection)
                 {
@@ -566,12 +564,28 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                     c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
                 }
             }
-            //else if (illuminationType == 1) {
+            else if (illuminationType == 1) {
                 // using the precomputed Color C, doing nothing
 
                 // todo: should interpolate the pixel with the flatShading light color?
 
-            //}
+            }
+            else if (illuminationType == 2)
+            {
+                if (perspectiveCorrection)
+                {
+                    const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
+                    c.r = std::clamp(static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r))), 0, 255);
+                    c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
+                    c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+                }
+                else
+                {
+                    c.r = std::clamp((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area, 0, 255);
+                    c.g = std::clamp((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area, 0, 255);
+                    c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
+                }
+            }
 
             _screen->drawPixel(x, y, c);
         }

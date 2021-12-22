@@ -38,7 +38,7 @@ public:
     // storing the vertexes and faces can just generate the "transformedTriangle"
     // on the fly and can help find in O(n^2) the adiacent faces for each vertex
     // that can be improved to store them in adjacency list for better performances.
-    // it would also be required to stare the "original "surface normals of each face to
+    // it would also be required to store the "original "surface normals of each face to
     // avoid recomputing them every time.
     //
     // The Triangle data structure instead can save the initial surface normal
@@ -62,9 +62,9 @@ public:
     
     // compute the vertex normals too
     
-    // A mesh instead of being composed of triangle should be composed by vertexes to be processed?
 
-    // @todo replace with vertex buffer?...
     std::vector<Triangle> tris; // ?
     std::string name;
+    
+    std::vector<std::array<std::vector<unsigned short>,3>> adjacency_index;
 };
