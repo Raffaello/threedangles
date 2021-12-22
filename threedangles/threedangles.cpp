@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("normal_cube.obj");
+    auto mesh = Mesh::loadFromOBJFile("plain_cube.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light
-    Light light(Vec4(1.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
+    Light light(Vec4(.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
     engine->addLight(light);
     Light light2(Vec4(1.0f, 3.0f, -1.0f), { 0, 255, 255, 255 });
     //engine->addLight(light2);
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        alpha = 0.0f;
+        //alpha = 0.0f;
         //alpha = alpha = 4;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotY = Mat4::createRotationY(alpha*0.1f);

@@ -39,6 +39,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     std::ifstream file(filename, std::ifstream::in);
     std::string line;
     std::vector<Vertex> vertexes;
+    std::vector<Vec4> vns;
     int vni = 0;
 
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
@@ -77,9 +78,9 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             // - int/int/int
             //  int//int
             std::string fs;
-            int v_[3];
-            //int vt_[3];
-            //int vn_[3];
+            std::array<int,3> v_;
+            std::array<int,3> vt_;
+            std::array<int, 3> vn_;
             for (int i = 0; i < 3; ++i)
             {
                 ss >> fs;
@@ -96,19 +97,25 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 try
                 {
                     int vt = std::stoi(svt);
-                    //vt_[i] = vt;
+                    vt_[i] = vt;
                 }
                 catch (const std::invalid_argument&) {}
                 try
                 {
                     int vn = std::stoi(svn);
-                    //vn_[i] = vn;
+                    vn_[i] = vn;
                 }
                 catch (const std::invalid_argument& e) {}
             }
             
             const std::array<unsigned short, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
+            const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
             //mesh->faces_index.push_back(face_index);
+            
+            for (int i = 0; i < 3; i++) {
+                vertexes.at(face_index[i]).normal = vns.at(fni[i]);
+            }
+
             mesh->tris.emplace_back(vertexes.at(face_index[0]), vertexes.at(face_index[1]), vertexes.at(face_index[2]));
         }
         else if (type == "vt")
@@ -118,9 +125,10 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         else if (type == "vn")
         {
             // vertex normal
-            Vertex v;
-            ss >> v.normal.x >> v.normal.y >> v.normal.z;
-            vertexes[vni++].normal = v.normal;
+            Vec4 v;
+            ss >> v.x >> v.y >> v.z;
+            //vertexes[vni++].normal = v.normal;
+            vns.push_back(v);
         }
         else if (type == "vp")
         {
@@ -175,7 +183,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 mesh->adjacency_index[i][2].push_back(j);
         }
     }*/
-    if (vni > 0) {
+    if (vni == 0) {
         // compute vertex normals
     }
 
