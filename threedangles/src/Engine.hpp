@@ -25,6 +25,10 @@ public:
         return _screen;
     }
 
+    void setPerpsectiveCorrection(bool on) {
+        _rasterizer->perspectiveCorrection = on;
+    }
+
     void setMatrixProjection(const Mat4& matProj) noexcept;
     void setMatrixWorld(const Mat4& matWorld) noexcept;
     void setMatrixView(const Mat4& matView) noexcept;

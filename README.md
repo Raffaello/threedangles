@@ -10,11 +10,11 @@ The project has been inspired by a video series of OLC (OneLoneCoder):
 It will feature the following algorithms:
 
 - [x] Line drawing (bresenham)
-- [/] Triangle filling (bresenham, pineda)
-- [/] Triangle clipping
+- [x] Triangle filling (bresenham, pineda)
+- [x] Triangle clipping
 - [x] Transformations
-- [/] Camera positioning
-- [/] Loading 3D file for objects
+- [x] Camera positioning
+- [x] Loading 3D file for objects
 - [ ] Textures
 - [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
@@ -23,11 +23,11 @@ It will feature the following algorithms:
 - [ ] Phong Shading
 - rasterization
 - [ ] Left-hand rules
-- Quaternions
+- [ ] Quaternions
 
 The implementation will be based on :
 
-- [x] compiler based
+- [x] CPU / compiler based 
 - [ ] SIMD instructions
 - [ ] GPU
 
@@ -42,7 +42,11 @@ The implementation will be based on :
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
 ## SIMD
-- [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations (vectorization)
+Using MMX/SSE/AVX for float 32 bit and Vec4 / Mat4 operations (vectorization) and rasterization.
+
+- [ ] MMX
+- [ ] SSE/SSE2/...
+- [ ] AVX/AVX512/...
 
 ## CUDA
 This might require to redo all the `engine` into `cudaEngine`:
@@ -51,6 +55,13 @@ This might require to redo all the `engine` into `cudaEngine`:
 - vectors, matrix and triangle storing and operations
 - screen and surface, textures
 - operations in the pipeline and how organize data might be required to reorder it and increment parallelism.
+
+### note
+It might just be pointless doing a "software 3D rendering Engine using GPGPU", apart some fun on it, but at that point would be better doing properly
+with Vulkan/DirectX/OpenGL.
+
+I am not sure if i will do it right now or in the future, as after wrote the algorithms,
+using CUDA won't change too much, especially with the usage of the `thrust` library.
 
 ## C/C++ compiler optimization
 - [ ] `__vectorcall`, `__fastcall`

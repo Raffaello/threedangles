@@ -17,6 +17,9 @@
 class Rasterizer
 {
 public:
+    // todo: remove
+    bool perspectiveCorrection = false;
+    
     Rasterizer() = delete;
     explicit Rasterizer(const std::shared_ptr<Screen> screen);
 

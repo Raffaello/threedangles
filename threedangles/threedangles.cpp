@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
+    auto mesh = Mesh::loadFromOBJFile("plain_triangle.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
     bool quit = false;
     unsigned int tot_frames = 0;
     uint32_t frame_start_ticks = SDL_GetTicks();
+    bool perspectiveCorrection = false;
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
@@ -211,6 +212,11 @@ int main(int argc, char* argv[])
                     cam.rollCW();
                     SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
                     break;*/
+                case SDLK_p:
+                    perspectiveCorrection = !perspectiveCorrection;
+                    engine->setPerpsectiveCorrection(perspectiveCorrection);
+                    SDL_Log("perspective Correction %d", perspectiveCorrection);
+                    break;
                 default:
                     break;
                 }
@@ -226,14 +232,15 @@ int main(int argc, char* argv[])
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         //alpha = 0.0f;
-        //alpha = alpha = 3.13700008;
+        alpha = alpha = 4;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
+        Mat4 matRotY = Mat4::createRotationY(alpha*0.1f);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
-
+        
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
         // World Matrix
-        engine->setMatrixWorld(matTrans * matRotZ * matRotX);
+        engine->setMatrixWorld(matTrans * matRotZ * matRotY * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
         // @todo there is a bug on the normal and light when "mounted on the cam"?

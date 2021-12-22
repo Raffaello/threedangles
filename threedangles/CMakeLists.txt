@@ -48,3 +48,7 @@ target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA
 if(BUILD_TESTING)
     add_subdirectory("test")
 endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory("examples")
+endif()

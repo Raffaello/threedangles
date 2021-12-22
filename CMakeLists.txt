@@ -10,6 +10,7 @@ endif()
 
 project ("threedangles")
 
+option(BUILD_EXAMPLES "Build Examples" TRUE)
 option(DETECT_CUDA "Detect if CUDA available and use it" FALSE)
 
 include(CTest)

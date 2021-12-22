@@ -16,10 +16,13 @@ public:
     Mesh() = default;
     ~Mesh() = default;
 
+    // TODO this on Mesh.. not sure.. Should be on the engine?
     void render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
         const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
         std::vector<Triangle>& out) const noexcept;
-    
+
+    bool visible = true;
+
     /**
      * @brief Load .OBJ file
      * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file
