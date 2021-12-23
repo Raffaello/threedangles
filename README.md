@@ -2,10 +2,11 @@
 
 Three-D-angles is a 3D triangles engine built from scratch.
 
-The project has been inspired by a video series of OLC (OneLoneCoder):
+This is a for fun, educational project.
+
+The project has been inspired by a OLC's video series (OneLoneCoder):
 - [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
 - [GitHub](https://github.com/OneLoneCoder)
-
 
 It will feature the following algorithms:
 
@@ -14,7 +15,7 @@ It will feature the following algorithms:
 - [x] Triangle clipping
 - [x] Transformations
 - [x] Camera positioning
-- [x] Loading 3D file for objects
+- [x] Loading 3D object files
 - [ ] Textures
 - [x] Painter's algorithm
 - [x] Z-buffer (Depth-Buffer)
@@ -31,6 +32,10 @@ The implementation will be based on :
 - [x] CPU / compiler based 
 - [ ] SIMD instructions
 - [ ] GPU
+
+# Compiling
+
+Use `CMake` and eventually `vcpkg` for package management.
 
 # Note on the implementation
 
