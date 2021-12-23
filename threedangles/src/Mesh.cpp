@@ -81,6 +81,8 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             std::array<int,3> v_;
             std::array<int,3> vt_;
             std::array<int, 3> vn_;
+            bool has_vt = true;
+            bool has_vn = true;
             for (int i = 0; i < 3; ++i)
             {
                 ss >> fs;
@@ -99,21 +101,33 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                     int vt = std::stoi(svt);
                     vt_[i] = vt;
                 }
-                catch (const std::invalid_argument&) {}
+                catch (const std::invalid_argument&) {
+                    has_vt = false;
+                }
                 try
                 {
                     int vn = std::stoi(svn);
                     vn_[i] = vn;
                 }
-                catch (const std::invalid_argument& e) {}
+                catch (const std::invalid_argument& e) {
+                    has_vn = false;
+                }
             }
             
             const std::array<unsigned short, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
-            const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
             //mesh->faces_index.push_back(face_index);
-            
-            for (int i = 0; i < 3; i++) {
-                vertexes.at(face_index[i]).normal = vns.at(fni[i]);
+
+            // Vertex normals, if presents
+            if (has_vn) {
+                const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
+                for (int i = 0; i < 3; i++) {
+                    vertexes.at(face_index[i]).normal = vns.at(fni[i]);
+                }
+            }
+
+            // Vertex texturs, if presents
+            if (has_vt) {
+                // todo
             }
 
             mesh->tris.emplace_back(vertexes.at(face_index[0]), vertexes.at(face_index[1]), vertexes.at(face_index[2]));
@@ -158,7 +172,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         t.faceNormal_ = t.faceNormal();
 
     // compute adjancency list for triangles (naive approach)
-    /*mesh->adjacency_index.resize(mesh->tris.size());
+    mesh->adjacency_index.resize(mesh->tris.size());
     for (int i = 0; i < mesh->tris.size(); i++)
     {
         auto& t1 = mesh->tris[i];
@@ -173,37 +187,40 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 || t1.a.v == t2.b.v
                 || t1.a.v == t2.c.v)
                 mesh->adjacency_index[i][0].push_back(j);
-            else if (t1.b.v == t2.a.v
+            if (t1.b.v == t2.a.v
                     || t1.b.v == t2.b.v
                     || t1.b.v == t2.c.v)
                 mesh->adjacency_index[i][1].push_back(j);
-            else if (t1.c.v == t2.a.v
+            if (t1.c.v == t2.a.v
                     || t1.c.v == t2.b.v
                     || t1.c.v == t2.c.v)
                 mesh->adjacency_index[i][2].push_back(j);
         }
-    }*/
-    if (vni == 0) {
-        // compute vertex normals
     }
 
-    // compute vertex normals
-    /*for(int i =0; i<mesh->tris.size();i++)
-    {
-        std::array<Vec4, 3> vns;
-        for (int j = 0; j < 3; j++)
+    // compute vertex normals if not present in the obj,
+    // otherwise use the one provided in the obj
+    if (vni == 0) {
+        
+        for (int i = 0; i < mesh->tris.size(); i++)
         {
-            Vec4 vn = mesh->tris[i].faceNormal_;
-            for (const auto& tn : mesh->adjacency_index[i][j]) {
-                vn += mesh->tris[tn].faceNormal_;
+            std::array<Vec4, 3> vns;
+            for (int j = 0; j < 3; j++)
+            {
+                Vec4 vn = mesh->tris[i].faceNormal_;
+                for (const auto& tn : mesh->adjacency_index[i][j]) {
+                    vn += mesh->tris[tn].faceNormal_;
+                }
+                vns[j] = vn.normalize();
             }
-            vns[j] = vn.normalize();
-        }
 
-        mesh->tris[i].a.normal = vns[0];
-        mesh->tris[i].b.normal = vns[1];
-        mesh->tris[i].c.normal = vns[2];
-    }*/
+            mesh->tris[i].a.normal = vns[0];
+            mesh->tris[i].b.normal = vns[1];
+            mesh->tris[i].c.normal = vns[2];
+        }
+    }
+
+    
 
     // compute vertex normal very slow and naive
     //for (auto& t : mesh->tris)
