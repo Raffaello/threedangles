@@ -15,7 +15,7 @@ public:
     Vertex a;
     Vertex b;
     Vertex c;
-    //std::array<Vertex, 3> v;
+    //std::array<Vertex, 3> p;
 
     Triangle operator*(const Mat4& m) const noexcept;
     Triangle& operator*=(const Mat4& m) noexcept;
@@ -25,10 +25,6 @@ public:
     void setColor(const Triangle& that) noexcept;
     Color getColor() const noexcept;
 
-    // @todo method make it private and const the value, compute it at constructor level.
-    // cant be private as Vertex might change for a triangle and then need to be recompute
-    // rename it as surfaceNormal
-     
     // Used for back-face culling and flat-shading
     Vec4 faceNormal() const noexcept;
     Vec4 faceNormal_;

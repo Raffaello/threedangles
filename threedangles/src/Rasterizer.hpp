@@ -9,10 +9,6 @@
 
 /**
  * @brief Rasterization primitives
- * 
- * @todo: How about lights interpolation at pixel level?
- *       Does it requires to pass lights into it?
- * 
 */
 class Rasterizer
 {

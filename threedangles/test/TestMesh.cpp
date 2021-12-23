@@ -9,8 +9,6 @@ TEST(Mesh, plain_cube)
     ASSERT_NE(m, nullptr);
     
     EXPECT_EQ(m->tris.size(), 12);
-    //EXPECT_EQ(m->vertexes.size(), 8);
-    //EXPECT_EQ(m->faces_index.size(), 12);
     EXPECT_STRCASEEQ(m->name.c_str(), "PlainCube");
     EXPECT_TRUE(m->visible);
 

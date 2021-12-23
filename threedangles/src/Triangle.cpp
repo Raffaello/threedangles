@@ -2,7 +2,7 @@
 #include <cassert>
 
 
-Triangle::Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_) : a(a_), b(b_), c(c_)//, faceNormal_(faceNormal())
+Triangle::Triangle(const Vertex& a_, const Vertex& b_, const Vertex& c_) : a(a_), b(b_), c(c_)
 {
 }
 

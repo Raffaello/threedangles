@@ -159,11 +159,10 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // represent a quad with two new triangles
 
         // Copy appearance info to new triangles
-        out_tri1.setColor(in);
-        //out_tri1.setColor(0, 64, 0, 255);
-        out_tri2.setColor(in);
+        //out_tri1.setColor(in);
+        //out_tri2.setColor(in);
         out_tri1.faceNormal_ = out_tri2.faceNormal_ = in.faceNormal_;
-        //out_tri2.setColor(0, 0, 64, 255);
+        
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
@@ -173,9 +172,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
         // TODO review these
         out_tri1.c.col = in.c.col; // should be intersected/interpolated too
-        out_tri2.c.col = in.c.col;
         out_tri1.c.normal = in.c.normal;
-        out_tri2.c.normal = in.c.normal;
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
@@ -183,6 +180,10 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri2.a = *inside_points[1];
         out_tri2.b = out_tri1.c;
         out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
+
+        out_tri2.c.col = in.c.col;
+        out_tri2.c.normal = in.c.normal;
+
 
         return 2;
     }
