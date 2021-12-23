@@ -33,28 +33,28 @@ The implementation will be based on :
 - [ ] SIMD instructions
 - [ ] GPU
 
-# Compiling
+## Compiling
 
 Use `CMake` and eventually `vcpkg` for package management.
 
-# Note on the implementation
+## Note on the implementation
 
 - Using SDL2 for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations.
 
-## windows
+### Windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
-## SIMD
+### SIMD
 Using MMX/SSE/AVX for float 32 bit and Vec4 / Mat4 operations (vectorization) and rasterization.
 
 - [ ] MMX
 - [ ] SSE/SSE2/...
 - [ ] AVX/AVX512/...
 
-## CUDA
+### CUDA
 This might require to redo all the `engine` into `cudaEngine`:
 
 - sorting
@@ -62,14 +62,14 @@ This might require to redo all the `engine` into `cudaEngine`:
 - screen and surface, textures
 - operations in the pipeline and how organize data might be required to reorder it and increment parallelism.
 
-### note
+#### note
 It might just be pointless doing a "software 3D rendering Engine using GPGPU", apart some fun on it, but at that point would be better doing properly
 with Vulkan/DirectX/OpenGL.
 
 I am not sure if i will do it right now or in the future, as after wrote the algorithms,
 using CUDA won't change too much, especially with the usage of the `thrust` library.
 
-## C/C++ compiler optimization
+### C/C++ compiler optimization
 - [ ] `__vectorcall`, `__fastcall`
 - [ ] various compiler switches
 
