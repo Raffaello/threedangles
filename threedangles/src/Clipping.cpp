@@ -130,7 +130,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // the plane, the triangle simply becomes a smaller triangle
 
         // Copy appearance info to new triangle
-        out_tri1.setColor(in);
+        //out_tri1.setColor(in);
         out_tri1.faceNormal_ = in.faceNormal_;
         
         //out_tri1.setColor(64, 0, 0, 255);
@@ -181,6 +181,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri2.b = out_tri1.c;
         out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
 
+        // TODO review these
         out_tri2.c.col = in.c.col;
         out_tri2.c.normal = in.c.normal;
 
