@@ -16,6 +16,7 @@ It will feature the following algorithms:
 - [x] Camera positioning
 - [x] Loading 3D file for objects
 - [ ] Textures
+- [x] Painter's algorithm
 - [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
 - [x] Vertex Normals
