@@ -65,6 +65,7 @@ private:
      * @brief  Z-depth sorting (Painter's Algorithm)
     */
     void sortZ() noexcept;
+    void sortZReverse() noexcept;
     void raster() noexcept;
 
     Mat4 _matProjection;

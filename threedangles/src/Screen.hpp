@@ -32,11 +32,6 @@ protected:
     std::string _title; // it could be redundant
 };
 
-//Screen::Screen(const std::string& title, const int width, const int height) :
-//    width(width), height(height), screenSize(width* height), _title(title) {
-//    _depthBuffer = std::shared_ptr<float[]>(new float(screenSize));
-//}
-
 inline void Screen::drawPixel(const int x, const int y, const Color& c)
 {
     setDrawColor(c);

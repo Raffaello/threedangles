@@ -53,7 +53,7 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     _trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
-    //for (int i = 0; i < _screen->screenSize; ++i) _screen->_depthBuffer[i] = far;
+    // TODO: notice that is -far instead of +far, it looks something not ok with left/right hand coordinates
     std::fill(_screen->_depthBuffer.get(), _screen->_depthBuffer.get() + _screen->screenSize, -far);
 
     for (const auto& mesh : _meshes)
@@ -67,7 +67,7 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     }
 
     // Z-depth reverse-sorting (Painter's Algorithm reverse)
-    sortZ();
+    sortZReverse();
 
     // Triangle Rasterization
     raster();
@@ -96,6 +96,19 @@ float Engine::lerp(const float a, const float b, const float t) noexcept
 }
 
 inline void Engine::sortZ() noexcept
+{
+    std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
+        [](const Triangle& t1, const Triangle& t2)
+        {
+            // divsion by 3.0f can be skipped
+            const float z1 = t1.a.v.z + t1.b.v.z + t1.c.v.z;
+            const float z2 = t2.a.v.z + t2.b.v.z + t2.c.v.z;
+            return z1 > z2;
+        }
+    );
+}
+
+void Engine::sortZReverse() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
         [](const Triangle& t1, const Triangle& t2)
