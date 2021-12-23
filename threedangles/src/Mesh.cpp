@@ -40,7 +40,6 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     std::string line;
     std::vector<Vertex> vertexes;
     std::vector<Vec4> vns;
-    int vni = 0;
 
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
@@ -125,7 +124,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 }
             }
 
-            // Vertex texturs, if presents
+            // Vertex textures, if presents
             if (has_vt) {
                 // todo
             }
@@ -141,7 +140,6 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             // vertex normal
             Vec4 v;
             ss >> v.x >> v.y >> v.z;
-            //vertexes[vni++].normal = v.normal;
             vns.push_back(v);
         }
         else if (type == "vp")
@@ -176,7 +174,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 
     // compute vertex normals if not present in the obj,
     // otherwise use the one provided in the obj
-    if (vni == 0)
+    if (vns.size() == 0)
         mesh->computeVertextNormals();
 
     return mesh;

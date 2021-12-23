@@ -89,24 +89,24 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
     // Create two temporary storage arrays to classify points either side of plane
     // If distance sign is positive, point lies on "inside" of plane
-    std::array<const Vec4*, 3> inside_points = {};
+    std::array<const Vertex*, 3> inside_points = {};
     int nInsidePointCount = 0;
-    std::array<const Vec4*, 3> outside_points = {};
+    std::array<const Vertex*, 3> outside_points = {};
     int nOutsidePointCount = 0;
 
     // Get signed distance of each point in triangle to plane
     if (dist(in.a.v) >= 0)
-        inside_points[nInsidePointCount++] = &in.a.v;
+        inside_points[nInsidePointCount++] = &in.a;
     else
-        outside_points[nOutsidePointCount++] = &in.a.v;
+        outside_points[nOutsidePointCount++] = &in.a;
     if (dist(in.b.v) >= 0)
-        inside_points[nInsidePointCount++] = &in.b.v;
+        inside_points[nInsidePointCount++] = &in.b;
     else
-        outside_points[nOutsidePointCount++] = &in.b.v;
+        outside_points[nOutsidePointCount++] = &in.b;
     if (dist(in.c.v) >= 0)
-        inside_points[nInsidePointCount++] = &in.c.v;
+        inside_points[nInsidePointCount++] = &in.c;
     else
-        outside_points[nOutsidePointCount++] = &in.c.v;
+        outside_points[nOutsidePointCount++] = &in.c;
 
     if (nInsidePointCount == 0)
     {
@@ -132,15 +132,22 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // Copy appearance info to new triangle
         out_tri1.setColor(in);
         out_tri1.faceNormal_ = in.faceNormal_;
+        
         //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
-        out_tri1.a.v = *inside_points[0];
+        out_tri1.a = *inside_points[0];
 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
-        out_tri1.b.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[1]);
+        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v);
+
+        // TODO review these:
+        out_tri1.b.col = in.b.col; // it should be intersected too.
+        out_tri1.c.col = in.c.col; // it should be intersected too.
+        out_tri1.b.normal = in.b.normal;
+        out_tri1.c.normal = in.c.normal;
 
         return 1;
     }
@@ -160,16 +167,22 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
-        out_tri1.a.v = *inside_points[0];
-        out_tri1.b.v = *inside_points[1];
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
+        out_tri1.a = *inside_points[0];
+        out_tri1.b = *inside_points[1];
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
+
+        // TODO review these
+        out_tri1.c.col = in.c.col; // should be intersected/interpolated too
+        out_tri2.c.col = in.c.col;
+        out_tri1.c.normal = in.c.normal;
+        out_tri2.c.normal = in.c.normal;
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
         // triangle and the plane, and the newly created point above
-        out_tri2.a.v = *inside_points[1];
-        out_tri2.b.v = out_tri1.c.v;
-        out_tri2.c.v = plane_p.intersectPlane(plane_n, *inside_points[1], *outside_points[0]);
+        out_tri2.a = *inside_points[1];
+        out_tri2.b = out_tri1.c;
+        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
 
         return 2;
     }
