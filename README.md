@@ -1,63 +1,73 @@
 ﻿# threedangles
 
-Three-D-angles is a 3D triangles engines built from scratch.
+Three-D-angles is a 3D triangles engine built from scratch.
+
+The project has been inspired by a video series of OLC (OneLoneCoder):
+- [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
+- [GitHub](https://github.com/OneLoneCoder)
+
 
 It will feature the following algorithms:
 
 - [x] Line drawing (bresenham)
-- [/] Triangle filling (bresenham)
-- [/] Triangle clipping
+- [x] Triangle filling (bresenham, pineda)
+- [x] Triangle clipping
 - [x] Transformations
-- [/] Camera positioning
-- [/] Loading 3D file for objects
+- [x] Camera positioning
+- [x] Loading 3D file for objects
 - [ ] Textures
+- [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
-- [ ] Gouraud Shading
+- [x] Vertex Normals
+- [x] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
-- Left-hand rules
-- Quaternions
+- [ ] Left-hand rules
+- [ ] Quaternions
 
-The algorithms are all implemented from scratch without using any modern library or Engine.
+The implementation will be based on :
 
-Their implementation will be based on :
-
-- [x] compiler based (can be using whatever instruction the compiler decide)
-- [ ] SIMD instructions (Intel)
-- [ ] GPU (CUDA)
-
-So it would be possible to benchmark those too.
-
-It might be later on implemented an analougue 3D engine feature using DirectX/OpenGL/Vulkan for
-a comparision/benchmark on the algorithms implemented here.
+- [x] CPU / compiler based 
+- [ ] SIMD instructions
+- [ ] GPU
 
 # Note on the implementation
 
-- Using SDL2 for window creation (and pixel drawing, soon to be removed) so it can be cross-OS in a simpler way,
+- Using SDL2 for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
-  SDL2 might be removed completely after few iterations of the engine.
+  SDL2 might be removed completely after few iterations.
 
 ## windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
 ## SIMD
-- [ ] SSE/AVX for float 32 bit and Vec4 / Mat4 operations
+Using MMX/SSE/AVX for float 32 bit and Vec4 / Mat4 operations (vectorization) and rasterization.
+
+- [ ] MMX
+- [ ] SSE/SSE2/...
+- [ ] AVX/AVX512/...
 
 ## CUDA
 This might require to redo all the `engine` into `cudaEngine`:
 
 - sorting
-- vectors, matrix and triangle storing and operations 
+- vectors, matrix and triangle storing and operations
 - screen and surface, textures
 - operations in the pipeline and how organize data might be required to reorder it and increment parallelism.
 
+### note
+It might just be pointless doing a "software 3D rendering Engine using GPGPU", apart some fun on it, but at that point would be better doing properly
+with Vulkan/DirectX/OpenGL.
+
+I am not sure if i will do it right now or in the future, as after wrote the algorithms,
+using CUDA won't change too much, especially with the usage of the `thrust` library.
+
 ## C/C++ compiler optimization
 - [ ] `__vectorcall`, `__fastcall`
+- [ ] various compiler switches
 
 #### Note on compilers
 It looks like compilers are already using some SIMD from default C/C++ code.
 
 - [ ] add specific compiler options on CMAKE configuration, to enhanche performances.
-
-

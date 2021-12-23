@@ -12,10 +12,10 @@ namespace sdl
         ~Screen_SDL() override;
 
         bool init() override;
-        void setDrawColor(const color_t& c) noexcept override;
+        void setDrawColor(const Color& c) noexcept override;
         void drawPixel(const int x, const int y) noexcept override;
         void setTitle(const std::string& title) noexcept override;
-        void clear(const color_t& c) noexcept override;
+        void clear(const Color& c) noexcept override;
         void flip() noexcept override;
     private:
         bool inited_sdl = false;

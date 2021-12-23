@@ -8,7 +8,7 @@
 #include <Engine.hpp>
 #include <Cam.hpp>
 #include <Light.hpp>
-#include <types.hpp>
+#include <Color.hpp>
 
 #include <SDL2/SDL.h>
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     const float h2 = 0.5f * static_cast<float>(height);
     uint32_t FPS = 60;
     uint32_t frameTime_ms = 1000 / FPS;
-    color_t black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
+    Color black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
 
     std::string title = "ThreeDangles";
     auto engine = Engine::createEngineSDL(title, width, height);
@@ -101,11 +101,20 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    if (!engine->addMeshFromOBJFile("plain_mountains.obj")) {
+    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
+    if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
     }
 
+    for (auto& t : mesh->tris)
+    {
+        t.a.col.r = 255;
+        t.b.col.b = 255;
+        t.c.col.g = 255;
+    }
+
+    engine->addMesh(mesh);
     // Projection Matrix
     const float fov = 50.0f;
     const float zfar = 100.0f;
@@ -115,13 +124,16 @@ int main(int argc, char* argv[])
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light
-    Light light(Vec4(1.0f, 3.0f, -1.0f), { 80, 32, 64, 255 });
-    
+    Light light(Vec4(.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
+    engine->addLight(light);
+    Light light2(Vec4(1.0f, 3.0f, -1.0f), { 0, 255, 255, 255 });
+    //engine->addLight(light2);
     // offset params
     Vec4 translation(0.0f, 0.0f, 0.0f);
     bool quit = false;
     unsigned int tot_frames = 0;
     uint32_t frame_start_ticks = SDL_GetTicks();
+    bool perspectiveCorrection = false;
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
@@ -146,7 +158,8 @@ int main(int argc, char* argv[])
                     SDL_Log("Show Hidden Vertexes = %d", engine->showHiddenVertexes);
                     break;
                 case SDLK_l:
-                    engine->illuminationOn = !engine->illuminationOn;
+                    engine->illuminationOn++;
+                    engine->illuminationOn %= 3;
                     SDL_Log("Illumination ON = %d", engine->illuminationOn);
                     break;
                 case SDLK_f:
@@ -191,6 +204,19 @@ int main(int argc, char* argv[])
                     cam.moveBackward();
                     SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
+                /*case SDLK_q:
+                    cam.rollCCW();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
+                    break;
+                case SDLK_e:
+                    cam.rollCW();
+                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
+                    break;*/
+                case SDLK_p:
+                    perspectiveCorrection = !perspectiveCorrection;
+                    engine->setPerpsectiveCorrection(perspectiveCorrection);
+                    SDL_Log("perspective Correction %d", perspectiveCorrection);
+                    break;
                 default:
                     break;
                 }
@@ -205,20 +231,22 @@ int main(int argc, char* argv[])
 
         // Rotation
         float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        alpha = 0.0f;
+        //alpha = 0.0f;
+        //alpha = alpha = 4;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
+        Mat4 matRotY = Mat4::createRotationY(alpha*0.1f);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
-
+        
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
         // World Matrix
-        engine->setMatrixWorld(matTrans * matRotZ * matRotX);
+        engine->setMatrixWorld(matTrans * matRotZ * matRotY * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-        // TODO there is a bug on the normal and light when "mounted on the cam"?
+        // @todo there is a bug on the normal and light when "mounted on the cam"?
         //light.direction_normalized = cam.position.normalize();
         // Process the triangles.
-        engine->processFrame(cam, light, black);
+        engine->processFrame(cam, black);
         tot_frames++;
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();

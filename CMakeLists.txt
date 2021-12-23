@@ -9,25 +9,29 @@ endif()
 
 
 project ("threedangles")
+
+option(BUILD_EXAMPLES "Build Examples" TRUE)
+option(DETECT_CUDA "Detect if CUDA available and use it" FALSE)
+
 include(CTest)
 
-include(CheckLanguage)
-check_language(CUDA)
-if(CMAKE_CUDA_COMPILER)
-    find_package(CUDAToolkit 11)
-    if (CUDAToolkit_FOUND)
-        enable_language(CUDA)
-        #set(LIB_CUDA cudart cudart_static)
-        #set(CMAKE_CUDA_STANDARD 10.2)
-        #set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-        set(CMAKE_CUDA_ARCHITECTURES OFF)
-        add_compile_definitions(WITH_CUDA)
+if(DETECT_CUDA)
+    include(CheckLanguage)
+    check_language(CUDA)
+    if(CMAKE_CUDA_COMPILER)
+        find_package(CUDAToolkit 11)
+        if (CUDAToolkit_FOUND)
+            enable_language(CUDA)
+            #set(LIB_CUDA cudart cudart_static)
+            #set(CMAKE_CUDA_STANDARD 10.2)
+            #set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+            set(CMAKE_CUDA_ARCHITECTURES OFF)
+            add_compile_definitions(WITH_CUDA)
+        endif()
+    else()
+      message(STATUS "No CUDA support")
     endif()
-else()
-  message(STATUS "No CUDA support")
 endif()
-
-
 
 # Include sub-projects.
 add_subdirectory ("threedangles")

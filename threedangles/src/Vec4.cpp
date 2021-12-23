@@ -18,6 +18,17 @@ Vec4::Vec4(const float x, const float y, const float z, const float w) :x(x), y(
     // but anyway it is compiled already with SSE even the CPU implementation due
     // to compiler optimization
     // probably can just be removed then.
+    // ----------------------------------------------------------------------------
+    // To do it properly:
+    // these routines should be done as separated shared objects:
+    // load them dynamically based on CPUID instruction set detection.
+    // Using a plug-in interface architecture for them, sharing same interface.
+    // So there will be a vec4cpu.dll (so), vec4sse.dll (so), etc..
+    // the engine will load the required dll (so) based on cpuid info.
+    // ----------------------------------------------------------------------------
+    // alternatively use static function pointers and initialize the class from the engine
+    // to associate the respective function once.
+
 #if 0
     switch (impl)
     {
@@ -60,6 +71,9 @@ Vec4::Vec4() : Vec4(0.0f, 0.0f, 0.0f, 1.0f)
 
 Vec4 Vec4::operator+(const Vec4& v) const
 {
+    //Vec4 u(*this);
+    //u.x += v.x; u.y += v.y; u.z += v.z;
+    //return u;
     return Vec4(x + v.x, y + v.y, z + v.z);
 #if 0
     //return cpu::vector_add(*this, v);
@@ -69,6 +83,9 @@ Vec4 Vec4::operator+(const Vec4& v) const
 
 Vec4 Vec4::operator-(const Vec4& v) const
 {
+    //Vec4 u(*this);
+    //u.x -= v.x; u.y -= v.y;  u.z -= v.z;
+    //return u;
     return Vec4(x - v.x, y - v.y, z - v.z);
 #if 0
     //return cpu::vector_sub(*this, v);
@@ -78,7 +95,9 @@ Vec4 Vec4::operator-(const Vec4& v) const
 
 Vec4 Vec4::operator*(const float k) const
 {
-    return Vec4(x * k, y * k, z * k);
+    Vec4 u(*this);
+    u.x *= k; u.y *= k; u.z *= k;
+    return u;
 #if 0
     //return cpu::vector_mul(*this, k);
     return mul(*this, k);
@@ -87,7 +106,9 @@ Vec4 Vec4::operator*(const float k) const
 
 Vec4 Vec4::operator/(const float k) const
 {
-    return Vec4(x / k, y / k, z / k);
+    Vec4 u(*this);
+    u.x /= k; u.y /= k; u.z /= k;
+    return u;
 #if 0
     //return cpu::vector_div(*this, k);
     return div(*this, k);
@@ -132,7 +153,9 @@ Vec4 Vec4::crossProd(const Vec4& v) const
 
 Vec4 Vec4::normByW() const
 {
-    return Vec4(x / w, y / w, z / w, 1.0f / w );
+    Vec4 u(*this);
+    u.x /= w; u.y /= w; u.z /= w; u.w = 1.0f / w;
+    return u;
 #if 0
     //return cpu::vector_normByW(*this);
     return nrw(*this);
@@ -153,6 +176,15 @@ Vec4& Vec4::operator+=(const Vec4& v) noexcept
     return *this;
 }
 
+Vec4& Vec4::operator*=(const Vec4& v) noexcept
+{
+    x *= v.x;
+    y *= v.y;
+    z *= v.z;
+
+    return *this;
+}
+
 //Vec4& Vec4::operator*=(const Mat4& m) noexcept
 //{
 //    x = x * m.m[0][0] + y * m.m[0][1] + z * m.m[0][2] + w * m.m[0][3];
@@ -162,6 +194,8 @@ Vec4& Vec4::operator+=(const Vec4& v) noexcept
 //
 //    return *this;
 //}
+
+
 
 Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept
 {

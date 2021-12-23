@@ -14,7 +14,6 @@ Mat4 Mat4::operator*(const Mat4& m_) const noexcept
             for (int k = 0; k < 4; k++) {
                 matrix.m[i][j] += m[i][k] * m_.m[k][j];
             }
-            //matrix.m[i][j] = m[i][0] * m_.m[0][j] + m[i][1] * m_.m[1][j] + m[i][2] * m_.m[2][j] + m[i][3] * m_.m[3][j];
         }
     }
 
@@ -23,7 +22,7 @@ Mat4 Mat4::operator*(const Mat4& m_) const noexcept
 
 Vec4 Mat4::operator*(const Vec4& i) const noexcept
 {
-    Vec4 v;
+    Vec4 v(i);
 
     v.x = i.x * this->m[0][0] + i.y * this->m[0][1] + i.z * this->m[0][2] + i.w * this->m[0][3];
     v.y = i.x * this->m[1][0] + i.y * this->m[1][1] + i.z * this->m[1][2] + i.w * this->m[1][3];
@@ -188,7 +187,7 @@ Mat4 Mat4::createProjection(const int w, const int h, const float fov, const flo
     m.m[2][2] = (znear + zfar) / (znear - zfar);
     m.m[2][3] = (2.0f * zfar * znear) / (znear - zfar);
     m.m[3][2] = -1.0f;
-    
+
 
 
     return m;

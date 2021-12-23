@@ -17,6 +17,7 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CPUID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Vertex.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp
@@ -25,6 +26,7 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Rasterizer.cpp
 )
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -45,4 +47,8 @@ target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA
 ############################### tests ########################################
 if(BUILD_TESTING)
     add_subdirectory("test")
+endif()
+
+if(BUILD_EXAMPLES)
+    add_subdirectory("examples")
 endif()

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <types.hpp>
-
 class Vec4
 {
 public:
@@ -20,7 +18,7 @@ public:
     Vec4();
     ~Vec4() = default;
 
-    // TODO: review the const to allow mutability
+    // @todo: review the const to allow mutability
     //       in the this ptr, so can be more
     //       performant as well less mem consuming
     //       and having more cpu cache hits
@@ -37,9 +35,10 @@ public:
     bool operator==(const Vec4& v) const;
 
     Vec4& operator+=(const Vec4& v) noexcept;
-    //Vec4& operator*=(const Vec4& m) noexcept;
+    Vec4& operator*=(const Vec4& v) noexcept;
     //Vec4& operator*=(const Mat4& m) noexcept;
 
+    // should make sense to have a "Plane" class instead of Vec4 for plane?
     Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept;
 
 //private:
@@ -47,8 +46,6 @@ public:
     float y = 0.0f;
     float z = 0.0f;
     float w = 1.0f;
-
-    color_t col;
 
 private:
 #if 0

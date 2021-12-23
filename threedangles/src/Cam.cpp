@@ -8,9 +8,8 @@ Mat4 Cam::matrixView() noexcept
 {
     // Camera Matrix
     Mat4 matCamRot = Mat4::createRotationY(yaw);
-    // TODO: this doesn't look right
-    target.x = 0.0f; target.y = 0.0f; target.z = 1.0f;
-    lookAt = matCamRot * target;
+    lookAt = matCamRot * znorm;
+    // @todo: i am computing twice the F,forward vector here and in matrixLookAt(), just compute once.
     Vec4 F = lookAt.normalize();
     Vec4 L = up.crossProd(F).normalize();
     lookAt = Mat4::createRotation(pitch, L) * lookAt;
@@ -49,9 +48,20 @@ void Cam::turnDown() noexcept
     pitch -= turnFactor;
 }
 
+//void Cam::rollCW() noexcept
+//{
+//    roll += rollFactor;
+//}
+//
+//void Cam::rollCCW() noexcept
+//{
+//    roll -= rollFactor;
+//}
+
 Mat4 Cam::matrixLookAt() const
 {
     /// @see https://www.3dgep.com/understanding-the-view-matrix/
+    // this is the same as lookAt.normalize()
     Vec4 forward = (target - position).normalize();
 
     Vec4 t = (forward * up.dotProd(forward));

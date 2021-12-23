@@ -39,7 +39,7 @@ void Clipping::clipZ(const Triangle& t, std::vector<Triangle>& out) const noexce
     }
 }
 
-void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const noexcept
+void Clipping::clipScreen(const Triangle& tri, std::list<Triangle>& out) const noexcept
 {
     // CLIPPING on Screen size
     std::array<Triangle,2> clipped;
@@ -52,25 +52,22 @@ void Clipping::clipScreen(const raster_t& tri, std::list<raster_t>& out) const n
         {
             int nTrisToAdd = 0;
             // Take triangle from front of queue
-            raster_t r = out.front();
+            Triangle r = out.front();
             out.pop_front();
             nNewTriangles--;
 
-            // Clip it against a plane. We only need to test each 
+            // Clip it against a plane. We only need to test each
             // subsequent plane, against subsequent new triangles
             // as all triangles after a plane clip are guaranteed
-            // to lie on the inside of the plane. I like how this
-            // comment is almost completely and utterly justified
-            nTrisToAdd = againstPlane(r.t, planes_p[p], planes_n[p], clipped[0], clipped[1]);
+            // to lie on the inside of the plane.
+            nTrisToAdd = againstPlane(r, planes_p[p], planes_n[p], clipped[0], clipped[1]);
 
             // Clipping may yield a variable number of triangles, so
             // add these new ones to the back of the queue for subsequent
             // clipping against next planes
-            for (int w = 0; w < nTrisToAdd; w++) {
-                raster_t rr;
-                rr.t = clipped[w];
-                rr.faceNormal = r.faceNormal;
-                out.push_back(rr);
+            for (int w = 0; w < nTrisToAdd; w++)
+            {
+                out.push_back(clipped[w]);
             }
         }
 
@@ -92,21 +89,21 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
     // Create two temporary storage arrays to classify points either side of plane
     // If distance sign is positive, point lies on "inside" of plane
-    std::array<const Vec4*, 3> inside_points = {};
+    std::array<const Vertex*, 3> inside_points = {};
     int nInsidePointCount = 0;
-    std::array<const Vec4*, 3> outside_points = {};
+    std::array<const Vertex*, 3> outside_points = {};
     int nOutsidePointCount = 0;
 
     // Get signed distance of each point in triangle to plane
-    if (dist(in.a) >= 0)
+    if (dist(in.a.v) >= 0)
         inside_points[nInsidePointCount++] = &in.a;
     else
         outside_points[nOutsidePointCount++] = &in.a;
-    if (dist(in.b) >= 0)
+    if (dist(in.b.v) >= 0)
         inside_points[nInsidePointCount++] = &in.b;
     else
         outside_points[nOutsidePointCount++] = &in.b;
-    if (dist(in.c) >= 0)
+    if (dist(in.c.v) >= 0)
         inside_points[nInsidePointCount++] = &in.c;
     else
         outside_points[nOutsidePointCount++] = &in.c;
@@ -133,7 +130,9 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // the plane, the triangle simply becomes a smaller triangle
 
         // Copy appearance info to new triangle
-        out_tri1.setColor(in);
+        //out_tri1.setColor(in);
+        out_tri1.faceNormal_ = in.faceNormal_;
+        
         //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
@@ -141,8 +140,14 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
-        out_tri1.b = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
-        out_tri1.c = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[1]);
+        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v);
+
+        // TODO review these:
+        out_tri1.b.col = in.b.col; // it should be intersected too.
+        out_tri1.c.col = in.c.col; // it should be intersected too.
+        out_tri1.b.normal = in.b.normal;
+        out_tri1.c.normal = in.c.normal;
 
         return 1;
     }
@@ -154,23 +159,32 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // represent a quad with two new triangles
 
         // Copy appearance info to new triangles
-        out_tri1.setColor(in);
-        //out_tri1.setColor(0, 64, 0, 255);
-        out_tri2.setColor(in);
-        //out_tri2.setColor(0, 0, 64, 255);
+        //out_tri1.setColor(in);
+        //out_tri2.setColor(in);
+        out_tri1.faceNormal_ = out_tri2.faceNormal_ = in.faceNormal_;
+        
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
         out_tri1.a = *inside_points[0];
         out_tri1.b = *inside_points[1];
-        out_tri1.c = plane_p.intersectPlane(plane_n, *inside_points[0], *outside_points[0]);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
+
+        // TODO review these
+        out_tri1.c.col = in.c.col; // should be intersected/interpolated too
+        out_tri1.c.normal = in.c.normal;
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
         // triangle and the plane, and the newly created point above
         out_tri2.a = *inside_points[1];
         out_tri2.b = out_tri1.c;
-        out_tri2.c = plane_p.intersectPlane(plane_n, *inside_points[1], *outside_points[0]);
+        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
+
+        // TODO review these
+        out_tri2.c.col = in.c.col;
+        out_tri2.c.normal = in.c.normal;
+
 
         return 2;
     }

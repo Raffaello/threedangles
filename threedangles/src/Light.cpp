@@ -2,20 +2,24 @@
 #include <cmath>
 #include <algorithm>
 
-Light::Light(const Vec4& direction, const color_t& color) :
+Light::Light(const Vec4& direction, const Color& color) :
+    direction(direction),
     direction_normalized(direction.normalize()), col(color)
 {
 }
 
-color_t Light::flatShading(const Vec4& triangleFaceNormal) const noexcept
+Color Light::flatShading(const Vec4& triangleFaceNormal) const noexcept
 {
-    float dp = triangleFaceNormal.dotProd(direction_normalized);
-    color_t c;
-    
-    c.r = static_cast<uint8_t>(std::clamp(std::round(dp * col.r), 0.0f, 255.0f));
-    c.g = static_cast<uint8_t>(std::clamp(std::round(dp * col.g), 0.0f, 255.0f));
-    c.b = static_cast<uint8_t>(std::clamp(std::round(dp * col.b), 0.0f, 255.0f));
-    //c.a = 255;
+    const float dp = triangleFaceNormal.dotProd(direction_normalized);
 
-    return c;
+    return Color(
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.r), 0.0f, 255.0f)),
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.g), 0.0f, 255.0f)),
+        static_cast<uint8_t>(std::clamp(std::round(dp * col.b), 0.0f, 255.0f))
+    );
+}
+
+Color Light::gouraudShading(const Triangle& triangle, const int w1, const int w2, const int w3, const int wn) const noexcept
+{
+    return Color();
 }

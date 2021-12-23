@@ -1,0 +1,6 @@
+o PlainTriangle
+v 0.0 1.0 0.0
+v 0.0 0.0 0.0
+v 1.0 0.0 0.0
+s off
+f 1 2 3

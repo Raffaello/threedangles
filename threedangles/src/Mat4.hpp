@@ -11,13 +11,14 @@ class Mat4
 {
 public:
     Mat4 operator*(const Mat4& m_) const noexcept;
+    // @todo remove this operator
     Vec4 operator*(const Vec4& i) const noexcept;
 
     bool operator==(const Mat4& m) const noexcept;
     
     static float deg2rad(const float deg);
     
-    // These method could be moved outside of this class
+    // These methods could be moved outside of this class, so the Vec4 dependency can be removed
     static Mat4 createIdentity();
     static Mat4 createTranslation(const Vec4& v);
     static Mat4 createTranslation(const float k);
@@ -29,7 +30,7 @@ public:
     static Mat4 createRotation(const float theta, const Vec4& n) noexcept;
 
 
-    // todo move to private
+    // @todo move to private
     std::array<std::array<float, 4>, 4> m = {};
 private:
     
