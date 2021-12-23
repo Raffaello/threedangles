@@ -84,8 +84,6 @@ int main(int argc, char* argv[])
 
     int width = 640;
     int height = 480;
-    const float w2 = 0.5f * static_cast<float>(width);
-    const float h2 = 0.5f * static_cast<float>(height);
     uint32_t FPS = 60;
     uint32_t frameTime_ms = 1000 / FPS;
     Color black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
@@ -101,7 +99,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("tex_suzanne.obj");
+    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -123,6 +121,7 @@ int main(int argc, char* argv[])
     engine->initPerspectiveProjection(fov, zfar, znear);
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
+
     // Light
     Light light(Vec4(.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
     engine->addLight(light);
@@ -134,6 +133,7 @@ int main(int argc, char* argv[])
     unsigned int tot_frames = 0;
     uint32_t frame_start_ticks = SDL_GetTicks();
     bool perspectiveCorrection = false;
+    bool zbuf = true;
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
@@ -216,6 +216,11 @@ int main(int argc, char* argv[])
                     perspectiveCorrection = !perspectiveCorrection;
                     engine->setPerpsectiveCorrection(perspectiveCorrection);
                     SDL_Log("perspective Correction %d", perspectiveCorrection);
+                    break;
+                case SDLK_z:
+                    zbuf = !zbuf;
+                    engine->setZBuffer(zbuf);
+                    SDL_Log("Z buffer %d", zbuf);
                     break;
                 default:
                     break;

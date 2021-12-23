@@ -25,8 +25,12 @@ public:
         return _screen;
     }
 
-    void setPerpsectiveCorrection(bool on) {
+    void setPerpsectiveCorrection(const bool on) const noexcept {
         _rasterizer->perspectiveCorrection = on;
+    }
+
+    void setZBuffer(const bool on) const noexcept {
+        _rasterizer->depthBuffer = on;
     }
 
     void setMatrixProjection(const Mat4& matProj) noexcept;
@@ -52,8 +56,6 @@ private:
     std::shared_ptr<Screen> _screen;
     std::shared_ptr<Clipping> _clipping;
     std::shared_ptr<Rasterizer> _rasterizer;
-    // move depthBuffer to screen?
-    //std::shared_ptr<float[]> _depthBuffer;
 
     float fov = 0.0f;
     float far = 0.0f;

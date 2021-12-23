@@ -15,6 +15,7 @@ class Rasterizer
 public:
     // todo: remove
     bool perspectiveCorrection = false;
+    bool depthBuffer = true;
     
     Rasterizer() = delete;
     explicit Rasterizer(const std::shared_ptr<Screen> screen);

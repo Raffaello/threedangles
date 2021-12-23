@@ -477,6 +477,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
         return;
 
     // these variables could be not used.
+    const float z1 = triangle.a.v.z;
+    const float z2 = triangle.b.v.z;
+    const float z3 = triangle.c.v.z;
     const float w1 = triangle.a.v.w;
     const float w2 = triangle.b.v.w;
     const float w3 = triangle.c.v.w;
@@ -533,9 +536,11 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     const int xmin = std::min(x1, std::min(x2, x3));
     const int xmax = std::max(x1, std::max(x2, x3));
     const int sa = area > 0 ? +1 : -1;
+    
 
     for (int y = ymin; y <= ymax; y++)
     {
+        const int yw = y * _screen->width;
         for (int x = xmin; x <= xmax; x++)
         {
             const int e3 = edge(x1, y1, x2, y2, x, y); // c3
@@ -546,6 +551,12 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 continue;
 
             // inside the triangle
+            const float z = (e1 * z1 + e2 * z2 + e3 * z3) / area;
+            
+            if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
+                continue;
+
+            _screen->_depthBuffer[yw + x] = z;
 
             // Lights off / gouraud
             if (illuminationType == 0)

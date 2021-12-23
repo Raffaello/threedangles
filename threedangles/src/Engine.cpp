@@ -6,7 +6,6 @@
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {
     _rasterizer = std::make_shared<Rasterizer>(_screen);
-    //_depthBuffer = std::make_shared<float[]>(_screen->screenSize);
 }
 
 std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const int width, const int height) noexcept
@@ -54,7 +53,8 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     _trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
-    //for (int i = 0; i < _screen->screenSize; ++i) _depthBuffer[i] = far;
+    //for (int i = 0; i < _screen->screenSize; ++i) _screen->_depthBuffer[i] = far;
+    std::fill(_screen->_depthBuffer.get(), _screen->_depthBuffer.get() + _screen->screenSize, -far);
 
     for (const auto& mesh : _meshes)
     {
@@ -66,7 +66,7 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
         mesh->render(_matProjection, _matWorld, _matView, showHiddenVertexes, cam, _clipping, _trianglesToRaster);
     }
 
-    // Z-depth sorting (Painter's Algorithm)
+    // Z-depth reverse-sorting (Painter's Algorithm reverse)
     sortZ();
 
     // Triangle Rasterization
