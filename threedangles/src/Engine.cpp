@@ -6,7 +6,6 @@
 Engine::Engine(const std::shared_ptr<Screen> screen) : _screen(screen)
 {
     _rasterizer = std::make_shared<Rasterizer>(_screen);
-    //_depthBuffer = std::make_shared<float[]>(_screen->screenSize);
 }
 
 std::shared_ptr<Engine> Engine::createEngineSDL(const std::string& title, const int width, const int height) noexcept
@@ -54,7 +53,8 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     _trianglesToRaster.clear();
     // Clear the screen/buffer
     _screen->clear(bg_col);
-    //for (int i = 0; i < _screen->screenSize; ++i) _depthBuffer[i] = far;
+    // TODO: notice that is -far instead of +far, it looks something not ok with left/right hand coordinates
+    std::fill(_screen->_depthBuffer.get(), _screen->_depthBuffer.get() + _screen->screenSize, -far);
 
     for (const auto& mesh : _meshes)
     {
@@ -66,8 +66,8 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
         mesh->render(_matProjection, _matWorld, _matView, showHiddenVertexes, cam, _clipping, _trianglesToRaster);
     }
 
-    // Z-depth sorting (Painter's Algorithm)
-    sortZ();
+    // Z-depth reverse-sorting (Painter's Algorithm reverse)
+    sortZReverse();
 
     // Triangle Rasterization
     raster();
@@ -96,6 +96,19 @@ float Engine::lerp(const float a, const float b, const float t) noexcept
 }
 
 inline void Engine::sortZ() noexcept
+{
+    std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
+        [](const Triangle& t1, const Triangle& t2)
+        {
+            // divsion by 3.0f can be skipped
+            const float z1 = t1.a.v.z + t1.b.v.z + t1.c.v.z;
+            const float z2 = t2.a.v.z + t2.b.v.z + t2.c.v.z;
+            return z1 > z2;
+        }
+    );
+}
+
+void Engine::sortZReverse() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
         [](const Triangle& t1, const Triangle& t2)
