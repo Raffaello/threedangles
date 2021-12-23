@@ -172,86 +172,65 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         t.faceNormal_ = t.faceNormal();
 
     // compute adjancency list for triangles (naive approach)
-    mesh->adjacency_index.resize(mesh->tris.size());
-    for (int i = 0; i < mesh->tris.size(); i++)
+    mesh->computeAdjacencyList();
+
+    // compute vertex normals if not present in the obj,
+    // otherwise use the one provided in the obj
+    if (vni == 0)
+        mesh->computeVertextNormals();
+
+    return mesh;
+}
+
+void Mesh::computeAdjacencyList()
+{
+    adjacency_index.resize(tris.size());
+    for (int i = 0; i < tris.size(); i++)
     {
-        auto& t1 = mesh->tris[i];
-        for (int j = 0; j < mesh->tris.size(); j++)
+        auto& t1 = tris[i];
+        for (int j = 0; j < tris.size(); j++)
         {
             if (i == j)
                 continue;
 
-            auto& t2 = mesh->tris[j];
+            auto& t2 = tris[j];
 
             if (t1.a.v == t2.a.v
                 || t1.a.v == t2.b.v
                 || t1.a.v == t2.c.v)
-                mesh->adjacency_index[i][0].push_back(j);
+                adjacency_index[i][0].push_back(j);
             if (t1.b.v == t2.a.v
-                    || t1.b.v == t2.b.v
-                    || t1.b.v == t2.c.v)
-                mesh->adjacency_index[i][1].push_back(j);
+                || t1.b.v == t2.b.v
+                || t1.b.v == t2.c.v)
+                adjacency_index[i][1].push_back(j);
             if (t1.c.v == t2.a.v
-                    || t1.c.v == t2.b.v
-                    || t1.c.v == t2.c.v)
-                mesh->adjacency_index[i][2].push_back(j);
+                || t1.c.v == t2.b.v
+                || t1.c.v == t2.c.v)
+                adjacency_index[i][2].push_back(j);
         }
     }
+}
 
-    // compute vertex normals if not present in the obj,
-    // otherwise use the one provided in the obj
-    if (vni == 0) {
-        
-        for (int i = 0; i < mesh->tris.size(); i++)
+void Mesh::computeVertextNormals()
+{
+    if (adjacency_index.size() != tris.size()) {
+        computeAdjacencyList();
+    }
+
+    for (int i = 0; i < tris.size(); i++)
+    {
+        std::array<Vec4, 3> vns;
+        for (int j = 0; j < 3; j++)
         {
-            std::array<Vec4, 3> vns;
-            for (int j = 0; j < 3; j++)
-            {
-                Vec4 vn = mesh->tris[i].faceNormal_;
-                for (const auto& tn : mesh->adjacency_index[i][j]) {
-                    vn += mesh->tris[tn].faceNormal_;
-                }
-                vns[j] = vn.normalize();
+            Vec4 vn = tris[i].faceNormal_;
+            for (const auto& tn : adjacency_index[i][j]) {
+                vn += tris[tn].faceNormal_;
             }
-
-            mesh->tris[i].a.normal = vns[0];
-            mesh->tris[i].b.normal = vns[1];
-            mesh->tris[i].c.normal = vns[2];
+            vns[j] = vn.normalize();
         }
+
+        tris[i].a.normal = vns[0];
+        tris[i].b.normal = vns[1];
+        tris[i].c.normal = vns[2];
     }
-
-    
-
-    // compute vertex normal very slow and naive
-    //for (auto& t : mesh->tris)
-    //    t.a.normal = t.b.normal = t.c.normal = t.faceNormal_;
-
-    //for (int i = 0; i < mesh->tris.size(); i++)
-    //{
-    //    auto& ti = mesh->tris[i];
-    //    //ti.a.normal = ti.b.normal = ti.c.normal = ti.faceNormal_;
-    //    for (int j = i+1; j < mesh->tris.size(); j++)
-    //    {
-    //        auto& tj = mesh->tris[j];
-    //        if      (ti.a == tj.a) ti.a.normal += tj.a.normal;
-    //        else if (ti.a == tj.b) ti.a.normal += tj.b.normal;
-    //        else if (ti.a == tj.c) ti.a.normal += tj.c.normal;
-
-    //        if      (ti.b == tj.a) ti.b.normal += tj.a.normal;
-    //        else if (ti.b == tj.b) ti.b.normal += tj.b.normal;
-    //        else if (ti.b == tj.c) ti.b.normal += tj.c.normal;
-
-    //        if      (ti.c == tj.a) ti.c.normal += tj.a.normal;
-    //        else if (ti.c == tj.b) ti.c.normal += tj.b.normal;
-    //        else if (ti.c == tj.c) ti.c.normal += tj.c.normal;
-    //            
-    //       
-    //    }
-
-    //    ti.a.normal = ti.a.normal.normalize();
-    //    ti.b.normal = ti.b.normal.normalize();
-    //    ti.c.normal = ti.c.normal.normalize();
-    //}
-
-    return mesh;
 }

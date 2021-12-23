@@ -18,8 +18,8 @@ It will feature the following algorithms:
 - [ ] Textures
 - [ ] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
-- [ ] Vertex Normals
-- [ ] Gouraud Shading
+- [x] Vertex Normals
+- [x] Gouraud Shading
 - [ ] Phong Shading
 - rasterization
 - [ ] Left-hand rules
