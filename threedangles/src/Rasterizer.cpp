@@ -551,7 +551,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 continue;
 
             // inside the triangle
-            const float z = (e1 * z1 + e2 * z2 + e3 * z3) / area;
+            const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
             
             if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
                 continue;
