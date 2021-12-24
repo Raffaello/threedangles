@@ -7,6 +7,7 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_DEBUG_POSTFIX d)
 
 find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2-image CONFIG REQUIRED)
 
 if (WIN32)
     set(LIB_SDL2main SDL2::SDL2main)
@@ -21,13 +22,18 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Triangle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Cam.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Quat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Rasterizer.cpp
+
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Image_SDL.cpp
+
 )
+
 target_include_directories(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CUDAToolkit_INCLUDE_DIRS}
@@ -41,7 +47,7 @@ if (CMAKE_CUDA_COMPILER)
     )
 endif()
 
-target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA})
+target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA} SDL2::SDL2_image)
 
 
 ############################### tests ########################################

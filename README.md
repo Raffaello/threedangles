@@ -4,7 +4,7 @@ Three-D-angles is a 3D triangles engine built from scratch.
 
 This is a for fun, educational project.
 
-The project has been inspired by a OLC's video series (OneLoneCoder):
+The project has been inspired by a OLC's video serie (OneLoneCoder):
 - [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
 - [GitHub](https://github.com/OneLoneCoder)
 
@@ -26,6 +26,12 @@ It will feature the following algorithms:
 - rasterization
 - [ ] Left-hand rules
 - [ ] Quaternions
+- [ ] Materials
+- [ ] advanced lighting
+- [ ] bezier curves
+- [ ] bezier triangles
+- [ ] splines
+- [ ] NURBS
 
 The implementation will be based on :
 
@@ -42,6 +48,10 @@ Use `CMake` and eventually `vcpkg` for package management.
 - Using SDL2 for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations.
+
+### SDL2-Image
+
+Used to load textures.
 
 ### Windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
