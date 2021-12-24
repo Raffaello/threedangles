@@ -59,6 +59,10 @@ void Rasterizer::draw_hline(int x1, int x2, const int y, Color c1, Color c2) con
     _screen->drawPixel(x2, y, c2);
 }
 
+void Rasterizer::TexTriangle3(const Triangle& triangle, const int illuminationType, const Image& texture) const noexcept
+{
+}
+
 inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2) const noexcept
 {
     int dx = abs(x2 - x1);

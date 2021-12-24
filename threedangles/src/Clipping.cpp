@@ -142,12 +142,15 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // original sides of the triangle (lines) intersect with the plane
         out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tb);
         out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v, tc);
-
+        // Color interpolation
         out_tri1.b.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tb);
         out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[1]->col, tc);
-
+        // Vertex Normal interpolation
         out_tri1.b.normal = Clipping::lerp(inside_points[0]->normal, outside_points[0]->normal, tb);
         out_tri1.c.normal = Clipping::lerp(inside_points[0]->normal, outside_points[1]->normal, tc);
+        // Texture interpolation
+        out_tri1.b.texture = Clipping::lerp(inside_points[0]->texture, outside_points[0]->texture, tb);
+        out_tri1.c.texture = Clipping::lerp(inside_points[0]->texture, outside_points[1]->texture, tc);
 
         return 1;
     }
@@ -170,19 +173,20 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri1.b = *inside_points[1];
         
         out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tc);
-
         out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tc);
         out_tri1.c.normal = Clipping::lerp(inside_points[0]->normal, outside_points[0]->normal, tc);
+        out_tri1.c.texture = Clipping::lerp(inside_points[0]->texture, outside_points[0]->texture, tc);
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
         // triangle and the plane, and the newly created point above
         out_tri2.a = *inside_points[1];
         out_tri2.b = out_tri1.c;
+        
         out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v, tc);
-
         out_tri2.c.col = Color::lerpRGB(inside_points[1]->col, outside_points[0]->col, tc);
         out_tri2.c.normal = Clipping::lerp(inside_points[1]->normal, outside_points[0]->normal, tc);
+        out_tri2.c.texture = Clipping::lerp(inside_points[1]->texture, outside_points[0]->texture, tc);
 
         return 2;
     }
