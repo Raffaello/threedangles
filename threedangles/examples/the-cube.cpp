@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
     unsigned int tot_frames = 0;
     uint32_t frame_start_ticks = SDL_GetTicks();
     bool perspectiveCorrection = false;
-    bool zbuf = true;
+    bool rotation = false;
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
@@ -227,6 +227,10 @@ int main(int argc, char* argv[])
                     engine->setPerpsectiveCorrection(perspectiveCorrection);
                     SDL_Log("perspective Correction %d", perspectiveCorrection);
                     break;
+                case SDLK_r:
+                    rotation = !rotation;
+                    SDL_Log("rotation on %d", rotation);
+                    break;
                 default:
                     break;
                 }
@@ -240,7 +244,9 @@ int main(int argc, char* argv[])
         }
 
         // Rotation
-        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
+        float alpha = 0.0f;
+        if (rotation)
+            alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
 

@@ -1,5 +1,6 @@
 #include <Rasterizer.hpp>
 #include <algorithm>
+#include <cassert>
 
 
 Rasterizer::Rasterizer(const std::shared_ptr<Screen> screen) : _screen(screen)
@@ -711,6 +712,8 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
             }
             
             Color c;
+            assert(u >= 0.0f && u <= 1.0f);
+            assert(v >= 0.0f && v <= 1.0f);
             triangle.texImg->getPixel(u, v, c);
             _screen->drawPixel(x, y, c);
         }

@@ -12,6 +12,16 @@ Tex3::Tex3() : Tex3(0.0f, 0.0f, 0.0f)
 {
 }
 
+Tex3 Tex3::normByW() const noexcept
+{
+    Tex3 t(*this);
+    t.u /= w;
+    t.v /= w;
+    t.w = 1.0f / w;
+    
+    return t;
+}
+
 bool Tex3::operator==(const Tex3& t) const noexcept
 {
     return u == t.u && v == t.v && w == t.w;

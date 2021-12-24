@@ -15,5 +15,7 @@ public:
     float v;
     float w;
 
+    Tex3 normByW() const noexcept;
+
     bool operator==(const Tex3& t) const noexcept;
 };
