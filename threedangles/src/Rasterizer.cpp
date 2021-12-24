@@ -561,7 +561,6 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
 
             // inside the triangle
             const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
-            
             if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
                 continue;
 
@@ -654,6 +653,9 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
     const float z1 = triangle.a.v.z;
     const float z2 = triangle.b.v.z;
     const float z3 = triangle.c.v.z;
+    const float w1 = triangle.a.v.w;
+    const float w2 = triangle.b.v.w;
+    const float w3 = triangle.c.v.w;
     
     Tex3 ta;
     Tex3 tb;
@@ -689,8 +691,6 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
     const int xmin = std::min(x1, std::min(x2, x3));
     const int xmax = std::max(x1, std::max(x2, x3));
     const int sa = area > 0 ? +1 : -1;
-    
-    
 
     for (int y = ymin; y <= ymax; y++)
     {
@@ -706,19 +706,17 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
 
             // inside the triangle
             const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
-
-            if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
+            const float zw = (w1 * e1 + w2 * e2 + w3 * e3) / static_cast<float>(area);
+            if (_screen->_depthBuffer[yw + x] > zw && depthBuffer)
                 continue;
 
-            _screen->_depthBuffer[yw + x] = z;
+            _screen->_depthBuffer[yw + x] = zw;
 
             float u = 0.0f;
             float v = 0.0f;
-            float w = 0.0f;
-            float tw = 0.0f;
             if (perspectiveCorrection)
             {
-               w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
+               const float w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
                u = w * (e1 * u1 + e2 * u2 + e3 * u3);
                v = w * (e1 * v1 + e2 * v2 + e3 * v3);
             }
