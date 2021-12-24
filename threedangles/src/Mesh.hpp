@@ -23,6 +23,9 @@ public:
 
     bool visible = true;
 
+    // TODO find a better way to deal with textures
+    bool hasTexture = false;
+    std::shared_ptr<Image> texture = nullptr;
     /**
      * @brief Load .OBJ file
      * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file

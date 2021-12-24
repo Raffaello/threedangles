@@ -55,7 +55,7 @@ public:
      * @param texture 
      * @return 
     */
-    void TexTriangle3(const Triangle& triangle, const int illuminationType, const Image& texture) const noexcept;
+    void TexTriangle3(const Triangle& triangle, const Image& texture) const noexcept;
 
     // @todo color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;

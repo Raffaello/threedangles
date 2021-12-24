@@ -47,6 +47,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     std::string line;
     std::vector<Vertex> vertexes;
     std::vector<Vec4> vns;
+    std::vector<Tex3> vts;
 
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
@@ -133,7 +134,10 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 
             // Vertex textures, if presents
             if (has_vt) {
-                // todo
+                const std::array<unsigned short, 3> fti = { vt_[0] - 1, vt_[1] - 1, vt_[2] - 1 };
+                for (int i = 0; i < 3; i++) {
+                    vertexes.at(face_index[i]).texture = vts.at(fti[i]);
+                }
             }
 
             mesh->tris.emplace_back(vertexes.at(face_index[0]), vertexes.at(face_index[1]), vertexes.at(face_index[2]));
@@ -141,6 +145,9 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         else if (type == "vt")
         {
             // vertex texture
+            Tex3 t;
+            ss >> t.u >> t.v >> t.w;
+            vts.push_back(t);
         }
         else if (type == "vn")
         {

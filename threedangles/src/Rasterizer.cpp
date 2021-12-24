@@ -59,10 +59,6 @@ void Rasterizer::draw_hline(int x1, int x2, const int y, Color c1, Color c2) con
     _screen->drawPixel(x2, y, c2);
 }
 
-void Rasterizer::TexTriangle3(const Triangle& triangle, const int illuminationType, const Image& texture) const noexcept
-{
-}
-
 inline void Rasterizer::drawLine(int x1, int y1, const int x2, const int y2) const noexcept
 {
     int dx = abs(x2 - x1);
@@ -145,8 +141,16 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
 
 void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 {
-    Color c = triangle.getColor();
-    drawTriangle(triangle, c);
+    int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    int y3 = static_cast<int>(std::round(triangle.c.v.y));
+
+    drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
+    drawLine(x2, y2, x3, y3, triangle.b.col, triangle.c.col);
+    drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
 void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const noexcept
@@ -159,9 +163,9 @@ void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const no
     int y3 = static_cast<int>(std::round(triangle.c.v.y));
 
     _screen->setDrawColor(c);
-    drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
-    drawLine(x2, y2, x3, y3, triangle.b.col, triangle.c.col);
-    drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
+    drawLine(x1, y1, x2, y2);
+    drawLine(x2, y2, x3, y3);
+    drawLine(x3, y3, x1, y1);
 }
 
 void Rasterizer::fillTriangleNoInterpolation(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
@@ -605,4 +609,108 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             _screen->drawPixel(x, y, c);
         }
     }
+}
+
+void Rasterizer::TexTriangle3(const Triangle& triangle, const Image& texture) const noexcept
+{
+    // Pineda algorithm, traversal bounding box, not incremental edge function
+    // Not efficient implementation.
+
+    // It is doing already the back-face culling if drawing only when area is positive
+    // this can be useful to avoid some computation.. but at the same time
+    // the faceback culling is useful to reduce the number of triangle to
+    // process
+
+    // Edge function
+    // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
+    //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
+    // @todo: make it inline
+    const auto edge = [](const int x1, const int y1, const int x2, const int y2, const int x, const int y) noexcept {
+        return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
+    };
+
+    // V1
+    const int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    const int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    // V2
+    const int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    const int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    // V3
+    const int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    const int y3 = static_cast<int>(std::round(triangle.c.v.y));
+
+    // @todo: move to Triangle and skip to reach here? 
+    //       what about clipping before rasterization process?
+    // 
+    // when area is negative is a back face, "hidden face" removed already
+    // by the back-face culling. Using != 0 so i can see the back of the triangle if wanted.
+    // the area == 0 is no triangle
+    const int area = edge(x1, y1, x2, y2, x3, y3);
+    if (area == 0)
+        return;
+
+    // these variables could be not used.
+    const float z1 = triangle.a.v.z;
+    const float z2 = triangle.b.v.z;
+    const float z3 = triangle.c.v.z;
+    const float w1 = triangle.a.v.w;
+    const float w2 = triangle.b.v.w;
+    const float w3 = triangle.c.v.w;
+
+    // textures coord
+    const float u1 = triangle.a.texture.u;
+    const float v1 = triangle.a.texture.v;
+    const float u2 = triangle.b.texture.u;
+    const float v2 = triangle.b.texture.v;
+    const float u3 = triangle.c.texture.u;
+    const float v3 = triangle.c.texture.v;
+
+    // bounding box (no clipping)
+    const int ymin = std::min(y1, std::min(y2, y3));
+    const int ymax = std::max(y1, std::max(y2, y3));
+    const int xmin = std::min(x1, std::min(x2, x3));
+    const int xmax = std::max(x1, std::max(x2, x3));
+    const int sa = area > 0 ? +1 : -1;
+
+    for (int y = ymin; y <= ymax; y++)
+    {
+        const int yw = y * _screen->width;
+        for (int x = xmin; x <= xmax; x++)
+        {
+            const int e3 = edge(x1, y1, x2, y2, x, y); // c3
+            const int e1 = edge(x2, y2, x3, y3, x, y); // c1
+            const int e2 = edge(x3, y3, x1, y1, x, y); // c2
+
+            if (e1 * sa < 0 || e2 * sa < 0 || e3 * sa < 0)
+                continue;
+
+            // inside the triangle
+            const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
+
+            if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
+                continue;
+
+            _screen->_depthBuffer[yw + x] = z;
+
+            float u = 0.0f;
+            float v = 0.0f;
+            if (perspectiveCorrection)
+            {
+                //const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
+                //c.r = std::clamp(static_cast<int>(std::round(w * (e1 * u1r + e2 * c2r + e3 * c3r))), 0, 255);
+                //c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
+                //c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+            }
+            else
+            {
+                u = (e1 * u1 + e2 * u2 + e3 * u3) / area;
+                v = (e1 * v1 + e2 * v2 + e3 * v3) / area;
+            }
+            
+            Color c;
+            texture.getPixel(u, v, c);
+            _screen->drawPixel(x, y, c);
+        }
+    }
+
 }

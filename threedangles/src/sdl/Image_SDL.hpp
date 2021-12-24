@@ -18,7 +18,12 @@ namespace sdl
         virtual ~Image_SDL();
 
         bool loadPNG(const std::string& filename) noexcept override;
-        bool getPixel(const int x, const int y, Color& c_out) noexcept override;
+        bool getPixel(const int x, const int y, Color& c_out) const noexcept override;
+        bool getPixel(const float u, const float v, Color& c_out) const noexcept override;
+
+        int getWidth() const noexcept override;
+        int getHeight() const noexcept override;
+
     private:
         SDL_Surface* _image = nullptr;
         bool _locked = false;

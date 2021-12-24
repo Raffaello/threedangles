@@ -127,20 +127,25 @@ void Engine::raster() noexcept
 
         for (auto& t : listTriangles)
         {
-            if (filled >= 1)
-            {
-                // fill triangle
-                _rasterizer->fillTriangle3(t, illuminationOn, _lights);
-                if (filled == 2)
-                {
-                    // wireframe debug
-                    _rasterizer->drawTriangle(t, Color(255, 255, 255));
-                }
-            }
-            else {
-                // wireframe
-                _rasterizer->drawTriangle(t);
-            }
+            //if (filled >= 1)
+            //{
+            //    // fill triangle
+            //    _rasterizer->fillTriangle3(t, illuminationOn, _lights);
+            //    if (filled == 2)
+            //    {
+            //        // wireframe debug
+            //        _rasterizer->drawTriangle(t, Color(255, 255, 255));
+            //    }
+            //}
+            //else {
+            //    // wireframe
+            //    _rasterizer->drawTriangle(t);
+            //}
+            
+
+            // TEST
+            _rasterizer->TexTriangle3(t, *_meshes[0]->texture);
+            //_rasterizer->drawTriangle(t, Color(255, 255, 255));
         }
     }
 }
