@@ -36,4 +36,6 @@ bool sdl::Image_SDL::getPixel(const int x, const int y, Color& c_out) noexcept
 
     const uint32_t col = reinterpret_cast<uint32_t*>(_pxl + y * _image->pitch)[x];
     SDL_GetRGBA(col, _image->format, &c_out.r, &c_out.g, &c_out.b, &c_out.a);
+
+    return true;
 }

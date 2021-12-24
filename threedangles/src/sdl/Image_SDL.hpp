@@ -10,14 +10,15 @@ namespace sdl
     class Image_SDL : public Image
     {
     public:
+        Image_SDL(Image_SDL&) = delete;
+        Image_SDL(Image_SDL&&) = delete;
+        Image_SDL& operator=(const Image_SDL&) = delete;
+
         Image_SDL() = default;
         virtual ~Image_SDL();
 
-
-        virtual bool loadPNG(const std::string& filename) noexcept override;
-        virtual bool getPixel(const int x, const int y, Color& c_out) noexcept override;
-        
-        //static std::shared_ptr<Image> loadPNG(const std::string& filename) noexcept;
+        bool loadPNG(const std::string& filename) noexcept override;
+        bool getPixel(const int x, const int y, Color& c_out) noexcept override;
     private:
         SDL_Surface* _image = nullptr;
         bool _locked = false;
