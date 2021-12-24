@@ -86,7 +86,7 @@ jobs:
         #if: steps.dep-cache.outputs.cache-hit != 'true'
         run: |
           . "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          vcpkg --triplet=x64-windows install sdl2 gtest
+          vcpkg --triplet=x64-windows install sdl2 sdl2-image gtest
 
       - uses: actions/cache@v2
         id: sonar-cache
