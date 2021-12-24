@@ -33,9 +33,8 @@ Triangle Triangle::normByW() const noexcept
     t.a.v = a.v.normByW();
     t.b.v = b.v.normByW();
     t.c.v = c.v.normByW();
-    t.a.texture = t.a.texture.normByW();
-    t.b.texture = t.b.texture.normByW();
-    t.c.texture = t.c.texture.normByW();
+
+    
 
     return t;
 }

@@ -120,21 +120,6 @@ int main(int argc, char* argv[])
         return -3;
     }
 
-    // Show Picture, test
-    const int maxy = std::min(engine->getScreen()->height, image->getHeight());
-    const int maxx = std::min(engine->getScreen()->width, image->getWidth());
-    for (int y = 0; y < maxy; y++)
-    {
-        for (int x = 0; x < maxx; x++)
-        {
-            Color c;
-            image->getPixel(x, y, c);
-            engine->getScreen()->drawPixel(x, y, c);
-        }
-    }
-    engine->getScreen()->flip();
-    SDL_Delay(3000);
-
     mesh->setTexture(image);
 
     engine->addMesh(mesh);

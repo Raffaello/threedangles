@@ -154,7 +154,8 @@ Vec4 Vec4::crossProd(const Vec4& v) const
 Vec4 Vec4::normByW() const
 {
     Vec4 u(*this);
-    u.x /= w; u.y /= w; u.z /= w; u.w = 1.0f / w;
+    u.x /= w; u.y /= w; u.z /= w; 
+    //u.w = 1.0f / w;
     return u;
 #if 0
     //return cpu::vector_normByW(*this);

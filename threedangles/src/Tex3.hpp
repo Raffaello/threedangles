@@ -15,7 +15,17 @@ public:
     float v;
     float w;
 
-    Tex3 normByW() const noexcept;
-
     bool operator==(const Tex3& t) const noexcept;
+    inline Tex3 operator*(const float k) const noexcept;
+    inline Tex3 operator/(const float k) const noexcept;
 };
+
+inline Tex3 Tex3::operator*(const float k) const noexcept
+{
+    return Tex3(u * k, v * k, w * k);
+}
+
+inline Tex3 Tex3::operator/(const float k) const noexcept
+{
+    return Tex3(u / k, v / k, w / k);
+}
