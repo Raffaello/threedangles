@@ -24,6 +24,7 @@ macro_example(
         ${CMAKE_SOURCE_DIR}/threedangles/src/CPUID.cpp
         ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
         ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+        ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
         ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
         ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
         ${CMAKE_SOURCE_DIR}/threedangles/src/Mesh.cpp
