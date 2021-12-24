@@ -44,7 +44,7 @@ jobs:
         #if: steps.dep-cache.outputs.cache-hit != 'true'
         run: |
           . "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars${{ env.ARCH }}.bat"
-          vcpkg --triplet=${{ matrix.triplet }} install sdl2 gtest
+          vcpkg --triplet=${{ matrix.triplet }} install sdl2 sdl2-image gtest
       - uses: actions/checkout@v2
       - name: create build dir
         run: mkdir build
