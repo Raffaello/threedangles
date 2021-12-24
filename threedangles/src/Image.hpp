@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <Color.hpp>
+#include <string>
 
 class Image
 {

@@ -13,6 +13,7 @@ namespace sdl
         Image_SDL() = default;
         virtual ~Image_SDL();
 
+
         virtual bool loadPNG(const std::string& filename) noexcept override;
         virtual bool getPixel(const int x, const int y, Color& c_out) noexcept override;
         
