@@ -23,11 +23,14 @@ It will feature the following algorithms:
 - [x] Vertex Normals
 - [x] Gouraud Shading
 - [ ] Phong Shading
-- rasterization
-- [ ] Left-hand rules
+
+Something to leave for the future due to time....
+
+- [ ] Left-hand/Right-hand rules
 - [ ] Quaternions
 - [ ] Materials
 - [ ] advanced lighting
+- [ ] triangle filling improvements (pineda)
 - [ ] bezier curves
 - [ ] bezier triangles
 - [ ] splines
@@ -51,7 +54,7 @@ Use `CMake` and eventually `vcpkg` for package management.
 
 ### SDL2-Image
 
-Used to load textures.
+Used to load images for textures.
 
 ### Windows
 - WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
@@ -76,7 +79,7 @@ This might require to redo all the `engine` into `cudaEngine`:
 It might just be pointless doing a "software 3D rendering Engine using GPGPU", apart some fun on it, but at that point would be better doing properly
 with Vulkan/DirectX/OpenGL.
 
-I am not sure if i will do it right now or in the future, as after wrote the algorithms,
+I am not sure if i will do it right now or in the future, as after I wrote the algorithms,
 using CUDA won't change too much, especially with the usage of the `thrust` library.
 
 ### C/C++ compiler optimization
