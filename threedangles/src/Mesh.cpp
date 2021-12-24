@@ -1,6 +1,7 @@
 #include <Mesh.hpp>
 #include <fstream>
 #include <strstream> // @todo remove as it has been deprecated
+#include <cassert>
 
 void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
     const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
@@ -20,9 +21,15 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         triTransformed.b.normal = matWorld * triTransformed.b.normal;
         triTransformed.c.normal = matWorld * triTransformed.c.normal;
 
+        // Texture info assertion
+        assert(triTransformed.a.texture == tri.a.texture);
+        assert(triTransformed.b.texture == tri.b.texture);
+        assert(triTransformed.c.texture == tri.c.texture);
+
         // World Space -> View Space
         triTransformed *= matView;
-        // Clipping section (this could be done at the rasterizer level?)
+        
+        // Clipping section
         std::vector<Triangle> clips;
         clipping->clipZ(triTransformed, clips);
 

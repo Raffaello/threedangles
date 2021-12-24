@@ -8,6 +8,8 @@ TEST(Vertex, assigment)
 
     v1.v = Vec4(1.f, 2.f, 3.f, 4.f);
     v1.col = Color(5, 6, 7, 8);
+    v1.texture = Tex3(9, 10, 11);
+
     Vertex v2;
 
     v2 = v1;
@@ -15,6 +17,7 @@ TEST(Vertex, assigment)
     EXPECT_EQ(v2, v1);
     EXPECT_EQ(v2.v, v1.v);
     EXPECT_EQ(v2.col, v1.col);
+    EXPECT_EQ(v2.texture, v1.texture);
 }
 TEST(Vertex, equality)
 {

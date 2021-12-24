@@ -8,7 +8,7 @@ The project has been inspired by a OLC's video serie (OneLoneCoder):
 - [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
 - [GitHub](https://github.com/OneLoneCoder)
 
-It will feature the following algorithms:
+It will feature the following algorithms (foundations):
 
 - [x] Line drawing (bresenham)
 - [x] Triangle filling (bresenham, pineda)

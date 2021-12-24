@@ -130,22 +130,22 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // the plane, the triangle simply becomes a smaller triangle
 
         // Copy appearance info to new triangle
-        //out_tri1.setColor(in);
         out_tri1.faceNormal_ = in.faceNormal_;
-        
-        //out_tri1.setColor(64, 0, 0, 255);
 
         // The inside point is valid, so keep that...
         out_tri1.a = *inside_points[0];
 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
-        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v);
+        float tb = 0.0f;
+        float tc = 0.0f;
+
+        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tb);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v, tc);
 
         // TODO review these:
-        out_tri1.b.col = in.b.col; // it should be intersected too.
-        out_tri1.c.col = in.c.col; // it should be intersected too.
+        out_tri1.b.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tb);
+        out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[1]->col, tc);
         out_tri1.b.normal = in.b.normal;
         out_tri1.c.normal = in.c.normal;
 
@@ -168,10 +168,11 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // intersects with the plane
         out_tri1.a = *inside_points[0];
         out_tri1.b = *inside_points[1];
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
+        float tc;
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tc);
 
         // TODO review these
-        out_tri1.c.col = in.c.col; // should be intersected/interpolated too
+        out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tc);
         out_tri1.c.normal = in.c.normal;
 
         // The second triangle is composed of one of he inside points, a
@@ -179,10 +180,10 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // triangle and the plane, and the newly created point above
         out_tri2.a = *inside_points[1];
         out_tri2.b = out_tri1.c;
-        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
+        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v, tc);
 
         // TODO review these
-        out_tri2.c.col = in.c.col;
+        out_tri2.c.col = Color::lerpRGB(inside_points[1]->col, outside_points[0]->col, tc);
         out_tri2.c.normal = in.c.normal;
 
 

@@ -90,11 +90,6 @@ void Engine::addLight(const Light& light)
     _lightCounts = _lights.size();
 }
 
-float Engine::lerp(const float a, const float b, const float t) noexcept
-{
-    return a + t * (b - a);
-}
-
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),

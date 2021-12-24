@@ -27,6 +27,9 @@ public:
     void clipScreen(const Triangle& tri, std::list<Triangle>& out) const noexcept;
 
     int againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept;
+
+    // @todo replace with std::lerp when C++20
+    static inline float lerp(const float a, const float b, const float t) noexcept;
 private:
     const Vec4 plane_p_near;
     const Vec4 plane_n_near;
@@ -36,3 +39,10 @@ private:
     const std::array<const Vec4, 4> planes_p;
     const std::array<const Vec4, 4> planes_n;
 };
+
+inline float Clipping::lerp(const float a, const float b, const float t) noexcept
+{
+    return a + t * (b - a);
+}
+
+

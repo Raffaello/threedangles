@@ -74,10 +74,18 @@ macro_test(
     )
 
 macro_test(
+    EXE TestTexture
+    FILE "TestTex3.cpp"
+    FILES
+        ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+)
+
+macro_test(
         EXE TestVertex
         FILE "TestVertex.cpp"
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
 )
 
@@ -88,6 +96,7 @@ macro_test(
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
 )
@@ -98,6 +107,7 @@ macro_test(
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Cam.cpp
@@ -115,6 +125,7 @@ macro_test(
         FILES
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Mesh.cpp
             ${CMAKE_SOURCE_DIR}/threedangles/src/Cam.cpp

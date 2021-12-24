@@ -199,14 +199,20 @@ Vec4& Vec4::operator*=(const Vec4& v) noexcept
 
 Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept
 {
+    float t = 0.0f;
+    return intersectPlane(plane_n, lineStart, lineEnd, t);
+}
+
+Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd, float& out_t) const noexcept
+{
     assert(plane_n == plane_n.normalize());
 
     const float plane_d = -plane_n.dotProd(*this);
     const float ad = lineStart.dotProd(plane_n);
     const float bd = lineEnd.dotProd(plane_n);
-    const float t = (-plane_d - ad) / (bd - ad);
+    out_t = (-plane_d - ad) / (bd - ad);
     const Vec4 lineStartToEnd = lineEnd - lineStart;
-    const Vec4 lineToIntersect = lineStartToEnd * t;
+    const Vec4 lineToIntersect = lineStartToEnd * out_t;
     return lineStart + lineToIntersect;
 #if 0
     //return cpu::vector_intersect_plane(*this, plane_n, lineStart, lineEnd);

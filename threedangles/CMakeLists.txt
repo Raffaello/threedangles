@@ -27,6 +27,7 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Light.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Rasterizer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Tex3.cpp
 
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
