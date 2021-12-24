@@ -611,7 +611,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     }
 }
 
-void Rasterizer::TexTriangle3(const Triangle& triangle, const Image& texture) const noexcept
+void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
 {
     // Pineda algorithm, traversal bounding box, not incremental edge function
     // Not efficient implementation.
@@ -665,6 +665,10 @@ void Rasterizer::TexTriangle3(const Triangle& triangle, const Image& texture) co
     const float u3 = triangle.c.texture.u;
     const float v3 = triangle.c.texture.v;
 
+    const float tw1 = triangle.a.texture.w;
+    const float tw2 = triangle.b.texture.w;
+    const float tw3 = triangle.c.texture.w;
+
     // bounding box (no clipping)
     const int ymin = std::min(y1, std::min(y2, y3));
     const int ymax = std::max(y1, std::max(y2, y3));
@@ -696,10 +700,9 @@ void Rasterizer::TexTriangle3(const Triangle& triangle, const Image& texture) co
             float v = 0.0f;
             if (perspectiveCorrection)
             {
-                //const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                //c.r = std::clamp(static_cast<int>(std::round(w * (e1 * u1r + e2 * c2r + e3 * c3r))), 0, 255);
-                //c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
-                //c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+               const float w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
+               u = w * (e1 * u1 + e2 * u2 + e3 * u3);
+               v = w * (e1 * v1 + e2 * v2 + e3 * v3);
             }
             else
             {
@@ -708,7 +711,7 @@ void Rasterizer::TexTriangle3(const Triangle& triangle, const Image& texture) co
             }
             
             Color c;
-            texture.getPixel(u, v, c);
+            triangle.texImg->getPixel(u, v, c);
             _screen->drawPixel(x, y, c);
         }
     }

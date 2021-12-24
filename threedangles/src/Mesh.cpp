@@ -246,3 +246,12 @@ void Mesh::computeVertextNormals()
         tris[i].c.normal = vns[2];
     }
 }
+
+void Mesh::setTexture(const std::shared_ptr<Image> texture) noexcept
+{
+    showTexture = true;
+    _texture = texture;
+    for (auto& t : tris) {
+        t.texImg = texture;
+    }
+}

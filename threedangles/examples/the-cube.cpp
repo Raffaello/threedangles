@@ -135,14 +135,7 @@ int main(int argc, char* argv[])
     engine->getScreen()->flip();
     SDL_Delay(3000);
 
-    /*for (auto& t : mesh->tris)
-    {
-        t.a.texture = Tex3(0.0f, 1.0f);
-        t.b.texture = Tex3(0.0f, 0.0f);
-        t.c.texture = Tex3(1.0f, 0.0f);
-    }*/
-    mesh->texture = image;
-    mesh->hasTexture = true;
+    mesh->setTexture(image);
 
     engine->addMesh(mesh);
     // Projection Matrix
