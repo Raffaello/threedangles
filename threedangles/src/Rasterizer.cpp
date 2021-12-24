@@ -702,6 +702,7 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
             if (perspectiveCorrection)
             {
                const float w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
+               const float tw = (e1 * tw1 + e2 * tw2 + e3 * tw3) / area;
                u = w * (e1 * u1 + e2 * u2 + e3 * u3);
                v = w * (e1 * v1 + e2 * v2 + e3 * v3);
             }
