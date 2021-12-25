@@ -535,6 +535,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     Tex3 ta;
     Tex3 tb;
     Tex3 tc;
+    Color ct;
 
     if (perspectiveCorrection && illuminationType != 1)
     {
@@ -565,6 +566,8 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     const float tw2 = tb.w;
     const float tw3 = tc.w;
 
+    const bool showTex = triangle.texImg != nullptr && triangle.showTexture;
+
     // bounding box (no clipping)
     const int ymin = std::min(y1, std::min(y2, y3));
     const int ymax = std::max(y1, std::max(y2, y3));
@@ -593,7 +596,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             _screen->_depthBuffer[yw + x] = z;
 
             // Texture
-            if (triangle.texImg != nullptr && triangle.showTexture)
+            if (showTex)
             {
                 float u;
                 float v;
@@ -609,9 +612,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                     v = (v1 * e1 + v2 * e2 + v3 * e3) / static_cast<float>(area);
                 }
 
-                triangle.texImg->getPixel(u, v, c);
-                _screen->drawPixel(x, y, c);
-                continue;
+                triangle.texImg->getPixel(u, v, ct);
+                //_screen->drawPixel(x, y, ct);
+                //continue;
             }
 
             // TODO interpolate with Texture;
@@ -635,9 +638,6 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             }
             else if (illuminationType == 1) {
                 // using the precomputed Color C, doing nothing
-
-                // todo: should interpolate the pixel with the flatShading light color?
-
             }
             else if (illuminationType == 2)
             {
@@ -655,6 +655,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                     c.b = (e1 * c1.b + e2 * c2.b + e3 * c3.b) / area;
                 }
             }
+
+            if (showTex)
+                c = Color::lerpRGBA(ct, c, 0.5);
 
             _screen->drawPixel(x, y, c);
         }

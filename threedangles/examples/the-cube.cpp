@@ -215,6 +215,10 @@ int main(int argc, char* argv[])
                     rotation = !rotation;
                     SDL_Log("rotation on %d", rotation);
                     break;
+                case SDLK_t:
+                    mesh->setShowTexture(!mesh->showTexture);
+                    SDL_Log("show texture %d", mesh->showTexture);
+                    break;
                 default:
                     break;
                 }
