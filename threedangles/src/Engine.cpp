@@ -144,7 +144,8 @@ void Engine::raster() noexcept
             
 
             // TEST
-            _rasterizer->TexTriangle3(t);
+            //_rasterizer->TexTriangle3(t);
+            _rasterizer->fillTriangle3(t, 0, _lights);
             _rasterizer->drawTriangle(t, Color(255, 255, 255));
         }
     }
