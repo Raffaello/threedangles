@@ -532,12 +532,38 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
         c3 = lights[0].flatShading(triangle.c.normal);
     }
 
+    Tex3 ta;
+    Tex3 tb;
+    Tex3 tc;
+
     if (perspectiveCorrection && illuminationType != 1)
     {
         c1r = w1 * c1.r; c1g = w1 * c1.g; c1b = w1 * c1.b;
         c2r = w2 * c2.r; c2g = w2 * c2.g; c2b = w2 * c2.b;
         c3r = w3 * c3.r; c3g = w3 * c3.g; c3b = w3 * c3.b;
+
+        ta = triangle.a.texture * w1;
+        tb = triangle.b.texture * w2;
+        tc = triangle.c.texture * w3;
     }
+    else
+    {
+        ta = triangle.a.texture;
+        tb = triangle.b.texture;
+        tc = triangle.c.texture;
+    }
+
+    // textures coord
+    const float u1 = ta.u;
+    const float v1 = ta.v;
+    const float u2 = tb.u;
+    const float v2 = tb.v;
+    const float u3 = tc.u;
+    const float v3 = tc.v;
+
+    const float tw1 = ta.w;
+    const float tw2 = tb.w;
+    const float tw3 = tc.w;
 
     // bounding box (no clipping)
     const int ymin = std::min(y1, std::min(y2, y3));
@@ -545,7 +571,6 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     const int xmin = std::min(x1, std::min(x2, x3));
     const int xmax = std::max(x1, std::max(x2, x3));
     const int sa = area > 0 ? +1 : -1;
-    
 
     for (int y = ymin; y <= ymax; y++)
     {
@@ -567,6 +592,30 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
 
             _screen->_depthBuffer[yw + x] = z;
 
+            // Texture
+            if (triangle.texImg != nullptr && triangle.showTexture)
+            {
+                float u;
+                float v;
+                if (perspectiveCorrection)
+                {
+                    const float w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
+                    u = w * (e1 * u1 + e2 * u2 + e3 * u3);
+                    v = w * (e1 * v1 + e2 * v2 + e3 * v3);
+                }
+                else
+                {
+                    u = (u1 * e1 + u2 * e2 + u3 * e3) / static_cast<float>(area);
+                    v = (v1 * e1 + v2 * e2 + v3 * e3) / static_cast<float>(area);
+                }
+
+                triangle.texImg->getPixel(u, v, c);
+                _screen->drawPixel(x, y, c);
+                continue;
+            }
+
+            // TODO interpolate with Texture;
+            // 
             // Lights off / gouraud
             if (illuminationType == 0)
             {
@@ -729,6 +778,7 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
             float u = 0.0f;
             float v = 0.0f;
             float w = 0.0f;
+            
             if (perspectiveCorrection)
             {
                /*const float*/ w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);

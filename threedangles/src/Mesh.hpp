@@ -23,6 +23,9 @@ public:
 
     bool visible = true;
     bool showTexture = false;
+
+    void setShowTexture(const bool show) noexcept;
+    
     
     /**
      * @brief Load .OBJ file

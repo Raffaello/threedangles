@@ -135,6 +135,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // Copy appearance info to new triangle
         out_tri1.faceNormal_ = in.faceNormal_;
         out_tri1.texImg = in.texImg;
+        out_tri1.showTexture = in.showTexture;
 
         // The inside point is valid, so keep that...
         out_tri1.a = *inside_points[0];
@@ -169,6 +170,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // Copy appearance info to new triangles
         out_tri1.faceNormal_ = out_tri2.faceNormal_ = in.faceNormal_;
         out_tri1.texImg = out_tri2.texImg = in.texImg;
+        out_tri1.showTexture = out_tri2.showTexture = in.showTexture;
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane

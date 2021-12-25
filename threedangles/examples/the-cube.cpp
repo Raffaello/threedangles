@@ -133,7 +133,6 @@ int main(int argc, char* argv[])
     engine->filled = 0;
     engine->illuminationOn = 0;
 
-
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
     // Light

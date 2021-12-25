@@ -41,6 +41,14 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
     }
 }
 
+void Mesh::setShowTexture(const bool show) noexcept
+{
+    showTexture = show;
+    for (auto& t : tris) {
+        t.showTexture = show;
+    }
+}
+
 std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 {
     std::ifstream file(filename, std::ifstream::in);
@@ -249,9 +257,9 @@ void Mesh::computeVertextNormals()
 
 void Mesh::setTexture(const std::shared_ptr<Image> texture) noexcept
 {
-    showTexture = true;
     _texture = texture;
     for (auto& t : tris) {
         t.texImg = texture;
     }
+    setShowTexture(true);
 }
