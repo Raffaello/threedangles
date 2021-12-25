@@ -32,8 +32,8 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         // Clipping section
         std::vector<Triangle> clips;
         clipping->clipZ(triTransformed, clips);
-
-        for (const auto& c : clips)
+        
+        for(const auto& c : clips)
         {
             // Projection 3D -> 2D & Scale into view (viewport)
             out.emplace_back((c * matProj).normByW());

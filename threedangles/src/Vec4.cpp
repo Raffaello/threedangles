@@ -215,6 +215,9 @@ Vec4 Vec4::intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4
     const Vec4 lineStartToEnd = lineEnd - lineStart;
     const Vec4 lineToIntersect = lineStartToEnd * out_t;
     return lineStart + lineToIntersect;
+    // Vec4 res = lineStart + lineToIntersect;
+    //res.w = lineStart.w;
+    //return res;
 #if 0
     //return cpu::vector_intersect_plane(*this, plane_n, lineStart, lineEnd);
     return inp(*this, plane_n, lineStart, lineEnd);

@@ -573,19 +573,15 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    /*c.r = std::clamp(static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r))), 0, 255);
-                    c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
-                    c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);*/
-
                     c.r = static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
                     c.g = static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
                     c.b = static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {
-                    c.r = /*std::clamp(*/(e1 * c1.r + e2 * c2.r + e3 * c3.r) / area/*, 0, 255)*/;
-                    c.g = /*std::clamp(*/(e1 * c1.g + e2 * c2.g + e3 * c3.g) / area/*, 0, 255)*/;
-                    c.b = /*std::clamp(*/(e1 * c1.b + e2 * c2.b + e3 * c3.b) / area/*, 0, 255)*/;
+                    c.r = (e1 * c1.r + e2 * c2.r + e3 * c3.r) / area;
+                    c.g = (e1 * c1.g + e2 * c2.g + e3 * c3.g) / area;
+                    c.b = (e1 * c1.b + e2 * c2.b + e3 * c3.b) / area;
                 }
             }
             else if (illuminationType == 1) {
@@ -599,15 +595,15 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    c.r = std::clamp(static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r))), 0, 255);
-                    c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
-                    c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+                    c.r = static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
+                    c.g = static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
+                    c.b = static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {
-                    c.r = std::clamp((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area, 0, 255);
-                    c.g = std::clamp((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area, 0, 255);
-                    c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
+                    c.r = (e1 * c1.r + e2 * c2.r + e3 * c3.r) / area;
+                    c.g = (e1 * c1.g + e2 * c2.g + e3 * c3.g) / area;
+                    c.b = (e1 * c1.b + e2 * c2.b + e3 * c3.b) / area;
                 }
             }
 
@@ -736,20 +732,8 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
             if (perspectiveCorrection)
             {
                /*const float*/ w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
-               u = (e1 * u1 + e2 * u2 + e3 * u3);
-               v = (e1 * v1 + e2 * v2 + e3 * v3);
-
-               if (u != 0.0f) u *= w;
-               if (v != 0.0f) v *= w;
-               
-               if (u > 1.0f) u -= 1.0f;
-               else  if (u < 0.0f) u += 1.0f;
-               
-               if (v > 1.0f) v -= 1.0f;
-               else if (v < 0.0f) v += 1.0f;
-                   
-               //u = std::clamp(u, 0.0f, 1.0f);
-               //v = std::clamp(v, 0.0f, 1.0f);
+               u = w * (e1 * u1 + e2 * u2 + e3 * u3);
+               v = w * (e1 * v1 + e2 * v2 + e3 * v3);
             }
             else
             {
@@ -757,11 +741,6 @@ void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
                 v = (v1 * e1 + v2 * e2 + v3 * e3) / static_cast<float>(area);
             }
             
-            if (u < 0.0f || u > 1.0f)
-                continue;
-            if (v < 0.0f || v > 1.0f)
-                continue;
-
             Color c;
             assert(u >= 0.0f && u <= 1.0f);
             assert(v >= 0.0f && v <= 1.0f);

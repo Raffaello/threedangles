@@ -142,7 +142,9 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
         out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tb);
+    out_tri1.b.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[0]->v.w, tb);
         out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v, tc);
+    out_tri1.c.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[1]->v.w, tc);
         // Color interpolation
         out_tri1.b.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tb);
         out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[1]->col, tc);
@@ -174,6 +176,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri1.b = *inside_points[1];
         
         out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tc);
+    out_tri1.c.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[0]->v.w, tc);
         out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tc);
         out_tri1.c.normal = Clipping::lerp(inside_points[0]->normal, outside_points[0]->normal, tc);
         out_tri1.c.texture = Clipping::lerp(inside_points[0]->texture, outside_points[0]->texture, tc);
@@ -185,6 +188,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
         out_tri2.b = out_tri1.c;
         
         out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v, tc);
+    out_tri2.c.v.w = Clipping::lerp(inside_points[1]->v.w, outside_points[0]->v.w, tc);
         out_tri2.c.col = Color::lerpRGB(inside_points[1]->col, outside_points[0]->col, tc);
         out_tri2.c.normal = Clipping::lerp(inside_points[1]->normal, outside_points[0]->normal, tc);
         out_tri2.c.texture = Clipping::lerp(inside_points[1]->texture, outside_points[0]->texture, tc);
