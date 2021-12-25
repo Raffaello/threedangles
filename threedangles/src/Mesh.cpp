@@ -1,6 +1,6 @@
 #include <Mesh.hpp>
 #include <fstream>
-#include <strstream> // @todo remove as it has been deprecated
+#include <sstream>
 #include <cassert>
 
 void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
@@ -65,7 +65,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     mesh->name = filename;
     while (std::getline(file, line))
     {
-        std::strstream ss;
+        std::stringstream ss;
         std::string type;
 
         ss << line;
@@ -84,8 +84,6 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         }
         else if (type == "f")
         {
-            // @todo: store vt and vn values
-
             // face
             // can be:
             // - int
@@ -93,15 +91,15 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             // - int/int/int
             //  int//int
             std::string fs;
-            std::array<int,3> v_;
-            std::array<int,3> vt_;
-            std::array<int, 3> vn_;
+            std::array<int, 3> v_ = {};
+            std::array<int, 3> vt_ = {};
+            std::array<int, 3> vn_ = {};
             bool has_vt = true;
             bool has_vn = true;
             for (int i = 0; i < 3; ++i)
             {
                 ss >> fs;
-                std::strstream ssf;
+                std::stringstream ssf;
                 ssf << fs;
                 std::string sv, svt, svn;
                 std::getline(ssf, sv, '/');
@@ -130,8 +128,6 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             }
             
             const std::array<unsigned short, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
-            //mesh->faces_index.push_back(face_index);
-
             // Vertex normals, if presents
             if (has_vn) {
                 const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };

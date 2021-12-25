@@ -24,6 +24,8 @@ public:
     bool visible = true;
     bool showTexture = false;
 
+    // This might not be the best iterate through all triangles
+    // to change that, but at the moment is acceptable.
     void setShowTexture(const bool show) noexcept;
     
     

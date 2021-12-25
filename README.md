@@ -16,7 +16,7 @@ It will feature the following algorithms (foundations):
 - [x] Transformations
 - [x] Camera positioning
 - [x] Loading 3D object files
-- [ ] Textures
+- [x] Textures
 - [x] Painter's algorithm
 - [x] Z-buffer (Depth-Buffer)
 - [x] Flat-Shading
@@ -26,6 +26,7 @@ It will feature the following algorithms (foundations):
 
 Something to leave for the future due to time....
 
+- [ ] multi-sample/fragments processing (post raster step) (more to related to organize better the code first)
 - [ ] Left-hand/Right-hand rules
 - [ ] Quaternions
 - [ ] Materials

@@ -36,6 +36,9 @@ bool sdl::Image_SDL::getPixel(const int x, const int y, Color& c_out) const noex
 {
     if (nullptr == _pxl)
         return false;
+    
+    SDL_assert(x >= 0 && x < _image->w);
+    SDL_assert(y >= 0 && y < _image->h);
 
     const int x3 = x * 3;
     const int yw = y * _image->pitch;

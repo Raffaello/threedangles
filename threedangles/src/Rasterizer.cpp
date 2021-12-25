@@ -457,6 +457,17 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     // the faceback culling is useful to reduce the number of triangle to
     // process
 
+    // NOTE ON BARYCENTRIC COORDINATES:
+    //           (y2-y3)(x-x3)+(x3-x2)(y-y3)
+    // e1 = ----------------------------------------
+    //       (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
+    //
+    //       (y3 - y1)(x - x3) + (x1 - x3)(y - y3)
+    // e2 = ---------------------------------------
+    //      (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
+    //
+    // e3 = 1 - e2 - e2
+    // ####################################################################
     // Edge function
     // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
     //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
@@ -595,7 +606,14 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
 
             _screen->_depthBuffer[yw + x] = z;
 
-            // Texture
+            // TODO store the results into fragments objects
+            //      and process them at the end.. 
+            //
+            // TODO detach into fragments to be rendered at the end
+            // it could also help parallelize it, while processing fragment (next pixel)
+            // another thread is writing on the buffer for eg. etc...
+
+            // Texture Fragment
             if (showTex)
             {
                 float u;
@@ -613,13 +631,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 }
 
                 triangle.texImg->getPixel(u, v, ct);
-                //_screen->drawPixel(x, y, ct);
-                //continue;
             }
 
-            // TODO interpolate with Texture;
-            // 
-            // Lights off / gouraud
+            // Lights Fragment
             if (illuminationType == 0)
             {
                 if (perspectiveCorrection)
@@ -662,144 +676,4 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
             _screen->drawPixel(x, y, c);
         }
     }
-}
-
-void Rasterizer::TexTriangle3(const Triangle& triangle) const noexcept
-{
-    // Pineda algorithm, traversal bounding box, not incremental edge function
-    // Not efficient implementation.
-
-    // It is doing already the back-face culling if drawing only when area is positive
-    // this can be useful to avoid some computation.. but at the same time
-    // the faceback culling is useful to reduce the number of triangle to
-    // process
-
-    // NOTE ON BARYCENTRIC COORDINATES:
-    //           (y2-y3)(x-x3)+(x3-x2)(y-y3)
-    // e1 = ----------------------------------------
-    //       (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
-    //
-    //       (y3 - y1)(x - x3) + (x1 - x3)(y - y3)
-    // e2 = ---------------------------------------
-    //      (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
-    //
-    // e3 = 1 - e2 - e2
-    // ####################################################################
-    // Edge function
-    // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dX), P(x,y)
-    //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
-    // @todo: make it inline
-    const auto edge = [](const int x1, const int y1, const int x2, const int y2, const int x, const int y) noexcept {
-        return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
-    };
-
-    // V1
-    const int x1 = static_cast<int>(std::round(triangle.a.v.x));
-    const int y1 = static_cast<int>(std::round(triangle.a.v.y));
-    // V2
-    const int x2 = static_cast<int>(std::round(triangle.b.v.x));
-    const int y2 = static_cast<int>(std::round(triangle.b.v.y));
-    // V3
-    const int x3 = static_cast<int>(std::round(triangle.c.v.x));
-    const int y3 = static_cast<int>(std::round(triangle.c.v.y));
-
-    // @todo: move to Triangle and skip to reach here? 
-    //       what about clipping before rasterization process?
-    // 
-    // when area is negative is a back face, "hidden face" removed already
-    // by the back-face culling. Using != 0 so i can see the back of the triangle if wanted.
-    // the area == 0 is no triangle
-    // edge(x3, y3, x2, y2, x1, y1)
-    const int area = edge(x1, y1, x2, y2, x3, y3);
-    if (area == 0)
-        return;
-
-    // these variables could be not used.
-    const float z1 = triangle.a.v.z;
-    const float z2 = triangle.b.v.z;
-    const float z3 = triangle.c.v.z;
-    const float w1 = triangle.a.v.w;
-    const float w2 = triangle.b.v.w;
-    const float w3 = triangle.c.v.w;
-    
-    Tex3 ta;
-    Tex3 tb;
-    Tex3 tc;
-
-    if (perspectiveCorrection)
-    {
-        ta = triangle.a.texture * w1;
-        tb = triangle.b.texture * w2;
-        tc = triangle.c.texture * w3;
-    }
-    else
-    {
-        ta = triangle.a.texture;
-        tb = triangle.b.texture;
-        tc = triangle.c.texture;
-    }
-
-    // textures coord
-    const float u1 = ta.u;
-    const float v1 = ta.v;
-    const float u2 = tb.u;
-    const float v2 = tb.v;
-    const float u3 = tc.u;
-    const float v3 = tc.v;
-
-    const float tw1 = ta.w;
-    const float tw2 = tb.w;
-    const float tw3 = tc.w;
-
-    // bounding box (no clipping)
-    const int ymin = std::min(y1, std::min(y2, y3));
-    const int ymax = std::max(y1, std::max(y2, y3));
-    const int xmin = std::min(x1, std::min(x2, x3));
-    const int xmax = std::max(x1, std::max(x2, x3));
-    const int sa = area > 0 ? +1 : -1;
-
-    for (int y = ymin; y <= ymax; y++)
-    {
-        const int yw = y * _screen->width;
-        for (int x = xmin; x <= xmax; x++)
-        {
-            //const int e3 = edge(x1, y1, x2, y2, x, y); // c3
-            const int e1 = edge(x2, y2, x3, y3, x, y); // c1
-            const int e2 = edge(x3, y3, x1, y1, x, y); // c2
-            const int e3 = area - e2 - e1;
-
-            if (e1 * sa < 0 || e2 * sa < 0 || e3 * sa < 0)
-                continue;
-
-            // inside the triangle
-            const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
-            if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
-                continue;
-
-            _screen->_depthBuffer[yw + x] = z;
-
-            float u = 0.0f;
-            float v = 0.0f;
-            float w = 0.0f;
-            
-            if (perspectiveCorrection)
-            {
-               /*const float*/ w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
-               u = w * (e1 * u1 + e2 * u2 + e3 * u3);
-               v = w * (e1 * v1 + e2 * v2 + e3 * v3);
-            }
-            else
-            {
-                u = (u1 * e1 + u2 * e2 + u3 * e3) / static_cast<float>(area);
-                v = (v1 * e1 + v2 * e2 + v3 * e3) / static_cast<float>(area);
-            }
-            
-            Color c;
-            assert(u >= 0.0f && u <= 1.0f);
-            assert(v >= 0.0f && v <= 1.0f);
-            triangle.texImg->getPixel(u, v, c);
-            _screen->drawPixel(x, y, c);
-        }
-    }
-
 }
