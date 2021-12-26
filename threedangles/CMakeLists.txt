@@ -13,7 +13,7 @@ if (WIN32)
     set(LIB_SDL2main SDL2::SDL2main)
 endif()
 
-add_library(engine_obj OBJECT
+set(engine_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CPUID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
@@ -32,29 +32,30 @@ add_library(engine_obj OBJECT
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Image_SDL.cpp
 )
 
-target_include_directories(engine_obj PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CUDAToolkit_INCLUDE_DIRS}
-)
-
 if (CMAKE_CUDA_COMPILER)
-    set_target_properties(engine_obj PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_sources(engine_obj PUBLIC
+    set(engine_sources
+        ${engine_sources}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/GPUInfo.cu
     )
 endif()
 
+add_library(engine_obj STATIC
+    ${engine_sources}
+)
+set_target_properties(engine_obj PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+target_include_directories(engine_obj PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CUDAToolkit_INCLUDE_DIRS}
+)
+target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image)
 
-target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image ${LIB_CUDA})
-
+##### ---- #####
 add_executable(threedangles "threedangles.cpp")
-
 target_include_directories(threedangles PRIVATE
     $<TARGET_PROPERTY:engine_obj,INCLUDE_DIRECTORIES>
 )
-
-target_link_libraries(threedangles PRIVATE $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES> $<TARGET_OBJECTS:engine_obj>)
+target_link_libraries(threedangles PRIVATE engine_obj)
 
 ############################### tests ########################################
 if(BUILD_TESTING)
