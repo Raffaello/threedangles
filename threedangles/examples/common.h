@@ -145,6 +145,11 @@ public:
                 t.c.col.g = 255;
             }
         }
+        else {
+            Color c(255, 255, 255);
+            for (auto& t : mesh->tris)
+                t.a.col = t.b.col = t.c.col = c;
+        }
 
         // Mesh - add texture
         if (hasTexture)
