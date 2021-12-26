@@ -39,6 +39,8 @@ endmacro()
 macro_example(
     EXE "vertex-coloring"
     FILE "vertex-coloring.cpp"
+    FIXTURES
+        plain_triangle.obj
 )
 
 macro_example(
