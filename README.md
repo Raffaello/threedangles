@@ -22,13 +22,14 @@ It will feature the following algorithms (foundations):
 
 Something to leave for the future due to time....
 
-- [ ] improve/evolve clipping functions
+- [ ] triangle filling improvements (pineda)
+- [ ] improve/evolve clipping functions (Cohen–Sutherland, Liang–Barsky, ...)
 - [ ] multi-sample/fragments processing (post raster step) (related to organize better the Rasterizer)
 - [ ] Left-hand/Right-hand rules
 - [ ] Quaternions
 - [ ] Materials
 - [ ] advanced lighting
-- [ ] triangle filling improvements (pineda)
+- [ ] Lines Anti-Aliasing
 
 Curves & Surfaces:
 
@@ -37,6 +38,15 @@ Curves & Surfaces:
 - [ ] splines/ B-splines
 - [ ] NURBS
 - [ ] Tessellation
+
+Furthermore:
+
+- [ ] Frustrum Culling
+- [ ] Texture MipMapping 
+- [ ] LightMaps
+- [ ] Normal Maps
+
+----
 
 The implementation will be based on :
 

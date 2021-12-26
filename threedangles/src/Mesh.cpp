@@ -32,18 +32,29 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         // Clipping section
         std::vector<Triangle> clips;
         clipping->clipZ(triTransformed, clips);
-        
-        for(const auto& c : clips)
+        for (const auto& c : clips)
         {
             // Projection 3D -> 2D & Scale into view (viewport)
             out.emplace_back((c * matProj).normByW());
         }
+
+        // TODO
+        // Should finishing it up to rasterize the mesh's triangles
+        // and clipping them and start enqueing in the trinagle to rasters?
     }
 }
 
 void Mesh::setShowTexture(const bool show) noexcept
 {
     showTexture = show;
+    // The triangle could have a reference/pointer to the
+    // Mesh showTexture field instead
+    // so no need to propagating the change
+    // As it might be pointless to do not 
+    // show 1 specific triangle for eg
+    // unless this can be a "Mesh decontruction", 
+    // for eg in a game that shooting the faces mesh
+    // is start decomposing.... anyway
     for (auto& t : tris) {
         t.showTexture = show;
     }
@@ -254,6 +265,13 @@ void Mesh::computeVertextNormals()
 void Mesh::setTexture(const std::shared_ptr<Image> texture) noexcept
 {
     _texture = texture;
+    // The triangles should be
+    // references directly to this
+    // pointer so if it changes,
+    // the will change too.
+    // But anyway for now is ok.
+    // This might allow multi-mesh-textures,
+    // even though it won't be the right approach
     for (auto& t : tris) {
         t.texImg = texture;
     }

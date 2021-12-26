@@ -67,5 +67,3 @@ inline Tex3 Clipping::lerp(const Tex3& a, const Tex3& b, const float t) noexcept
         Clipping::lerp(a.w, b.w, t)
     );
 }
-
-

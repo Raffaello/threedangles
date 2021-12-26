@@ -64,7 +64,7 @@ private:
     */
     void sortZ() noexcept;
     void sortZReverse() noexcept;
-    void raster() noexcept;
+    void raster() const noexcept;
 
     Mat4 _matProjection;
     Mat4 _matWorld;

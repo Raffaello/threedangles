@@ -1,6 +1,7 @@
 #include <Rasterizer.hpp>
 #include <algorithm>
 #include <cassert>
+#include <Tex3.hpp>
 
 
 Rasterizer::Rasterizer(const std::shared_ptr<Screen> screen) : _screen(screen)
@@ -670,6 +671,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 }
             }
 
+            // Blending Texture & Light fragment
             if (showTex)
                 c = Color::lerpRGBA(ct, c, 0.5);
 

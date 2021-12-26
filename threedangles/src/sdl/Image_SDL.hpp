@@ -28,5 +28,8 @@ namespace sdl
         SDL_Surface* _image = nullptr;
         bool _locked = false;
         uint8_t* _pxl = nullptr;
+
+        int _w1 = 0;
+        int _h1 = 0;
     };
 }

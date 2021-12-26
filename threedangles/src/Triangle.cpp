@@ -34,8 +34,6 @@ Triangle Triangle::normByW() const noexcept
     t.b.v = b.v.normByW();
     t.c.v = c.v.normByW();
 
-    
-
     return t;
 }
 

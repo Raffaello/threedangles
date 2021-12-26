@@ -60,6 +60,10 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     {
         if (!mesh->visible)
             continue;
+
+        // TODO: Add Frustrum Culling
+
+
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?
@@ -116,7 +120,7 @@ void Engine::sortZReverse() noexcept
     );
 }
 
-void Engine::raster() noexcept
+void Engine::raster() const noexcept
 {
     for (const auto& t : _trianglesToRaster)
     {
@@ -141,11 +145,6 @@ void Engine::raster() noexcept
                 // wireframe
                 _rasterizer->drawTriangle(t);
             }
-            
-            // TEST
-            //_rasterizer->TexTriangle3(t);
-            //_rasterizer->fillTriangle3(t, 0, _lights);
-            //_rasterizer->drawTriangle(t, Color(255, 255, 255));
         }
     }
 }

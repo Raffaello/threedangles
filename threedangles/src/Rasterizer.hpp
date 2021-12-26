@@ -6,7 +6,6 @@
 #include <memory>
 #include <Light.hpp>
 #include <vector>
-#include <Tex3.hpp>
 
 /**
  * @brief Rasterization primitives

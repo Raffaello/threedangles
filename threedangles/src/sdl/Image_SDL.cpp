@@ -27,6 +27,8 @@ bool sdl::Image_SDL::loadPNG(const std::string& filename) noexcept
     _locked = true;
     
     _pxl = reinterpret_cast<uint8_t*>(_image->pixels);
+    _w1 = _image->w - 1;
+    _h1 = _image->h - 1;
 
     IMG_Quit();
     return true;
@@ -59,8 +61,8 @@ bool sdl::Image_SDL::getPixel(const int x, const int y, Color& c_out) const noex
 bool sdl::Image_SDL::getPixel(const float u, const float v, Color& c_out) const noexcept
 {
     return getPixel(
-        static_cast<int>(std::round(u * (_image->w - 1))),
-        static_cast<int>(std::round(v * (_image->h - 1))),
+        static_cast<int>(std::round(u * (_w1))),
+        static_cast<int>(std::round(v * (_h1))),
         c_out
     );
 }

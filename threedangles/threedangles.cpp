@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("plain_teapot.obj");
+    auto mesh = Mesh::loadFromOBJFile("tex_suzanne.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -114,14 +114,14 @@ int main(int argc, char* argv[])
     }
 
     // Mesh - add texture
-    /*std::shared_ptr<Image> image = std::make_shared<sdl::Image_SDL>();
+    std::shared_ptr<Image> image = std::make_shared<sdl::Image_SDL>();
     if (!image->loadPNG("Suzanne.png"))
     {
         cerr << "Can't load texture";
         return -3;
     }
 
-    mesh->setTexture(image);*/
+    mesh->setTexture(image);
 
     engine->addMesh(mesh);
     // Projection Matrix
