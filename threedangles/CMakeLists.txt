@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for threedangles, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.17)
+cmake_minimum_required (VERSION 3.18.1)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_DEBUG_POSTFIX d)
@@ -13,7 +13,7 @@ if (WIN32)
     set(LIB_SDL2main SDL2::SDL2main)
 endif()
 
-add_library(engine_obj OBJECT 
+add_library(engine_obj OBJECT
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CPUID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
@@ -32,20 +32,21 @@ add_library(engine_obj OBJECT
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Image_SDL.cpp
 )
 
-if (CMAKE_CUDA_COMPILER)
-    set_target_properties(engine_obj PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_include_directories(engine_obj PUBLIC ${CUDAToolkit_INCLUDE_DIRS})
-    target_sources(engine_obj PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/GPUInfo.cu
-    )
-endif()
-
 target_include_directories(engine_obj PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CUDAToolkit_INCLUDE_DIRS}
 )
 
-target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image)
+if (CMAKE_CUDA_COMPILER)
+    set_target_properties(engine_obj PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_sources(engine_obj PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/GPUInfo.cu
+    )
+endif()
+
+
+
+target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image ${LIB_CUDA})
 
 add_executable(threedangles "threedangles.cpp")
 
