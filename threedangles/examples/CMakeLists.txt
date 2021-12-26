@@ -50,3 +50,10 @@ macro_example(
         texture_cube.obj
         wood.png
 )
+
+macro_example(
+    EXE "psy-teapot"
+    FILE "psy-teapot.cpp"
+    FIXTURES
+        plain_teapot.obj
+)
