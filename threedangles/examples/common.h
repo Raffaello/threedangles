@@ -127,7 +127,7 @@ public:
         engine->initPerspectiveProjection(fov, zfar, znear);
         engine->showHiddenVertexes = false;
         engine->filled = 0;
-        engine->illuminationOn = 0;
+        engine->illuminationType = 0;
     }
 
     void addMesh(const std::string& filename, bool hasVertexColored, bool hasTexture, const std::string& tex_filename)
@@ -196,9 +196,9 @@ public:
                         SDL_Log("Show Hidden Vertexes = %d", engine->showHiddenVertexes);
                         break;
                     case SDLK_l:
-                        engine->illuminationOn++;
-                        engine->illuminationOn %= 3;
-                        SDL_Log("Illumination ON = %d", engine->illuminationOn);
+                        engine->illuminationType++;
+                        engine->illuminationType %= 3;
+                        SDL_Log("Illumination ON = %d", engine->illuminationType);
                         break;
                     case SDLK_f:
                         engine->filled++; engine->filled %= 3;
@@ -307,7 +307,7 @@ public:
         example.rotation = rotation;
         example.perspectiveCorrection = perspectiveCorrection;
         example.engine->filled = filled;
-        example.engine->illuminationOn = illuminationType;
+        example.engine->illuminationType = illuminationType;
         
         example.cpu_features();
         example.gpu_features();

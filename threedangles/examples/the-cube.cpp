@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     engine->initPerspectiveProjection(fov, zfar, znear);
     engine->showHiddenVertexes = false;
     engine->filled = 0;
-    engine->illuminationOn = 0;
+    engine->illuminationType = 0;
 
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
@@ -168,9 +168,9 @@ int main(int argc, char* argv[])
                     SDL_Log("Show Hidden Vertexes = %d", engine->showHiddenVertexes);
                     break;
                 case SDLK_l:
-                    engine->illuminationOn++;
-                    engine->illuminationOn %= 3;
-                    SDL_Log("Illumination ON = %d", engine->illuminationOn);
+                    engine->illuminationType++;
+                    engine->illuminationType %= 3;
+                    SDL_Log("Illumination ON = %d", engine->illuminationType);
                     break;
                 case SDLK_f:
                     engine->filled++; engine->filled %= 3;
