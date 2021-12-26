@@ -640,15 +640,15 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    c.r = static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
-                    c.g = static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
-                    c.b = static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
+                    c.r = static_cast<uint8_t>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
+                    c.g = static_cast<uint8_t>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
+                    c.b = static_cast<uint8_t>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {
-                    c.r = (e1 * c1.r + e2 * c2.r + e3 * c3.r) / area;
-                    c.g = (e1 * c1.g + e2 * c2.g + e3 * c3.g) / area;
-                    c.b = (e1 * c1.b + e2 * c2.b + e3 * c3.b) / area;
+                    c.r = static_cast<uint8_t>((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area);
+                    c.g = static_cast<uint8_t>((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area);
+                    c.b = static_cast<uint8_t>((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area);
                 }
             }
             else if (illuminationType == 1) {
@@ -659,9 +659,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    c.r = static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
-                    c.g = static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
-                    c.b = static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
+                    c.r = static_cast<uint8_t>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
+                    c.g = static_cast<uint8_t>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
+                    c.b = static_cast<uint8_t>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {

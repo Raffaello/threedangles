@@ -138,10 +138,10 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 }
             }
             
-            const std::array<unsigned short, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
+            const std::array<int, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
             // Vertex normals, if presents
             if (has_vn) {
-                const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
+                const std::array<int, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
                 for (int i = 0; i < 3; i++) {
                     vertexes.at(face_index[i]).normal = vns.at(fni[i]);
                 }
@@ -149,7 +149,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 
             // Vertex textures, if presents
             if (has_vt) {
-                const std::array<unsigned short, 3> fti = { vt_[0] - 1, vt_[1] - 1, vt_[2] - 1 };
+                const std::array<int, 3> fti = { vt_[0] - 1, vt_[1] - 1, vt_[2] - 1 };
                 for (int i = 0; i < 3; i++) {
                     vertexes.at(face_index[i]).texture = vts.at(fti[i]);
                 }

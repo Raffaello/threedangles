@@ -61,8 +61,8 @@ bool sdl::Image_SDL::getPixel(const int x, const int y, Color& c_out) const noex
 bool sdl::Image_SDL::getPixel(const float u, const float v, Color& c_out) const noexcept
 {
     return getPixel(
-        static_cast<int>(std::round(u * (_w1))),
-        static_cast<int>(std::round(v * (_h1))),
+        static_cast<int>(std::round(u * _w1)),
+        static_cast<int>(std::round(v * _h1)),
         c_out
     );
 }
