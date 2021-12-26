@@ -4,16 +4,12 @@ Three-D-angles is a 3D triangles engine built from scratch.
 
 This is a for fun, educational project.
 
-The project has been inspired by a OLC's video serie (OneLoneCoder):
-- [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
-- [GitHub](https://github.com/OneLoneCoder)
-
 It will feature the following algorithms (foundations):
 
 - [x] Line drawing (bresenham)
 - [x] Triangle filling (bresenham, pineda)
 - [x] Triangle clipping
-- [x] Transformations
+- [x] 3D Transformations
 - [x] Camera positioning
 - [x] Loading 3D object files
 - [x] Textures
@@ -26,16 +22,21 @@ It will feature the following algorithms (foundations):
 
 Something to leave for the future due to time....
 
-- [ ] multi-sample/fragments processing (post raster step) (more to related to organize better the code first)
+- [ ] improve/evolve clipping functions
+- [ ] multi-sample/fragments processing (post raster step) (related to organize better the Rasterizer)
 - [ ] Left-hand/Right-hand rules
 - [ ] Quaternions
 - [ ] Materials
 - [ ] advanced lighting
 - [ ] triangle filling improvements (pineda)
+
+Curves & Surfaces:
+
 - [ ] bezier curves
 - [ ] bezier triangles
-- [ ] splines
+- [ ] splines/ B-splines
 - [ ] NURBS
+- [ ] Tessellation
 
 The implementation will be based on :
 
@@ -49,7 +50,7 @@ Use `CMake` and eventually `vcpkg` for package management.
 
 ## Note on the implementation
 
-- Using SDL2 for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
+- Using `SDL2` for window creation, pixel drawing and input events, so it can be cross-OS in a simpler way,
   without worrying about the "initial boiler plate OS dependant code".
   SDL2 might be removed completely after few iterations.
 
@@ -58,7 +59,7 @@ Use `CMake` and eventually `vcpkg` for package management.
 Used to load images for textures.
 
 ### Windows
-- WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
+- [ ] WinRT: https://docs.microsoft.com/en-us/uwp/api/windows.ui.xaml.media.imaging.writeablebitmap.pixelbuffer?view=winrt-22000#examples
 - WinGDI: https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-setpixel
 
 ### SIMD
@@ -91,3 +92,17 @@ using CUDA won't change too much, especially with the usage of the `thrust` libr
 It looks like compilers are already using some SIMD from default C/C++ code.
 
 - [ ] add specific compiler options on CMAKE configuration, to enhanche performances.
+
+## Credits
+
+The project has been inspired by a OLC's video serie (OneLoneCoder):
+- [YouTube](https://www.youtube.com/watch?v=ih20l3pJoeU)
+- [GitHub](https://github.com/OneLoneCoder)
+
+Papers, documentations and specs (available also in the `/doc` folder):
+
+- [OBJ File Specification](http://www.paulbourke.net/dataformats/obj/)
+- [MTL OBJ File Specification](http://paulbourke.net/dataformats/mtl/)
+- [A Parallel Algorithm for Polygon Rasterization (1988)](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.157.4621)
+- [Fundamentals of Texture Mapping and Image Warping](https://www2.eecs.berkeley.edu/Pubs/TechRpts/1989/5504.html)
+- [Triangle Scan Conversion using 2D Homogeneous Coordinates (1997)](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.7279)
