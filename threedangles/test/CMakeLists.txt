@@ -50,21 +50,24 @@ endmacro()
 macro_test(
         EXE TestVec4
         FILE "TestVec4.cpp"
-        FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
     )
 
 macro_test(
         EXE TestMat4
         FILE "TestMat4.cpp"
-        FILES
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #FILES
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+        LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
     )
 
 macro_test(
     EXE TestQuat
     FILE "TestQuat.cpp"
-    FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Quat.cpp
+    #FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Quat.cpp
+    LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
 )
 
 macro_test(
@@ -76,46 +79,49 @@ macro_test(
 macro_test(
     EXE TestTexture
     FILE "TestTex3.cpp"
-    FILES
-        ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+    #FILES ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+    LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
 )
 
 macro_test(
         EXE TestVertex
         FILE "TestVertex.cpp"
-        FILES
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
+        #FILES
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
+        LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
 )
 
 
 macro_test(
         EXE TestTriangle
         FILE "TestTriangle.cpp"
-        FILES
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
+        #FILES
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
+        LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
 )
 
 macro_test(
         EXE TestMesh
         FILE "TestMesh.cpp"
-        FILES
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Cam.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Clipping.cpp
-            ${CMAKE_SOURCE_DIR}/threedangles/src/Mesh.cpp
+        #FILES
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Mat4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vec4.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Tex3.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Vertex.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Triangle.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Cam.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Clipping.cpp
+        #    ${CMAKE_SOURCE_DIR}/threedangles/src/Mesh.cpp
         FIXTURES
             plain_cube.obj
             normal_cube.obj
+        LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
 )
 
 

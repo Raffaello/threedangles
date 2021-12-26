@@ -13,8 +13,7 @@ if (WIN32)
     set(LIB_SDL2main SDL2::SDL2main)
 endif()
 
-add_executable(threedangles "threedangles.cpp")
-target_sources(threedangles PRIVATE
+add_library(engine_obj OBJECT 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CPUID.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vec4.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Mat4.cpp
@@ -28,28 +27,33 @@ target_sources(threedangles PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Clipping.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Rasterizer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Tex3.cpp
-
-
+    ### SDL dependencies
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Screen_SDL.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/Image_SDL.cpp
-
-)
-
-target_include_directories(threedangles PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CUDAToolkit_INCLUDE_DIRS}
 )
 
 if (CMAKE_CUDA_COMPILER)
-    set_target_properties(threedangles PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_include_directories(threedangles PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
-    target_sources(threedangles PRIVATE
+    set_target_properties(engine_obj PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_include_directories(engine_obj PUBLIC ${CUDAToolkit_INCLUDE_DIRS})
+    target_sources(engine_obj PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/cuda/GPUInfo.cu
     )
 endif()
 
-target_link_libraries(threedangles PRIVATE SDL2::SDL2 ${LIB_SDL2main} ${LIB_CUDA} SDL2::SDL2_image)
+target_include_directories(engine_obj PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CUDAToolkit_INCLUDE_DIRS}
+)
 
+target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image)
+
+add_executable(threedangles "threedangles.cpp")
+
+target_include_directories(threedangles PRIVATE
+    $<TARGET_PROPERTY:engine_obj,INCLUDE_DIRECTORIES>
+)
+
+target_link_libraries(threedangles PRIVATE $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES> $<TARGET_OBJECTS:engine_obj>)
 
 ############################### tests ########################################
 if(BUILD_TESTING)
