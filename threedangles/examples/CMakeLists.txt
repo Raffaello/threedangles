@@ -12,8 +12,10 @@ macro(macro_example) # ${ARGN} link libraries
     
     add_executable (${EXAMPLE_EXE} ${EXAMPLE_FILE})
     target_sources(${EXAMPLE_EXE} PRIVATE ${EXAMPLE_FILES})
-    target_include_directories(${EXAMPLE_EXE} PRIVATE ${CMAKE_SOURCE_DIR}/threedangles/src)
-    target_link_libraries(${EXAMPLE_EXE} ${EXAMPLE_LINKS})
+    target_include_directories(${EXAMPLE_EXE} PRIVATE
+        ${CMAKE_SOURCE_DIR}/threedangles/examples
+    )
+    target_link_libraries(${EXAMPLE_EXE} ${EXAMPLE_LINKS} engine_obj)
 
     set(fixtures ${EXAMPLE_FIXTURES})
     list(LENGTH fixtures num_fixtures)
@@ -37,13 +39,13 @@ endmacro()
 macro_example(
     EXE "vertex-coloring"
     FILE "vertex-coloring.cpp"
-    LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
+    FIXTURES
+        plain_triangle.obj
 )
 
 macro_example(
     EXE "the-cube"
     FILE "the-cube.cpp"
-    LINKS $<TARGET_OBJECTS:engine_obj> $<TARGET_PROPERTY:engine_obj,LINK_LIBRARIES>
     FIXTURES
         texture_cube.obj
         wood.png

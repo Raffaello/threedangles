@@ -42,7 +42,7 @@ public:
 
     bool showHiddenVertexes = false;
     // 0 = off, 1 = flat, 2=gouraud
-    short illuminationOn = 1;
+    short illuminationType = 1;
     // 0 wire, 1 filled, 2 filled+wire, replace with an enum
     short filled = 1;
 

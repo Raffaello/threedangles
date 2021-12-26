@@ -134,7 +134,7 @@ void Engine::raster() const noexcept
             if (filled >= 1)
             {
                 // fill triangle
-                _rasterizer->fillTriangle3(t, illuminationOn, _lights);
+                _rasterizer->fillTriangle3(t, illuminationType, _lights);
                 if (filled == 2)
                 {
                     // wireframe debug
