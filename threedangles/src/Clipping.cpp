@@ -126,65 +126,74 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
     if (nInsidePointCount == 1 && nOutsidePointCount == 2)
     {
+        float tb = 0.0f;
+        float tc = 0.0f;
+
         // Triangle should be clipped. As two points lie outside
         // the plane, the triangle simply becomes a smaller triangle
 
         // Copy appearance info to new triangle
-        //out_tri1.setColor(in);
         out_tri1.faceNormal_ = in.faceNormal_;
-        
-        //out_tri1.setColor(64, 0, 0, 255);
+        out_tri1.texImg = in.texImg;
+        out_tri1.showTexture = in.showTexture;
 
         // The inside point is valid, so keep that...
         out_tri1.a = *inside_points[0];
 
         // but the two new points are at the locations where the 
         // original sides of the triangle (lines) intersect with the plane
-        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v);
-
-        // TODO review these:
-        out_tri1.b.col = in.b.col; // it should be intersected too.
-        out_tri1.c.col = in.c.col; // it should be intersected too.
-        out_tri1.b.normal = in.b.normal;
-        out_tri1.c.normal = in.c.normal;
+        out_tri1.b.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tb);
+    out_tri1.b.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[0]->v.w, tb);
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[1]->v, tc);
+    out_tri1.c.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[1]->v.w, tc);
+        // Color interpolation
+        out_tri1.b.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tb);
+        out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[1]->col, tc);
+        // Vertex Normal interpolation
+        out_tri1.b.normal = Clipping::lerp(inside_points[0]->normal, outside_points[0]->normal, tb);
+        out_tri1.c.normal = Clipping::lerp(inside_points[0]->normal, outside_points[1]->normal, tc);
+        // Texture interpolation
+        out_tri1.b.texture = Clipping::lerp(inside_points[0]->texture, outside_points[0]->texture, tb);
+        out_tri1.c.texture = Clipping::lerp(inside_points[0]->texture, outside_points[1]->texture, tc);
 
         return 1;
     }
 
     if (nInsidePointCount == 2 && nOutsidePointCount == 1)
     {
+        float tc = 0.0f;
+
         // Triangle should be clipped. As two points lie inside the plane,
         // the clipped triangle becomes a "quad". Fortunately, we can
         // represent a quad with two new triangles
 
         // Copy appearance info to new triangles
-        //out_tri1.setColor(in);
-        //out_tri2.setColor(in);
         out_tri1.faceNormal_ = out_tri2.faceNormal_ = in.faceNormal_;
-        
+        out_tri1.texImg = out_tri2.texImg = in.texImg;
+        out_tri1.showTexture = out_tri2.showTexture = in.showTexture;
         // The first triangle consists of the two inside points and a new
         // point determined by the location where one side of the triangle
         // intersects with the plane
         out_tri1.a = *inside_points[0];
         out_tri1.b = *inside_points[1];
-        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v);
-
-        // TODO review these
-        out_tri1.c.col = in.c.col; // should be intersected/interpolated too
-        out_tri1.c.normal = in.c.normal;
+        
+        out_tri1.c.v = plane_p.intersectPlane(plane_n, inside_points[0]->v, outside_points[0]->v, tc);
+    out_tri1.c.v.w = Clipping::lerp(inside_points[0]->v.w, outside_points[0]->v.w, tc);
+        out_tri1.c.col = Color::lerpRGB(inside_points[0]->col, outside_points[0]->col, tc);
+        out_tri1.c.normal = Clipping::lerp(inside_points[0]->normal, outside_points[0]->normal, tc);
+        out_tri1.c.texture = Clipping::lerp(inside_points[0]->texture, outside_points[0]->texture, tc);
 
         // The second triangle is composed of one of he inside points, a
         // new point determined by the intersection of the other side of the 
         // triangle and the plane, and the newly created point above
         out_tri2.a = *inside_points[1];
         out_tri2.b = out_tri1.c;
-        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v);
-
-        // TODO review these
-        out_tri2.c.col = in.c.col;
-        out_tri2.c.normal = in.c.normal;
-
+        
+        out_tri2.c.v = plane_p.intersectPlane(plane_n, inside_points[1]->v, outside_points[0]->v, tc);
+    out_tri2.c.v.w = Clipping::lerp(inside_points[1]->v.w, outside_points[0]->v.w, tc);
+        out_tri2.c.col = Color::lerpRGB(inside_points[1]->col, outside_points[0]->col, tc);
+        out_tri2.c.normal = Clipping::lerp(inside_points[1]->normal, outside_points[0]->normal, tc);
+        out_tri2.c.texture = Clipping::lerp(inside_points[1]->texture, outside_points[0]->texture, tc);
 
         return 2;
     }

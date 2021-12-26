@@ -60,6 +60,10 @@ void Engine::processFrame(const Cam& cam, const Color& bg_col) noexcept
     {
         if (!mesh->visible)
             continue;
+
+        // TODO: Add Frustrum Culling
+
+
         // matWorld can be copied in the Mesh and concatenated to other Mesh transformation
         // and then compute the "MeshTransformed already" to be ready to be reused
         // unless something changes ?
@@ -90,11 +94,6 @@ void Engine::addLight(const Light& light)
     _lightCounts = _lights.size();
 }
 
-float Engine::lerp(const float a, const float b, const float t) noexcept
-{
-    return a + t * (b - a);
-}
-
 inline void Engine::sortZ() noexcept
 {
     std::sort(_trianglesToRaster.begin(), _trianglesToRaster.end(),
@@ -121,7 +120,7 @@ void Engine::sortZReverse() noexcept
     );
 }
 
-void Engine::raster() noexcept
+void Engine::raster() const noexcept
 {
     for (const auto& t : _trianglesToRaster)
     {

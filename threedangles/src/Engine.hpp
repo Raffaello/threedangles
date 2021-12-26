@@ -50,8 +50,6 @@ public:
     void addLight(const Light& light);
     // @todo add the "remove/update/set method" for mesh and light
 
-    // @todo replace with std::lerp when C++20
-    static float lerp(const float a, const float b, const float t) noexcept;
 private:
     std::shared_ptr<Screen> _screen;
     std::shared_ptr<Clipping> _clipping;
@@ -66,7 +64,7 @@ private:
     */
     void sortZ() noexcept;
     void sortZReverse() noexcept;
-    void raster() noexcept;
+    void raster() const noexcept;
 
     Mat4 _matProjection;
     Mat4 _matWorld;

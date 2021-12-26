@@ -1,5 +1,7 @@
 #include <Rasterizer.hpp>
 #include <algorithm>
+#include <cassert>
+#include <Tex3.hpp>
 
 
 Rasterizer::Rasterizer(const std::shared_ptr<Screen> screen) : _screen(screen)
@@ -141,8 +143,16 @@ void Rasterizer::drawLine(const int x1, const int y1, const int x2, const int y2
 
 void Rasterizer::drawTriangle(const Triangle& triangle) const noexcept
 {
-    Color c = triangle.getColor();
-    drawTriangle(triangle, c);
+    int x1 = static_cast<int>(std::round(triangle.a.v.x));
+    int y1 = static_cast<int>(std::round(triangle.a.v.y));
+    int x2 = static_cast<int>(std::round(triangle.b.v.x));
+    int y2 = static_cast<int>(std::round(triangle.b.v.y));
+    int x3 = static_cast<int>(std::round(triangle.c.v.x));
+    int y3 = static_cast<int>(std::round(triangle.c.v.y));
+
+    drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
+    drawLine(x2, y2, x3, y3, triangle.b.col, triangle.c.col);
+    drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
 }
 
 void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const noexcept
@@ -155,9 +165,9 @@ void Rasterizer::drawTriangle(const Triangle& triangle, const Color& c) const no
     int y3 = static_cast<int>(std::round(triangle.c.v.y));
 
     _screen->setDrawColor(c);
-    drawLine(x1, y1, x2, y2, triangle.a.col, triangle.b.col);
-    drawLine(x2, y2, x3, y3, triangle.b.col, triangle.c.col);
-    drawLine(x3, y3, x1, y1, triangle.c.col, triangle.a.col);
+    drawLine(x1, y1, x2, y2);
+    drawLine(x2, y2, x3, y3);
+    drawLine(x3, y3, x1, y1);
 }
 
 void Rasterizer::fillTriangleNoInterpolation(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
@@ -448,6 +458,17 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     // the faceback culling is useful to reduce the number of triangle to
     // process
 
+    // NOTE ON BARYCENTRIC COORDINATES:
+    //           (y2-y3)(x-x3)+(x3-x2)(y-y3)
+    // e1 = ----------------------------------------
+    //       (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
+    //
+    //       (y3 - y1)(x - x3) + (x1 - x3)(y - y3)
+    // e2 = ---------------------------------------
+    //      (y2 - y3)(x1 - x3) + (x3 - x2)(y1 - y3)
+    //
+    // e3 = 1 - e2 - e2
+    // ####################################################################
     // Edge function
     // E(x,y) = (x-X)*dY - (y-Y)*dX ==> V1 = (X,Y), V2(X+dY, Y+dY), P(x,y)
     //        = (x-v1.x)*(v2.y-v1.y) - (y-v1.y)*(v2.y-v1.y)
@@ -523,12 +544,41 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
         c3 = lights[0].flatShading(triangle.c.normal);
     }
 
+    Tex3 ta;
+    Tex3 tb;
+    Tex3 tc;
+    Color ct;
+
     if (perspectiveCorrection && illuminationType != 1)
     {
         c1r = w1 * c1.r; c1g = w1 * c1.g; c1b = w1 * c1.b;
         c2r = w2 * c2.r; c2g = w2 * c2.g; c2b = w2 * c2.b;
         c3r = w3 * c3.r; c3g = w3 * c3.g; c3b = w3 * c3.b;
+
+        ta = triangle.a.texture * w1;
+        tb = triangle.b.texture * w2;
+        tc = triangle.c.texture * w3;
     }
+    else
+    {
+        ta = triangle.a.texture;
+        tb = triangle.b.texture;
+        tc = triangle.c.texture;
+    }
+
+    // textures coord
+    const float u1 = ta.u;
+    const float v1 = ta.v;
+    const float u2 = tb.u;
+    const float v2 = tb.v;
+    const float u3 = tc.u;
+    const float v3 = tc.v;
+
+    const float tw1 = ta.w;
+    const float tw2 = tb.w;
+    const float tw3 = tc.w;
+
+    const bool showTex = triangle.texImg != nullptr && triangle.showTexture;
 
     // bounding box (no clipping)
     const int ymin = std::min(y1, std::min(y2, y3));
@@ -536,67 +586,94 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     const int xmin = std::min(x1, std::min(x2, x3));
     const int xmax = std::max(x1, std::max(x2, x3));
     const int sa = area > 0 ? +1 : -1;
-    
 
     for (int y = ymin; y <= ymax; y++)
     {
         const int yw = y * _screen->width;
         for (int x = xmin; x <= xmax; x++)
         {
-            const int e3 = edge(x1, y1, x2, y2, x, y); // c3
+            //const int e3 = edge(x1, y1, x2, y2, x, y); // c3
             const int e1 = edge(x2, y2, x3, y3, x, y); // c1
             const int e2 = edge(x3, y3, x1, y1, x, y); // c2
+            const int e3 = area - e2 - e1;
 
             if (e1 * sa < 0 || e2 * sa < 0 || e3 * sa < 0)
                 continue;
 
             // inside the triangle
             const float z = (z1 * e1 + z2 * e2 + z3 * e3) / static_cast<float>(area);
-            
             if (_screen->_depthBuffer[yw + x] > z && depthBuffer)
                 continue;
 
             _screen->_depthBuffer[yw + x] = z;
 
-            // Lights off / gouraud
+            // TODO store the results into fragments objects
+            //      and process them at the end.. 
+            //
+            // TODO detach into fragments to be rendered at the end
+            // it could also help parallelize it, while processing fragment (next pixel)
+            // another thread is writing on the buffer for eg. etc...
+
+            // Texture Fragment
+            if (showTex)
+            {
+                float u;
+                float v;
+                if (perspectiveCorrection)
+                {
+                    const float w = 1.0f / (e1 * tw1 + e2 * tw2 + e3 * tw3);
+                    u = w * (e1 * u1 + e2 * u2 + e3 * u3);
+                    v = w * (e1 * v1 + e2 * v2 + e3 * v3);
+                }
+                else
+                {
+                    u = (u1 * e1 + u2 * e2 + u3 * e3) / static_cast<float>(area);
+                    v = (v1 * e1 + v2 * e2 + v3 * e3) / static_cast<float>(area);
+                }
+
+                triangle.texImg->getPixel(u, v, ct);
+            }
+
+            // Lights Fragment
             if (illuminationType == 0)
             {
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    c.r = std::clamp(static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r))), 0, 255);
-                    c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
-                    c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+                    c.r = static_cast<uint8_t>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
+                    c.g = static_cast<uint8_t>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
+                    c.b = static_cast<uint8_t>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {
-                    c.r = std::clamp((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area, 0, 255);
-                    c.g = std::clamp((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area, 0, 255);
-                    c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
+                    c.r = static_cast<uint8_t>((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area);
+                    c.g = static_cast<uint8_t>((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area);
+                    c.b = static_cast<uint8_t>((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area);
                 }
             }
             else if (illuminationType == 1) {
                 // using the precomputed Color C, doing nothing
-
-                // todo: should interpolate the pixel with the flatShading light color?
-
             }
             else if (illuminationType == 2)
             {
                 if (perspectiveCorrection)
                 {
                     const float w = 1.0f / (e1 * w1 + e2 * w2 + e3 * w3);
-                    c.r = std::clamp(static_cast<int>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r))), 0, 255);
-                    c.g = std::clamp(static_cast<int>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g))), 0, 255);
-                    c.b = std::clamp(static_cast<int>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b))), 0, 255);
+                    c.r = static_cast<uint8_t>(std::round(w * (e1 * c1r + e2 * c2r + e3 * c3r)));
+                    c.g = static_cast<uint8_t>(std::round(w * (e1 * c1g + e2 * c2g + e3 * c3g)));
+                    c.b = static_cast<uint8_t>(std::round(w * (e1 * c1b + e2 * c2b + e3 * c3b)));
                 }
                 else
                 {
-                    c.r = std::clamp((e1 * c1.r + e2 * c2.r + e3 * c3.r) / area, 0, 255);
-                    c.g = std::clamp((e1 * c1.g + e2 * c2.g + e3 * c3.g) / area, 0, 255);
-                    c.b = std::clamp((e1 * c1.b + e2 * c2.b + e3 * c3.b) / area, 0, 255);
+                    c.r = (e1 * c1.r + e2 * c2.r + e3 * c3.r) / area;
+                    c.g = (e1 * c1.g + e2 * c2.g + e3 * c3.g) / area;
+                    c.b = (e1 * c1.b + e2 * c2.b + e3 * c3.b) / area;
                 }
             }
+
+            // Blending Texture & Light fragment
+            if (showTex)
+                c = Color::lerpRGBA(ct, c, 0.5);
 
             _screen->drawPixel(x, y, c);
         }

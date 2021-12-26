@@ -1,6 +1,7 @@
 #include <Mesh.hpp>
 #include <fstream>
-#include <strstream> // @todo remove as it has been deprecated
+#include <sstream>
+#include <cassert>
 
 void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView,
     const bool showHiddenVertexes, const Cam& cam, const std::shared_ptr<Clipping>& clipping,
@@ -20,17 +21,42 @@ void Mesh::render(const Mat4& matProj, const Mat4& matWorld, const Mat4& matView
         triTransformed.b.normal = matWorld * triTransformed.b.normal;
         triTransformed.c.normal = matWorld * triTransformed.c.normal;
 
+        // Texture info assertion
+        assert(triTransformed.a.texture == tri.a.texture);
+        assert(triTransformed.b.texture == tri.b.texture);
+        assert(triTransformed.c.texture == tri.c.texture);
+
         // World Space -> View Space
         triTransformed *= matView;
-        // Clipping section (this could be done at the rasterizer level?)
+        
+        // Clipping section
         std::vector<Triangle> clips;
         clipping->clipZ(triTransformed, clips);
-
         for (const auto& c : clips)
         {
             // Projection 3D -> 2D & Scale into view (viewport)
             out.emplace_back((c * matProj).normByW());
         }
+
+        // TODO
+        // Should finishing it up to rasterize the mesh's triangles
+        // and clipping them and start enqueing in the trinagle to rasters?
+    }
+}
+
+void Mesh::setShowTexture(const bool show) noexcept
+{
+    showTexture = show;
+    // The triangle could have a reference/pointer to the
+    // Mesh showTexture field instead
+    // so no need to propagating the change
+    // As it might be pointless to do not 
+    // show 1 specific triangle for eg
+    // unless this can be a "Mesh decontruction", 
+    // for eg in a game that shooting the faces mesh
+    // is start decomposing.... anyway
+    for (auto& t : tris) {
+        t.showTexture = show;
     }
 }
 
@@ -40,6 +66,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     std::string line;
     std::vector<Vertex> vertexes;
     std::vector<Vec4> vns;
+    std::vector<Tex3> vts;
 
     std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
@@ -49,7 +76,7 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
     mesh->name = filename;
     while (std::getline(file, line))
     {
-        std::strstream ss;
+        std::stringstream ss;
         std::string type;
 
         ss << line;
@@ -68,8 +95,6 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         }
         else if (type == "f")
         {
-            // @todo: store vt and vn values
-
             // face
             // can be:
             // - int
@@ -77,15 +102,15 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
             // - int/int/int
             //  int//int
             std::string fs;
-            std::array<int,3> v_;
-            std::array<int,3> vt_;
-            std::array<int, 3> vn_;
+            std::array<int, 3> v_ = {};
+            std::array<int, 3> vt_ = {};
+            std::array<int, 3> vn_ = {};
             bool has_vt = true;
             bool has_vn = true;
             for (int i = 0; i < 3; ++i)
             {
                 ss >> fs;
-                std::strstream ssf;
+                std::stringstream ssf;
                 ssf << fs;
                 std::string sv, svt, svn;
                 std::getline(ssf, sv, '/');
@@ -113,12 +138,10 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
                 }
             }
             
-            const std::array<unsigned short, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
-            //mesh->faces_index.push_back(face_index);
-
+            const std::array<int, 3> face_index = { v_[0] - 1, v_[1] - 1, v_[2] - 1 };
             // Vertex normals, if presents
             if (has_vn) {
-                const std::array<unsigned short, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
+                const std::array<int, 3> fni = { vn_[0] - 1, vn_[1] - 1, vn_[2] - 1 };
                 for (int i = 0; i < 3; i++) {
                     vertexes.at(face_index[i]).normal = vns.at(fni[i]);
                 }
@@ -126,7 +149,10 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
 
             // Vertex textures, if presents
             if (has_vt) {
-                // todo
+                const std::array<int, 3> fti = { vt_[0] - 1, vt_[1] - 1, vt_[2] - 1 };
+                for (int i = 0; i < 3; i++) {
+                    vertexes.at(face_index[i]).texture = vts.at(fti[i]);
+                }
             }
 
             mesh->tris.emplace_back(vertexes.at(face_index[0]), vertexes.at(face_index[1]), vertexes.at(face_index[2]));
@@ -134,6 +160,9 @@ std::shared_ptr<Mesh>  Mesh::loadFromOBJFile(const std::string& filename)
         else if (type == "vt")
         {
             // vertex texture
+            Tex3 t;
+            ss >> t.u >> t.v >> t.w;
+            vts.push_back(t);
         }
         else if (type == "vn")
         {
@@ -231,4 +260,20 @@ void Mesh::computeVertextNormals()
         tris[i].b.normal = vns[1];
         tris[i].c.normal = vns[2];
     }
+}
+
+void Mesh::setTexture(const std::shared_ptr<Image> texture) noexcept
+{
+    _texture = texture;
+    // The triangles should be
+    // references directly to this
+    // pointer so if it changes,
+    // the will change too.
+    // But anyway for now is ok.
+    // This might allow multi-mesh-textures,
+    // even though it won't be the right approach
+    for (auto& t : tris) {
+        t.texImg = texture;
+    }
+    setShowTexture(true);
 }

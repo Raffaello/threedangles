@@ -39,7 +39,10 @@ public:
     //Vec4& operator*=(const Mat4& m) noexcept;
 
     // should make sense to have a "Plane" class instead of Vec4 for plane?
+    // TODO: This work only when w=1 before the normByW is called. so clipping against
+    //       screen *MUST* be done before projecting into 2D with this routine.
     Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd) const noexcept;
+    Vec4 intersectPlane(const Vec4& plane_n, const Vec4& lineStart, const Vec4& lineEnd, float& out_t) const noexcept;
 
 //private:
     float x = 0.0f;

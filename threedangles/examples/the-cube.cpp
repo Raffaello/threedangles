@@ -1,4 +1,4 @@
-﻿// threedangles.cpp : Defines the entry point for the application.
+// threedangles.cpp : Defines the entry point for the application.
 //
 
 #include <cstdint>
@@ -70,13 +70,12 @@ void gpu_features()
             << "Name:       " << devProp.name << " - " << devProp.major << "." << devProp.minor << endl
             << "Global Mem: " << devProp.totalGlobalMem << endl
             << "Shared Mem: " << devProp.sharedMemPerBlock << endl
-        ;
+            ;
     }
 #else
     cout << "No CUDA 11 available" << endl;
 #endif
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -89,18 +88,19 @@ int main(int argc, char* argv[])
     uint32_t frameTime_ms = 1000 / FPS;
     Color black = { 0, 0, 0, SDL_ALPHA_OPAQUE };
 
-    std::string title = "ThreeDangles";
+    std::string title = "The Cube";
     auto engine = Engine::createEngineSDL(title, width, height);
     if (engine == nullptr) {
         cerr << "can't init engine" << endl;
         return -1;
     }
     auto screen = engine->getScreen();
-    
+
     SDL_Log("FPS CAP ~= %d", FPS);
     SDL_Log("frame_time = %d", frameTime_ms);
 
-    auto mesh = Mesh::loadFromOBJFile("tex_suzanne.obj");
+    // Mesh
+    auto mesh = Mesh::loadFromOBJFile("texture_cube.obj");
     if (nullptr == mesh) {
         cerr << "Can't load OBJ file";
         return -2;
@@ -112,10 +112,9 @@ int main(int argc, char* argv[])
         t.b.col.b = 255;
         t.c.col.g = 255;
     }
-
     // Mesh - add texture
     std::shared_ptr<Image> image = std::make_shared<sdl::Image_SDL>();
-    if (!image->loadPNG("Suzanne.png"))
+    if (!image->loadPNG("wood.png"))
     {
         cerr << "Can't load texture";
         return -3;
@@ -128,27 +127,27 @@ int main(int argc, char* argv[])
     const float fov = 50.0f;
     const float zfar = 100.0f;
     const float znear = .5f;
-    
+
     engine->initPerspectiveProjection(fov, zfar, znear);
+    engine->showHiddenVertexes = false;
+    engine->filled = 0;
+    engine->illuminationOn = 0;
+
     // Cam
     Cam cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f));
-
     // Light
     Light light(Vec4(.0f, 0.0f, -1.0f), { 80, 32, 64, 255 });
     engine->addLight(light);
-    Light light2(Vec4(1.0f, 3.0f, -1.0f), { 0, 255, 255, 255 });
-    //engine->addLight(light2);
     // offset params
     Vec4 translation(0.0f, 0.0f, 0.0f);
     bool quit = false;
     unsigned int tot_frames = 0;
     uint32_t frame_start_ticks = SDL_GetTicks();
     bool perspectiveCorrection = false;
-    bool zbuf = true;
+    bool rotation = false;
     while (!quit)
     {
         uint32_t startTicks = SDL_GetTicks();
-        //uint64_t start_perf = SDL_GetPerformanceCounter();
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
@@ -176,14 +175,6 @@ int main(int argc, char* argv[])
                 case SDLK_f:
                     engine->filled++; engine->filled %= 3;
                     SDL_Log("Filling Triangles = %d", engine->filled);
-                    break;
-                case SDLK_KP_PLUS:
-                    translation.z += 0.5f;
-                    SDL_Log("offset = %f", translation.z);
-                    break;
-                case SDLK_KP_MINUS:
-                    translation.z -= 0.5f;
-                    SDL_Log("offset = %f", translation.z);
                     break;
                 case SDLK_UP:
                     cam.position.y += 1.0f;
@@ -215,23 +206,14 @@ int main(int argc, char* argv[])
                     cam.moveBackward();
                     SDL_Log("cam (%f, %f, %f)", cam.position.x, cam.position.y, cam.position.z);
                     break;
-                /*case SDLK_q:
-                    cam.rollCCW();
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
-                    break;
-                case SDLK_e:
-                    cam.rollCW();
-                    SDL_Log("cam (%f, %f, %f, %f)", cam.position.x, cam.position.y, cam.position.z, cam.roll);
-                    break;*/
                 case SDLK_p:
                     perspectiveCorrection = !perspectiveCorrection;
                     engine->setPerpsectiveCorrection(perspectiveCorrection);
                     SDL_Log("perspective Correction %d", perspectiveCorrection);
                     break;
-                case SDLK_z:
-                    zbuf = !zbuf;
-                    engine->setZBuffer(zbuf);
-                    SDL_Log("Z buffer %d", zbuf);
+                case SDLK_r:
+                    rotation = !rotation;
+                    SDL_Log("rotation on %d", rotation);
                     break;
                 case SDLK_t:
                     mesh->setShowTexture(!mesh->showTexture);
@@ -250,36 +232,30 @@ int main(int argc, char* argv[])
         }
 
         // Rotation
-        float alpha = 1.0f * SDL_GetTicks() / 1000.0f;
-        //alpha = 0.0f;
-        //alpha = alpha = 4;
+        float alpha = 0.0f;
+        if (rotation)
+            alpha = 1.0f * SDL_GetTicks() / 1000.0f;
         Mat4 matRotZ = Mat4::createRotationZ(alpha);
-        Mat4 matRotY = Mat4::createRotationY(alpha*0.1f);
         Mat4 matRotX = Mat4::createRotationX(alpha * 0.5f);
-        
+
         // Translation
         Mat4 matTrans = Mat4::createTranslation(translation);
         // World Matrix
-        engine->setMatrixWorld(matTrans * matRotZ * matRotY * matRotX);
+        engine->setMatrixWorld(matTrans * matRotZ * matRotX);
         // Camera Matrix
         engine->setMatrixView(cam.matrixView());
-        // @todo there is a bug on the normal and light when "mounted on the cam"?
-        //light.direction_normalized = cam.position.normalize();
-        // Process the triangles.
         engine->processFrame(cam, black);
         tot_frames++;
         // FPS frame rate cap
         const uint32_t endTicks = SDL_GetTicks();
-        //uint64_t endPerf = SDL_GetPerformanceCounter();
         const uint32_t totTicks = (endTicks - startTicks);
         const uint32_t frameTicks = endTicks - frame_start_ticks;
         uint32_t frameDelay = 0;
 
         if (totTicks < frameTime_ms)
             frameDelay = frameTime_ms - totTicks;
-        
+
         screen->setTitle(title + " FPS: ~" + std::to_string(1000.0f / totTicks) + " AVG: " + std::to_string(tot_frames * 1000.0f / frameTicks));
-        //SDL_Log("s=%d -- e=%d, d=%u", startTicks, endTicks, frameDelay);
         SDL_Delay(frameDelay);
         if (frameTicks >= 5000) {
             tot_frames = 0;

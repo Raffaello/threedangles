@@ -16,6 +16,9 @@ public:
     Vertex b;
     Vertex c;
     //std::array<Vertex, 3> p;
+    // Mesh texture copied to the triangle, used in vertexes a,b,c
+    std::shared_ptr<Image> texImg = nullptr;
+    bool showTexture = false;
 
     Triangle operator*(const Mat4& m) const noexcept;
     Triangle& operator*=(const Mat4& m) noexcept;
@@ -28,4 +31,6 @@ public:
     // Used for back-face culling and flat-shading
     Vec4 faceNormal() const noexcept;
     Vec4 faceNormal_;
+ 
+    
 };

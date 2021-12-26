@@ -67,7 +67,7 @@ namespace sdl
 
     inline void Screen_SDL::drawPixel(const int x, const int y) noexcept
     {
-        assert(x >= 0 && x < width&& y >= 0 && y < height);
+        assert(x >= 0 && x < width && y >= 0 && y < height);
         // writing multiple horizontal pixels at time could
         // be more performant, like using a memcpy
         //uint32_t* buf = reinterpret_cast<uint32_t*>(pxl + y * pitch);

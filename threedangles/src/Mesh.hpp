@@ -22,7 +22,13 @@ public:
         std::vector<Triangle>& out) const noexcept;
 
     bool visible = true;
+    bool showTexture = false;
 
+    // This might not be the best iterate through all triangles
+    // to change that, but at the moment is acceptable.
+    void setShowTexture(const bool show) noexcept;
+    
+    
     /**
      * @brief Load .OBJ file
      * @link  https://en.wikipedia.org/wiki/Wavefront_.obj_file
@@ -33,19 +39,13 @@ public:
 
     void computeAdjacencyList();
     void computeVertextNormals();
+    void setTexture(const std::shared_ptr<Image> texture) noexcept;
 
     // @todo add mesh position in the world. ?
 
-    // Store the list of vertexes and the faces like the OBJ file model.
-    // from this point can derive the adiajency list for each vertex related to faces.
-
-    // compute the surface normals of each triangle too as a post-loading operation.
-    
-    // compute the vertex normals too
-    
-
-    std::vector<Triangle> tris; // ?
+    std::vector<Triangle> tris;
     std::string name;
-    
     std::vector<std::array<std::vector<unsigned short>,3>> adjacency_index;
+private:
+    std::shared_ptr<Image> _texture = nullptr;
 };
