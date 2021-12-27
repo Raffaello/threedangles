@@ -68,7 +68,7 @@ The implementation will be based on :
 ![alt text](screenshots/vertex-coloring_fill.png 'fill')
 ![alt text](screenshots/vertex-coloring_fill_perspective.png 'perspective')
 
-### Cube
+### The Cube
 
 
 ## Compiling
