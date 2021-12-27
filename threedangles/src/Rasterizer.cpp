@@ -448,7 +448,7 @@ NEXT:
     }
 }
 
-void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept
+void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<std::shared_ptr<Light>>& lights) const noexcept
 {
     // Pineda algorithm, traversal bounding box, not incremental edge function
     // Not efficient implementation.
@@ -527,7 +527,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
         int r = 0; int g = 0; int b = 0; int a = 0;
         for (const auto& light : lights)
         {
-            Color col = light.flatShading(triangle.faceNormal_);
+            Color col = light->flatShading(triangle.faceNormal_);
             r += col.r; g += col.g; b += col.b; a += col.a;
         }
 
@@ -539,9 +539,9 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     else if (illuminationType == 2)
     {
         // Gouraud
-        c1 = lights[0].flatShading(triangle.a.normal);
-        c2 = lights[0].flatShading(triangle.b.normal);
-        c3 = lights[0].flatShading(triangle.c.normal);
+        c1 = lights[0]->flatShading(triangle.a.normal);
+        c2 = lights[0]->flatShading(triangle.b.normal);
+        c3 = lights[0]->flatShading(triangle.c.normal);
     }
 
     Tex3 ta;

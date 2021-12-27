@@ -85,7 +85,7 @@ public:
     // Cam
     Cam cam;
     // Light
-    Light light;
+    std::shared_ptr<Light> light;
     // Projection Matrix
     const float fov = 50.0f;
     const float zfar = 100.0f;
@@ -111,7 +111,7 @@ public:
         : title(title), width(width), height(height),
         fov(fov),zfar(zfar),znear(znear),
         cam(Vec4(0.0f, 0.0f, -5.0f), Vec4(0.0f, 1.0f, 0.0f)),
-        light(Vec4(.0f, 0.0f, -1.0f), Color(80, 32, 64)),
+        //light(Vec4(.0f, 0.0f, -1.0f), Color(80, 32, 64)),
         translation(0.0f, 0.0f, 0.0f)
     {
         engine = Engine::createEngineSDL(title, width, height);
@@ -122,6 +122,7 @@ public:
         SDL_Log("FPS CAP ~= %d", FPS);
         SDL_Log("frame_time = %d", frameTime_ms);
         
+        light = std::make_shared<Light>(Vec4(.0f, 0.0f, -1.0f), Color(80, 32, 64));
         engine->addLight(light);
         
         engine->initPerspectiveProjection(fov, zfar, znear);

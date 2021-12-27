@@ -47,7 +47,7 @@ public:
     short filled = 1;
 
     void addMesh(const std::shared_ptr<Mesh>& mesh);
-    void addLight(const Light& light);
+    void addLight(const std::shared_ptr<Light>& light);
     // @todo add the "remove/update/set method" for mesh and light
 
 private:
@@ -71,7 +71,7 @@ private:
     Mat4 _matView;
 
     std::vector<Triangle> _trianglesToRaster;
-    std::vector<Light> _lights;
+    std::vector<std::shared_ptr<Light>> _lights;
     uint8_t _lightCounts = 1;
     std::vector<std::shared_ptr<Mesh>> _meshes;
 };

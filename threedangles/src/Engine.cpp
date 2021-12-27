@@ -88,7 +88,7 @@ void Engine::addMesh(const std::shared_ptr<Mesh>& mesh)
     _meshes.push_back(mesh);
 }
 
-void Engine::addLight(const Light& light)
+void Engine::addLight(const std::shared_ptr<Light>& light)
 {
     _lights.push_back(light);
     _lightCounts = _lights.size();

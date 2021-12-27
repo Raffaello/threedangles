@@ -44,7 +44,7 @@ public:
      * @link  "doc/A Parallel Algorithm for Polygon Rasterization.pdf"
      * THIS IS a lot slower than 'fillTriangle', need improvements
     */
-    void fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<Light>& lights) const noexcept;
+    void fillTriangle3(const Triangle& triangle, const int illuminationType, const std::vector<std::shared_ptr<Light>>& lights) const noexcept;
 
     // @todo color vertex interpolation? let see later...
     void drawLine(int x1, int y1, const int x2, const int y2) const noexcept;
