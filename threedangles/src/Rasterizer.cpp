@@ -549,7 +549,7 @@ void Rasterizer::fillTriangle3(const Triangle& triangle, const int illuminationT
     Tex3 tc;
     Color ct;
 
-    if (perspectiveCorrection && illuminationType != 1)
+    if (perspectiveCorrection)
     {
         c1r = w1 * c1.r; c1g = w1 * c1.g; c1b = w1 * c1.b;
         c2r = w2 * c2.r; c2g = w2 * c2.g; c2b = w2 * c2.b;
