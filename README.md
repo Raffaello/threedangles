@@ -18,6 +18,7 @@ It will feature the following algorithms (foundations):
 - [x] Flat-Shading
 - [x] Vertex Normals
 - [x] Gouraud Shading
+- [x] Perspective Correction
 - [ ] Phong Shading
 
 Something to leave for the future due to time....
