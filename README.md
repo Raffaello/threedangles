@@ -54,23 +54,6 @@ The implementation will be based on :
 - [ ] SIMD instructions
 - [ ] GPU
 
-
-## Examples
-
-### Vertex Coloring
-
-- wireframe
-
-![alt text](screenshots/vertex-coloring_wireframe.png 'wireframe')
-
-- fill & perspective
-
-![alt text](screenshots/vertex-coloring_fill.png 'fill')
-![alt text](screenshots/vertex-coloring_fill_perspective.png 'perspective')
-
-### The Cube
-
-
 ## Compiling
 
 Use `CMake` and eventually `vcpkg` for package management.
