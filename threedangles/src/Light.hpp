@@ -8,7 +8,7 @@ class Light
 {
 public:
     Light(const Vec4& direction, const Color& color);
-    const Vec4 direction; // (0.0f, 0.0f, -1.0f);
+    Vec4 direction; // (0.0f, 0.0f, -1.0f);
     Vec4 direction_normalized; // = light_direction.normalize();
     Color col;
 
