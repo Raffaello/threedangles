@@ -44,7 +44,7 @@ public:
      * 4 = quad clipped | v0,v1,v2',v3 => 1 triangle returning 2 triangles => (v0,v1,v2'), (v0,v1,v3)
      * -1 = error unreachable step.
     */
-    int clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4 v2, Vec4& v3) const noexcept;
+    int clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4& v2, Vec4& v3) const noexcept;
 
     // @todo replace with std::lerp when C++20
     static inline float lerp(const float a, const float b, const float t) noexcept;
