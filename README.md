@@ -100,7 +100,7 @@ using CUDA won't change too much, especially with the usage of the `thrust` libr
 - [ ] various compiler switches
 
 #### Note on compilers
-It looks like compilers are already using some SIMD from default C/C++ code.
+Compilers are capable of using SIMD / Vectorization from default C/C++ code.
 
 - [ ] add specific compiler options on CMAKE configuration, to enhanche performances.
 
