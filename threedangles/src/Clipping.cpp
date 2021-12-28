@@ -201,7 +201,7 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
     return -1;
 }
 
-int Clipping::clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4 v2, Vec4& v3) const noexcept
+int Clipping::clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4& v2, Vec4& v3) const noexcept
 {
     // Distances to the plane ( this is an array parallel
     // to v[], stored as a vec3 )
