@@ -200,3 +200,72 @@ int Clipping::againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& 
 
     return -1;
 }
+
+int Clipping::clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4 v2, Vec4& v3) const noexcept
+{
+    // Distances to the plane ( this is an array parallel
+    // to v[], stored as a vec3 )
+    Vec4 dist = Vec4(v0.dotProd(n), v1.dotProd(n), v2.dotProd(n));
+    const float clipEpsilon = 0.00001, clipEpsilon2 = 0.01;
+
+    
+    if (!(dist.x >= clipEpsilon2 ||
+        dist.y >= clipEpsilon2 ||
+        dist.z >= clipEpsilon2))
+        return 0; // all clipped
+
+    if (dist.x >= -clipEpsilon &&
+        dist.y >= -clipEpsilon &&
+        dist.z >= -clipEpsilon)
+        return 3; // none clipped
+
+    // There are either 1 or 2 vertices above the clipping plane .
+    const std::array<bool, 3> above = { dist.x >= 0.0f, dist.y >= 0.0f, dist.z >= 0.0f };
+    bool nextIsAbove;
+    // Find the CCW - most vertex above the plane .
+    if (above[1] && !above[0]) {
+        // Cycle once CCW. Use v3 as a temp
+        nextIsAbove = above[2];
+        v3 = v0; v0 = v1; v1 = v2; v2 = v3;
+        //dist = dist.yzx;
+        const float x = dist.x;
+        dist.x = dist.y;
+        dist.y = dist.z;
+        dist.z = x;
+    }
+    else if (above[2] && !above[1]) {
+        // Cycle once CW. Use v3 as a temp .
+        nextIsAbove = above[0];
+        v3 = v2; v2 = v1; v1 = v0; v0 = v3;
+        //dist = dist.zxy;
+        const float z = dist.z;
+        dist.z = dist.y;
+        dist.y = dist.x;
+        dist.x = z;
+    }
+    else nextIsAbove = above[1];
+
+    // We always need to clip v2 -v0.
+    //v3 = mix(v0, v2, dist[0] / (dist[0] - dist[2]));
+    v3 = Clipping::lerp(v0, v2, dist.x / (dist.x - dist.z));
+
+    if (nextIsAbove) {
+        // Case 3 (returning 2 stripped triangles)
+        // Triangle (v0,v1,v2') , Triangle(v0, v1, v3)
+        //v2 = mix(v1, v2, dist[1] / (dist[1] - dist[2]));
+        v2 = Clipping::lerp(v1, v2, dist.y / (dist.y - dist.z));
+        return 4;
+    }
+    else {
+        // Case 4
+        // Triangle (v0,v1',v2')
+        //v1 = mix(v0, v1, dist[0] / (dist[0] - dist[1]));
+        v1 = Clipping::lerp(v0, v1, dist.x / (dist.x - dist.y));
+        v2 = v3; v3 = v0;
+        return 3;
+    }
+
+    // unreachable code
+    assert(false);
+    return -1;
+}

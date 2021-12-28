@@ -118,3 +118,4 @@ Papers, documentations and specs (available also in the `/doc` folder):
 - [Fundamentals of Texture Mapping and Image Warping](https://www2.eecs.berkeley.edu/Pubs/TechRpts/1989/5504.html)
 - [Triangle Scan Conversion using 2D Homogeneous Coordinates (1997)](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.7279)
 - [Hyperbolic Interpolation](https://www.semanticscholar.org/paper/Hyperbolic-Interpolation-Blinn/bd49758a125e441deed1f4e761f8bd33b8fdb7d0)
+- [Efficient Triangle and Quadrilateral Clipping within Shaders](https://www.tandfonline.com/doi/abs/10.1080/2151237X.2011.619891?journalCode=ujgt20)

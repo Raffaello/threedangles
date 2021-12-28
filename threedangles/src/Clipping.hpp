@@ -30,6 +30,22 @@ public:
     //       clipping in the screen should use against a line instead of a plane ...
     int againstPlane(const Triangle& in, const Vec4& plane_p, const Vec4& plane_n, Triangle& out_tri1, Triangle& out_tri2) const noexcept;
 
+    /**
+     * Not used yet 
+     * @brief fast clipping
+     * @param n normal plane
+     * @param v0 triangle.a
+     * @param v1 triangle.b
+     * @param v2 triangle.c
+     * @param v3 the extra vertex for the 2nd triangle eventually
+     * @return number of vectors(vertexes) 0, 3, 4
+     * 0 = all clipped
+     * 3 = none clipped | v0,v1',v2' => 1 triangle clipped to a new one
+     * 4 = quad clipped | v0,v1,v2',v3 => 1 triangle returning 2 triangles => (v0,v1,v2'), (v0,v1,v3)
+     * -1 = error unreachable step.
+    */
+    int clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4 v2, Vec4& v3) const noexcept;
+
     // @todo replace with std::lerp when C++20
     static inline float lerp(const float a, const float b, const float t) noexcept;
     static inline Vec4 lerp(const Vec4& a, const Vec4& b, const float t) noexcept;
