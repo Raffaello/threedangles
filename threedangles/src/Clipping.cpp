@@ -206,7 +206,8 @@ int Clipping::clip3(const Vec4& n, Vec4& v0, Vec4& v1, Vec4& v2, Vec4& v3) const
     // Distances to the plane ( this is an array parallel
     // to v[], stored as a vec3 )
     Vec4 dist = Vec4(v0.dotProd(n), v1.dotProd(n), v2.dotProd(n));
-    const float clipEpsilon = 0.00001, clipEpsilon2 = 0.01;
+    const float clipEpsilon = 0.00001f;
+    const float clipEpsilon2 = 0.01f;
 
     
     if (!(dist.x >= clipEpsilon2 ||
