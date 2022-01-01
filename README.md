@@ -31,6 +31,7 @@ Something to leave for the future due to time....
 - [ ] Materials
 - [ ] advanced lighting
 - [ ] Lines Anti-Aliasing
+- [ ] biliniear interpolation
 
 Curves & Surfaces:
 
