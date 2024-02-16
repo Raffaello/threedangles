@@ -7,7 +7,7 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_DEBUG_POSTFIX d)
 
 find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2-image CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
 
 if (WIN32)
     set(LIB_SDL2main SDL2::SDL2main)
@@ -48,7 +48,10 @@ target_include_directories(engine_obj PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CUDAToolkit_INCLUDE_DIRS}
 )
-target_link_libraries(engine_obj PUBLIC SDL2::SDL2 ${LIB_SDL2main} SDL2::SDL2_image)
+target_link_libraries(engine_obj PUBLIC
+    SDL2::SDL2 ${LIB_SDL2main}
+    $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
+)
 
 ##### ---- #####
 add_executable(threedangles "threedangles.cpp")
